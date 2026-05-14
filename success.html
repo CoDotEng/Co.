@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Received | CODOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE CSS --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1, .logo { font-family: 'Space Grotesk', sans-serif; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+
+        /* --- NAVIGATION (Simplified for this page) --- */
+        nav {
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: transparent; z-index: 1000;
+        }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
+
+        /* --- SUCCESS MESSAGE CONTENT --- */
+        .success-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+        p { font-size: 1.2rem; color: var(--text-muted); max-width: 500px; margin-bottom: 2.5rem; }
+
+        .btn-group {
+            display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem; background-color: var(--accent); color: var(--bg-color);
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
+            border-radius: 4px; transition: all 0.3s ease;
+        }
+        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+        .btn-outline {
+            padding: 1rem 2rem; background-color: transparent; color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; border-radius: 4px; transition: all 0.3s ease;
+        }
+        .btn-outline:hover { border-color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
+    </nav>
+
+    <div class="success-container">
+        <div class="icon-circle">
+            <!-- Checkmark SVG -->
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h1>Application Received<span class="dot">.</span></h1>
+        <p>Thank you for applying. Our team will review your business details and get back to you within 48 hours regarding the next steps.</p>
+        
+        <div class="btn-group">
+            <a href="index.html" class="btn">Return Home</a>
+            <a href="work.html" class="btn-outline">View Portfolio</a>
+        </div>
+    </div>
+
+</body>
+</html>
