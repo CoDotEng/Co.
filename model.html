@@ -91,40 +91,29 @@
         .step-content p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem; }
         .highlight { color: var(--text-main); font-weight: 600; }
 
-        /* --- FAQ SECTION (Accordion) --- */
-        .faq-container { max-width: 800px; margin: 0 auto; }
-        details {
+        /* --- ADVANTAGE GRID --- */
+        .advantage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .adv-card {
             background: var(--surface-color);
-            margin-bottom: 1rem;
-            border-radius: 4px;
+            padding: 2.5rem;
+            border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.05);
-            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
-        summary {
-            padding: 1.5rem;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .adv-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
         }
-        summary::-webkit-details-marker { display: none; }
-        summary:after {
-            content: '+';
+        .adv-card h3 {
             color: var(--accent);
+            margin-bottom: 1rem;
             font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-        details[open] summary:after { transform: rotate(45deg); }
-        details p {
-            padding: 0 1.5rem 1.5rem 1.5rem;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 1rem;
-            padding-top: 1rem;
         }
 
         /* --- CTA --- */
@@ -216,31 +205,26 @@
         </div>
     </section>
 
-    <!-- NEW PARTNERSHIP FAQ SECTION -->
+    <!-- THE MUTUAL ADVANTAGE SECTION (Replaces the FAQ) -->
     <section class="section" style="background-color: var(--bg-color);">
-        <h2 class="section-title reveal">Partnership FAQ.</h2>
-        <p class="reveal" style="text-align: center; color: var(--text-muted); margin-bottom: 3rem; margin-top: -2rem;">Everything you need to know about our zero-risk development model.</p>
+        <h2 class="section-title reveal">The Mutual Advantage.</h2>
+        <p class="reveal" style="text-align: center; color: var(--text-muted); margin-bottom: 4rem; margin-top: -2rem;">Why our zero-risk model outperforms traditional web agencies.</p>
         
-        <div class="faq-container">
-            <details class="reveal">
-                <summary>How are advertisements integrated into the design?</summary>
-                <p>We are a premium design agency first. Advertisements are integrated seamlessly into the layout—similar to a high-end digital magazine—ensuring they never disrupt the user experience. We exclusively partner with high-quality ad networks.</p>
-            </details>
+        <div class="advantage-grid">
+            <div class="adv-card reveal">
+                <h3>Financial Freedom</h3>
+                <p>Keep your capital. Instead of dropping $5,000+ on a website build, you can invest that money directly into your marketing, product development, or team.</p>
+            </div>
             
-            <details class="reveal">
-                <summary>Is there an option to remove the ads in the future?</summary>
-                <p>Yes. We offer a flexible Buyout Clause. If your business scales and you prefer an ad-free experience, you can purchase the website code, design rights, and transition off our hosting for a pre-agreed flat fee.</p>
-            </details>
+            <div class="adv-card reveal">
+                <h3>Aligned Incentives</h3>
+                <p>Traditional agencies get paid regardless of how your site performs. We only generate ad revenue if your site actually gets traffic. Your success is literally our success.</p>
+            </div>
 
-            <details class="reveal">
-                <summary>Who retains ownership of the domain and assets?</summary>
-                <p>You will always retain 100% ownership of your domain name and brand assets. CODOT simply retains ownership of the underlying code while it operates under our free ad-supported hosting. If you exercise the Buyout Clause, full code ownership transfers to you.</p>
-            </details>
-
-            <details class="reveal">
-                <summary>What criteria do you use to select partners?</summary>
-                <p>Because we invest heavily upfront in design and development, we cannot accept every project. We select partners based on current web traffic, business growth potential, and industry fit to ensure the partnership is mutually beneficial.</p>
-            </details>
+            <div class="adv-card reveal">
+                <h3>Zero Maintenance</h3>
+                <p>Never worry about plugin updates, server crashes, or expensive hosting fees again. We handle 100% of the technical upkeep for the lifetime of our partnership.</p>
+            </div>
         </div>
     </section>
 
