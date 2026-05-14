@@ -130,12 +130,12 @@
 
     <!-- FORM SECTION -->
     <section class="form-section reveal">
-        <!-- REPLACE THE ACTION URL WITH YOUR FORMSPREE ENDPOINT -->
-        <form class="application-form" action="https://formspree.io/f/YOUR_ENDPOINT_HERE" method="POST">
+        <!-- THE FORMSPREE ENDPOINT IS INJECTED HERE -->
+        <form class="application-form" action="https://formspree.io/f/mrejwply" method="POST">
             
-            <!-- MAGIC REDIRECT: This sends them to your custom success page -->
-            <!-- IMPORTANT: Change this value to your actual GitHub Pages URL once it's live -->
-            <input type="hidden" name="_next" value="https://YOUR_USERNAME.github.io/YOUR_REPO/success.html">
+            <!-- MAGIC REDIRECT -->
+            <!-- IMPORTANT NOTE: Once your GitHub Pages site is live, change the value below to your exact live URL (e.g., value="https://yourusername.github.io/your-repo/success.html") -->
+            <input type="hidden" name="_next" value="success.html">
             
             <!-- Anti-Spam Honeypot -->
             <input type="text" name="_gotcha" style="display:none" />
