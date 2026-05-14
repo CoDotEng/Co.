@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODOT | Premium Web Design Agency</title>
+    <title>CODOT | The Zero-Risk Web Agency</title>
     <!-- Google Fonts: Space Grotesk for Headings, Inter for Body -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,7 @@
             --surface-color: #121212;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
-            --accent: #00e5ff; /* Neon Cyan for the "DOT" */
+            --accent: #00e5ff; /* Neon Cyan */
             --accent-glow: rgba(0, 229, 255, 0.4);
         }
 
@@ -82,6 +82,18 @@
             color: var(--accent);
         }
 
+        .nav-btn {
+            background-color: var(--accent);
+            color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 700 !important;
+        }
+
+        .nav-btn:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
         /* --- HERO SECTION --- */
         .hero {
             height: 100vh;
@@ -95,7 +107,7 @@
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 6vw, 5rem);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
             line-height: 1.1;
             margin-bottom: 1.5rem;
         }
@@ -103,7 +115,7 @@
         .hero p {
             font-size: 1.2rem;
             color: var(--text-muted);
-            max-width: 600px;
+            max-width: 650px;
             margin-bottom: 2.5rem;
         }
 
@@ -118,6 +130,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-radius: 4px;
+            display: inline-block;
         }
 
         .btn:hover {
@@ -126,18 +139,25 @@
             box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        /* --- PORTFOLIO SECTION --- */
+        /* --- SECTIONS & GRIDS --- */
         .section {
             padding: 6rem 5%;
         }
 
         .section-title {
             font-size: 2.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             text-align: center;
         }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+            font-size: 1.1rem;
+        }
 
-        .portfolio-grid {
+        .grid-3 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
@@ -149,7 +169,7 @@
             background: var(--surface-color);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 8px;
-            padding: 2rem;
+            padding: 2.5rem;
             transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
@@ -161,6 +181,16 @@
         .card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
+        }
+        
+        .step-number {
+            color: var(--accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+            display: block;
         }
 
         .card p {
@@ -180,36 +210,20 @@
             text-shadow: 0 0 10px var(--accent-glow);
         }
 
-        /* --- CONTACT SECTION --- */
-        .contact-form {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 1rem;
-            background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            border-radius: 4px;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
+        /* --- CTA SECTION --- */
+        .cta-section {
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-color) 0%, var(--surface-color) 100%);
+            padding: 8rem 5%;
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         footer {
             text-align: center;
             padding: 3rem 5%;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 4rem;
+            background-color: var(--surface-color);
             color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         /* --- ANIMATIONS --- */
@@ -225,83 +239,79 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; } /* Simplified mobile nav for now */
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION -->
+    <!-- NAVIGATION (Now fully linked for a multipage setup) -->
     <nav>
-        <a href="#" class="logo">Co<span class="dot">.</span></a>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
-            <a href="#work">Work</a>
-            <a href="#services">Services</a>
-            <a href="#contact">Contact</a>
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
-    <!-- HERO -->
+    <!-- HERO: The Zero-Risk Pitch -->
     <section class="hero">
-        <h1 class="reveal">Stand Out.<br>We'll Handle the Code<span class="dot">.</span></h1>
-        <p class="reveal">CODOT builds lightning-fast, high-converting websites designed to scale your business.</p>
-        <a href="#contact" class="btn reveal">Get a Free Quote</a>
+        <h1 class="reveal">We Build First.<br>You Pay If You Love It<span class="dot">.</span></h1>
+        <p class="reveal">High-performance, custom-coded websites built exclusively on our zero-risk, ad-supported partnership model.</p>
+        <a href="apply.html" class="btn reveal">Apply for a Website</a>
     </section>
 
-    <!-- PORTFOLIO -->
+    <!-- THE PARTNERSHIP MODEL (Replaces generic services) -->
+    <section id="model" class="section" style="background-color: var(--surface-color);">
+        <h2 class="section-title reveal">The CODOT Partnership</h2>
+        <p class="section-subtitle reveal">A radically transparent way to get a premium website for your business.</p>
+        
+        <div class="grid-3">
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">01</span>
+                <h3>The Free Build</h3>
+                <p>We design and code a blazing-fast, custom website tailored perfectly to your brand. You pay $0 upfront for our development time.</p>
+            </div>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">02</span>
+                <h3>The Approval</h3>
+                <p>Review the live staging site. If you love it, you simply cover the cost of your custom domain and backend setup. Don't like it? Walk away, no questions asked.</p>
+            </div>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">03</span>
+                <h3>Ad-Supported Hosting</h3>
+                <p>We host and maintain your site for free forever. In exchange, we seamlessly integrate high-quality ad spaces. You get a world-class site; we share in the success.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROOF / WORK SECTION -->
     <section id="work" class="section">
-        <h2 class="section-title reveal">Selected Work</h2>
-        <div class="portfolio-grid">
-            <!-- Project 1: Gravity Research -->
-            <div class="card reveal">
-                <h3>Gravity Research</h3>
-                <p>A modern, responsive landing environment built to present research insights with clarity and speed.</p>
-                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="card-link">View Live Site &rarr;</a>
-            </div>
-            
-            <!-- Project 2: Placeholder for future work -->
-            <div class="card reveal" style="opacity: 0.5; border: 1px dashed rgba(255,255,255,0.2);">
-                <h3>Your Next Project</h3>
-                <p>We are currently accepting new clients. Let's build something extraordinary together.</p>
-                <span class="card-link" style="color: var(--text-muted);">Available for Work</span>
+        <h2 class="section-title reveal">Built for Speed.</h2>
+        <p class="section-subtitle reveal">See what an ad-supported, premium website looks like.</p>
+        
+        <div class="grid-3" style="grid-template-columns: 1fr; max-width: 800px;">
+            <!-- Project Highlight: Gravity Research -->
+            <div class="card reveal" style="text-align: center; padding: 4rem 2rem;">
+                <h3 style="font-size: 2rem;">Gravity Research</h3>
+                <p style="max-width: 500px; margin: 0 auto 2rem auto;">A modern, responsive landing environment built to present research insights. 100/100 Lighthouse performance score. Launched under the CODOT Partnership Model.</p>
+                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="card-link" style="font-size: 1.1rem;">View Live Site &rarr;</a>
             </div>
         </div>
     </section>
 
-    <!-- SERVICES -->
-    <section id="services" class="section" style="background-color: var(--surface-color);">
-        <h2 class="section-title reveal">What We Do</h2>
-        <div class="portfolio-grid">
-            <div class="card reveal" style="background-color: var(--bg-color);">
-                <h3>High-Speed Websites</h3>
-                <p>Static sites optimized for 100/100 Lighthouse scores, ensuring your customers never wait for a page to load.</p>
-            </div>
-            <div class="card reveal" style="background-color: var(--bg-color);">
-                <h3>Responsive Design</h3>
-                <p>Flawless execution across mobile, tablet, and desktop screens.</p>
-            </div>
-            <div class="card reveal" style="background-color: var(--bg-color);">
-                <h3>Conversion Focused</h3>
-                <p>Clean UI/UX design that guides your visitors directly to your checkout or contact form.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section">
-        <h2 class="section-title reveal">Let's Talk</h2>
-        <!-- Note: Replace the action URL with your own Formspree endpoint -->
-        <form class="contact-form reveal" action="https://formspree.io/f/YOUR_ENDPOINT_HERE" method="POST">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Your Email" required>
-            <textarea name="message" rows="5" placeholder="Tell us about your project..." required></textarea>
-            <button type="submit" class="btn" style="width: 100%;">Send Message</button>
-        </form>
+    <!-- CALL TO ACTION (Funnels to the Apply Page) -->
+    <section class="cta-section">
+        <h2 class="reveal" style="font-size: 3rem; margin-bottom: 1.5rem;">Ready to upgrade your web presence?</h2>
+        <p class="reveal" style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">Because we cover the upfront development costs, we only take on a limited number of new partners each month. Submit your project details to see if we're a match.</p>
+        <a href="apply.html" class="btn reveal" style="background-color: var(--accent); color: var(--bg-color);">Start Your Application</a>
     </section>
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; 2026 CODOT Agency. All rights reserved.</p>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
     <!-- JAVASCRIPT FOR SCROLL ANIMATIONS -->
