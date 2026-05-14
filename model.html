@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works | CODOT</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE CSS (Matching index.html) --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
+        
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+        }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* --- PAGE HEADER --- */
+        .page-header {
+            padding: 12rem 5% 6rem 5%;
+            text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* --- SECTIONS & GRIDS --- */
+        .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
+        .section-title { font-size: 2.5rem; margin-bottom: 3rem; text-align: center; }
+
+        /* --- TIMELINE/PROCESS LAYOUT --- */
+        .process-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            background: var(--surface-color);
+            padding: 3rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .process-step:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+        .step-number {
+            color: var(--accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1;
+            opacity: 0.8;
+            min-width: 80px;
+        }
+        .step-content h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .step-content p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem; }
+        .highlight { color: var(--text-main); font-weight: 600; }
+
+        /* --- FAQ SECTION (Accordion) --- */
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        details {
+            background: var(--surface-color);
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        summary {
+            padding: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary:after {
+            content: '+';
+            color: var(--accent);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        details[open] summary:after { transform: rotate(45deg); }
+        details p {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        /* --- CTA --- */
+        .cta-section {
+            text-align: center;
+            padding: 6rem 5%;
+            background: var(--surface-color);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+        }
+        .btn {
+            padding: 1rem 2.5rem; background-color: var(--accent); color: var(--bg-color);
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
+            margin-top: 2rem;
+        }
+        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+
+        /* --- ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .process-step { flex-direction: column; gap: 1rem; padding: 2rem; }
+            .step-number { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
+        <div class="nav-links">
+            <a href="model.html" class="active">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <h1 class="reveal">Radical Transparency<span class="dot">.</span></h1>
+        <p class="reveal">We believe small businesses shouldn't have to risk thousands of dollars for a website that might not convert. Here is exactly how our partnership model works.</p>
+    </header>
+
+    <!-- THE PROCESS -->
+    <section class="section">
+        <h2 class="section-title reveal">The Four-Step Blueprint</h2>
+        
+        <div class="process-step reveal">
+            <div class="step-number">01</div>
+            <div class="step-content">
+                <h3>The Free Build</h3>
+                <p>After your application is accepted, our team gets to work. We design, code, and optimize a custom website for your brand. <span class="highlight">We do not use slow templates or clunky builders.</span> Every site is hard-coded for maximum speed and performance.</p>
+                <p><strong>Your Cost:</strong> $0.00</p>
+            </div>
+        </div>
+
+        <div class="process-step reveal">
+            <div class="step-number">02</div>
+            <div class="step-content">
+                <h3>The Review & Approval</h3>
+                <p>Within a few weeks, we send you a live staging link to view your new site. You can click around, test the speed, and see it on mobile. If it doesn't align with your vision, you walk away. No hard feelings, no invoices.</p>
+                <p><strong>Your Risk:</strong> Zero.</p>
+            </div>
+        </div>
+
+        <div class="process-step reveal">
+            <div class="step-number">03</div>
+            <div class="step-content">
+                <h3>Domain & Activation</h3>
+                <p>When you give the green light, we push the site live. <span class="highlight">You retain full ownership of your brand.</span> You simply purchase your own domain name (e.g., yourbusiness.com) and any necessary backend services (like email hosting). We handle the technical connection.</p>
+                <p><strong>Your Cost:</strong> Standard domain registrar fees (usually $10-$20/year).</p>
+            </div>
+        </div>
+
+        <div class="process-step reveal">
+            <div class="step-number">04</div>
+            <div class="step-content">
+                <h3>The Ad-Supported Partnership</h3>
+                <p>Instead of charging you $3,000+ for the website and $100/mo for maintenance, <span class="highlight">we host and maintain the site for free forever.</span> In exchange, CODOT integrates highly curated, non-intrusive ad spaces into the layout. We collect the ad revenue to cover our development and hosting costs. When your business grows and gets traffic, we both win.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="section" style="background-color: var(--bg-color);">
+        <h2 class="section-title reveal">The Catch, Explained.</h2>
+        <p class="reveal" style="text-align: center; color: var(--text-muted); margin-bottom: 3rem; margin-top: -2rem;">Clear answers to the questions you're probably thinking right now.</p>
+        
+        <div class="faq-container">
+            <details class="reveal">
+                <summary>Will the ads make my site look cheap or spammy?</summary>
+                <p>Absolutely not. We are a premium web design agency first. The ads are integrated seamlessly into the design layout (like a high-end magazine) rather than intrusive pop-ups. We only partner with quality ad networks.</p>
+            </details>
+            
+            <details class="reveal">
+                <summary>What if I want to remove the ads later?</summary>
+                <p>We offer a Buyout Clause. If your business scales and you prefer an ad-free experience, you can buy the website code, design rights, and exit the hosting partnership for a flat, pre-agreed fee.</p>
+            </details>
+
+            <details class="reveal">
+                <summary>Who owns the website and the domain?</summary>
+                <p>You always own your domain name. CODOT retains ownership of the underlying code and design while it is under the free Ad-Supported Partnership. If you trigger the Buyout Clause, full ownership transfers to you.</p>
+            </details>
+
+            <details class="reveal">
+                <summary>Do you accept every application?</summary>
+                <p>Because we invest heavily upfront in design and coding, we cannot take on every project. We select partners based on current traffic, growth potential, and industry fit to ensure the ad-revenue model is viable for us.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2 class="reveal">Ready to partner up?</h2>
+        <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">Submit your details to see if your business qualifies for a free build.</p>
+        <a href="apply.html" class="btn reveal">Start Your Application</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
+
+    <!-- SCROLL REVEAL SCRIPT -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+    </script>
+</body>
+</html>
