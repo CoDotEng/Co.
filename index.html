@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODOT | Premium Web Design Agency</title>
+    <!-- Google Fonts: Space Grotesk for Headings, Inter for Body -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #00e5ff; /* Neon Cyan for the "DOT" */
+            --accent-glow: rgba(0, 229, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .logo {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--text-main);
+            transition: color 0.3s ease;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .dot {
+            color: var(--accent);
+        }
+
+        .nav-links a {
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 70%);
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            background-color: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* --- PORTFOLIO SECTION --- */
+        .section {
+            padding: 6rem 5%;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-link {
+            color: var(--accent);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-link:hover {
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* --- CONTACT SECTION --- */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            border-radius: 4px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+            color: var(--text-muted);
+        }
+
+        /* --- ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* Simplified mobile nav for now */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <a href="#" class="logo">Co<span class="dot">.</span></a>
+        <div class="nav-links">
+            <a href="#work">Work</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1 class="reveal">Stand Out.<br>We'll Handle the Code<span class="dot">.</span></h1>
+        <p class="reveal">CODOT builds lightning-fast, high-converting websites designed to scale your business.</p>
+        <a href="#contact" class="btn reveal">Get a Free Quote</a>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="work" class="section">
+        <h2 class="section-title reveal">Selected Work</h2>
+        <div class="portfolio-grid">
+            <!-- Project 1: Gravity Research -->
+            <div class="card reveal">
+                <h3>Gravity Research</h3>
+                <p>A modern, responsive landing environment built to present research insights with clarity and speed.</p>
+                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="card-link">View Live Site &rarr;</a>
+            </div>
+            
+            <!-- Project 2: Placeholder for future work -->
+            <div class="card reveal" style="opacity: 0.5; border: 1px dashed rgba(255,255,255,0.2);">
+                <h3>Your Next Project</h3>
+                <p>We are currently accepting new clients. Let's build something extraordinary together.</p>
+                <span class="card-link" style="color: var(--text-muted);">Available for Work</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="section" style="background-color: var(--surface-color);">
+        <h2 class="section-title reveal">What We Do</h2>
+        <div class="portfolio-grid">
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <h3>High-Speed Websites</h3>
+                <p>Static sites optimized for 100/100 Lighthouse scores, ensuring your customers never wait for a page to load.</p>
+            </div>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <h3>Responsive Design</h3>
+                <p>Flawless execution across mobile, tablet, and desktop screens.</p>
+            </div>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <h3>Conversion Focused</h3>
+                <p>Clean UI/UX design that guides your visitors directly to your checkout or contact form.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+        <h2 class="section-title reveal">Let's Talk</h2>
+        <!-- Note: Replace the action URL with your own Formspree endpoint -->
+        <form class="contact-form reveal" action="https://formspree.io/f/YOUR_ENDPOINT_HERE" method="POST">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" rows="5" placeholder="Tell us about your project..." required></textarea>
+            <button type="submit" class="btn" style="width: 100%;">Send Message</button>
+        </form>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 CODOT Agency. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT FOR SCROLL ANIMATIONS -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
+    </script>
+</body>
+</html>
