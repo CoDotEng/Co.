@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Work | CODOT</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE CSS (Matching previous pages) --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
+            --success: #10b981; /* Green for performance metrics */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
+        
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+        }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* --- PAGE HEADER --- */
+        .page-header {
+            padding: 12rem 5% 6rem 5%;
+            text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* --- CASE STUDIES --- */
+        .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
+        
+        .project-card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 4rem;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .project-content { padding: 3rem; }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .project-title h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .project-category { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
+
+        .metrics-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .metric-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-description {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--bg-color);
+            background-color: var(--accent);
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .project-link:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Coming Soon Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .placeholder-card {
+            border: 1px dashed rgba(255,255,255,0.2);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease, border-color 0.3s ease;
+        }
+
+        .placeholder-card:hover {
+            opacity: 1;
+            border-color: var(--accent);
+        }
+
+        /* --- CTA --- */
+        .cta-section {
+            text-align: center;
+            padding: 6rem 5%;
+            background: var(--surface-color);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+        }
+
+        .btn-outline {
+            padding: 1rem 2.5rem; background-color: transparent; color: var(--accent);
+            border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            border-radius: 4px; display: inline-block; margin-top: 2rem;
+        }
+        .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+
+        /* --- ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .project-header { flex-direction: column; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
+        <div class="nav-links">
+            <a href="model.html">How It Works</a>
+            <a href="work.html" class="active">Work</a>
+            <a href="about.html">About</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <h1 class="reveal">Proof of Performance<span class="dot">.</span></h1>
+        <p class="reveal">Explore sites built and hosted under the CODOT Ad-Supported Partnership. High-speed, high-conversion, zero upfront cost.</p>
+    </header>
+
+    <!-- MAIN CASE STUDY -->
+    <section class="section">
+        <div class="project-card reveal">
+            <div class="project-content">
+                <div class="project-header">
+                    <div class="project-title">
+                        <span class="project-category">Research & Data / Landing Environment</span>
+                        <h2>Gravity Research</h2>
+                    </div>
+                    <div class="metrics-container">
+                        <div class="metric-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            100/100 Lighthouse
+                        </div>
+                        <div class="metric-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                            Ultra-Fast Load
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="project-description">
+                    A modern, responsive landing environment designed to present complex research insights with absolute clarity. Built entirely with vanilla web technologies to ensure lightning-fast load times. Under the CODOT model, this site features premium ad placements integrated seamlessly into the dark-mode aesthetic, generating passive revenue without disrupting the user experience.
+                </p>
+
+                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="project-link">
+                    View Live Project &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- FUTURE PROJECTS GRID -->
+        <div class="grid-2">
+            <div class="placeholder-card reveal">
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Client Slot #02</h3>
+                <p style="color: var(--text-muted);">Currently accepting applications for next month's build cycle.</p>
+            </div>
+            
+            <div class="placeholder-card reveal">
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Client Slot #03</h3>
+                <p style="color: var(--text-muted);">Currently accepting applications for next month's build cycle.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2 class="reveal">Claim the next slot.</h2>
+        <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">We only take on projects where our ad-supported model is a guaranteed win for both of us.</p>
+        <a href="apply.html" class="btn-outline reveal">Apply For A Free Build</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
+
+    <!-- SCROLL REVEAL SCRIPT -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+    </script>
+</body>
+</html>
