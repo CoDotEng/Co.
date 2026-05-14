@@ -99,8 +99,7 @@
             cursor: pointer; transition: all 0.3s ease; border-radius: 4px; border: none;
             margin-top: 1rem;
         }
-        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
-        
+        .btn:hover:not(:disabled) { box-shadow: 0 0 20px var(--accent-glow); }
         .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
         /* --- SUCCESS MESSAGE STYLING (Hidden by default) --- */
@@ -237,13 +236,14 @@
         }
         window.addEventListener("scroll", reveal); reveal();
 
-        // AJAX Form Submission Logic (Bypasses Formspree Page)
+        // AJAX Form Submission Logic
         var form = document.getElementById("codot-form");
         var successMessage = document.getElementById("form-success");
         var submitBtn = document.getElementById("submit-btn");
 
         form.addEventListener("submit", async function(event) {
-            event.preventDefault(); // Stop normal redirect
+            event.preventDefault(); // Stops the page from loading the Formspree URL
+            
             submitBtn.innerHTML = "Sending...";
             submitBtn.disabled = true;
 
@@ -256,18 +256,22 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    // Success: Hide form, show success message
+                    // 1. WIPE THE DATA COMPLETELY
+                    form.reset(); 
+                    
+                    // 2. Hide form and show success message
                     form.style.display = "none";
                     successMessage.style.display = "block";
-                    form.reset();
+                    
+                    // 3. Reset the button text for the future
+                    submitBtn.innerHTML = "Submit Application";
+                    submitBtn.disabled = false;
                 } else {
-                    // Error from server
                     alert("Oops! There was a problem submitting your form.");
                     submitBtn.innerHTML = "Submit Application";
                     submitBtn.disabled = false;
                 }
             }).catch(error => {
-                // Network error
                 alert("Oops! There was a problem. Please check your connection.");
                 submitBtn.innerHTML = "Submit Application";
                 submitBtn.disabled = false;
