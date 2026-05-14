@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Work | CODOT</title>
+    <title>About Us | CODOT</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -15,7 +15,6 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
-            --success: #10b981; /* Green for performance metrics */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,101 +58,79 @@
         .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
         .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
 
-        /* --- CASE STUDIES --- */
+        /* --- THE STORY SECTION --- */
         .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
         
-        .project-card {
-            background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 4rem;
-            display: flex;
-            flex-direction: column;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-        }
-
-        .project-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-        }
-
-        .project-content { padding: 3rem; }
-        
-        .project-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .project-title h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .project-category { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
-
-        .metrics-container {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .metric-badge {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
+        .story-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
             align-items: center;
-            gap: 0.5rem;
+            margin-bottom: 6rem;
         }
 
-        .project-description {
+        .story-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .story-text p {
             color: var(--text-muted);
             font-size: 1.1rem;
-            max-width: 800px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--bg-color);
-            background-color: var(--accent);
-            padding: 0.8rem 1.5rem;
-            border-radius: 4px;
-            font-weight: 700;
+        .highlight-box {
+            background: var(--surface-color);
+            padding: 3rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
             font-family: 'Space Grotesk', sans-serif;
-            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            line-height: 1.4;
         }
 
-        .project-link:hover {
-            box-shadow: 0 0 15px var(--accent-glow);
+        /* --- VALUES GRID --- */
+        .values-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
         }
 
-        /* Coming Soon Grid */
-        .grid-2 {
+        .grid-3 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
         }
 
-        .placeholder-card {
-            border: 1px dashed rgba(255,255,255,0.2);
-            padding: 4rem 2rem;
+        .value-card {
+            background: var(--surface-color);
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
             text-align: center;
-            border-radius: 12px;
-            opacity: 0.6;
-            transition: opacity 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
-        .placeholder-card:hover {
-            opacity: 1;
+        .value-card:hover {
+            transform: translateY(-10px);
             border-color: var(--accent);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .value-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-card p {
+            color: var(--text-muted);
         }
 
         /* --- CTA --- */
@@ -165,13 +142,13 @@
             margin-top: 4rem;
         }
 
-        .btn-outline {
-            padding: 1rem 2.5rem; background-color: transparent; color: var(--accent);
-            border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
-            border-radius: 4px; display: inline-block; margin-top: 2rem;
+        .btn {
+            padding: 1rem 2.5rem; background-color: var(--accent); color: var(--bg-color);
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
+            margin-top: 2rem;
         }
-        .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- FOOTER --- */
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
@@ -180,10 +157,9 @@
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+            .story-container { grid-template-columns: 1fr; gap: 2rem; }
             .nav-links { display: none; }
-            .project-header { flex-direction: column; }
-            .grid-2 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -194,68 +170,60 @@
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
-            <a href="work.html" class="active">Work</a>
-            <a href="about.html">About</a>
+            <a href="work.html">Work</a>
+            <a href="about.html" class="active">About</a>
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
     <!-- HEADER -->
     <header class="page-header">
-        <h1 class="reveal">Proof of Performance<span class="dot">.</span></h1>
-        <p class="reveal">Explore sites built and hosted under the CODOT Ad-Supported Partnership. High-speed, high-conversion, zero upfront cost.</p>
+        <h1 class="reveal">The Industry is Broken<span class="dot">.</span></h1>
+        <p class="reveal">We built CODOT to fix it. We believe premium web design shouldn't require a small business to take on massive financial risk.</p>
     </header>
 
-    <!-- MAIN CASE STUDY -->
+    <!-- THE STORY -->
     <section class="section">
-        <div class="project-card reveal">
-            <div class="project-content">
-                <div class="project-header">
-                    <div class="project-title">
-                        <span class="project-category">Research & Data / Landing Environment</span>
-                        <h2>Gravity Research</h2>
-                    </div>
-                    <div class="metrics-container">
-                        <div class="metric-badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            100/100 Lighthouse
-                        </div>
-                        <div class="metric-badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                            Ultra-Fast Load
-                        </div>
-                    </div>
-                </div>
-                
-                <p class="project-description">
-                    A modern, responsive landing environment designed to present complex research insights with absolute clarity. Built entirely with vanilla web technologies to ensure lightning-fast load times. Under the CODOT model, this site features premium ad placements integrated seamlessly into the dark-mode aesthetic, generating passive revenue without disrupting the user experience.
-                </p>
-
-                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="project-link">
-                    View Live Project &rarr;
-                </a>
+        <div class="story-container">
+            <div class="story-text reveal">
+                <h2>Why we changed the equation.</h2>
+                <p>Most web design agencies operate the same way: they charge you thousands of dollars upfront, take weeks to build a bloated WordPress site, and then hit you with expensive monthly retainers just to keep it online.</p>
+                <p>If you don't have that kind of budget, you're forced to use DIY site builders that are slow, clunky, and terrible for search engine rankings. It's a lose-lose situation for growing businesses.</p>
+                <p>We created CODOT to completely eliminate that barrier. We are developers who actually put skin in the game.</p>
+            </div>
+            <div class="highlight-box reveal">
+                "We don't just sell websites. We invest our code into your business, creating a true partnership where we only succeed if you do."
             </div>
         </div>
 
-        <!-- FUTURE PROJECTS GRID -->
-        <div class="grid-2">
-            <div class="placeholder-card reveal">
-                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Client Slot #02</h3>
-                <p style="color: var(--text-muted);">Currently accepting applications for next month's build cycle.</p>
+        <!-- CORE VALUES -->
+        <h2 class="values-title reveal">Our Core Directives</h2>
+        <div class="grid-3">
+            <div class="value-card reveal">
+                <div class="value-icon">01</div>
+                <h3>Skin in the Game</h3>
+                <p>Because we build your site for free and rely on our ad-supported hosting model, we are financially incentivized to build the fastest, highest-converting website possible. If your site doesn't perform, we don't win.</p>
             </div>
             
-            <div class="placeholder-card reveal">
-                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Client Slot #03</h3>
-                <p style="color: var(--text-muted);">Currently accepting applications for next month's build cycle.</p>
+            <div class="value-card reveal">
+                <div class="value-icon">02</div>
+                <h3>Hand-Coded Precision</h3>
+                <p>We refuse to use visual page builders. Every CODOT site is hard-coded using modern web technologies to ensure perfect Lighthouse scores, instant load times, and a flawless user experience.</p>
+            </div>
+
+            <div class="value-card reveal">
+                <div class="value-icon">03</div>
+                <h3>Total Independence</h3>
+                <p>You always own your domain name and your brand. We don't trap you in complicated contracts. You are free to leverage our zero-maintenance ad hosting, or buy out the code whenever you choose.</p>
             </div>
         </div>
     </section>
 
     <!-- CTA -->
     <section class="cta-section">
-        <h2 class="reveal">Claim the next slot.</h2>
-        <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">We only take on projects where our ad-supported model is a guaranteed win for both of us.</p>
-        <a href="apply.html" class="btn-outline reveal">Apply For A Free Build</a>
+        <h2 class="reveal">Let's build something incredible.</h2>
+        <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">Stop paying upfront for websites that underperform.</p>
+        <a href="apply.html" class="btn reveal">Start Your Free Build</a>
     </section>
 
     <!-- FOOTER -->
