@@ -62,6 +62,7 @@
             padding: 3rem;
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.05);
+            transition: opacity 0.5s ease;
         }
 
         .form-group { margin-bottom: 1.5rem; }
@@ -90,7 +91,6 @@
             border-color: var(--accent);
         }
 
-        /* Fix dropdown arrow color in dark mode */
         select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto; }
 
         .btn {
@@ -100,11 +100,45 @@
             margin-top: 1rem;
         }
         .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
+        
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* --- SUCCESS MESSAGE STYLING (Hidden by default) --- */
+        #form-success {
+            display: none;
+            text-align: center;
+            background: var(--surface-color);
+            padding: 4rem 2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .icon-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1); border: 2px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 2rem auto; color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        #form-success h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        #form-success p { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2rem auto; }
+
+        .btn-outline {
+            padding: 1rem 2rem; background-color: transparent; color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; border-radius: 4px; transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-outline:hover { border-color: var(--text-main); }
 
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
 
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) { .nav-links { display: none; } .application-form { padding: 2rem; } }
     </style>
@@ -130,12 +164,9 @@
 
     <!-- FORM SECTION -->
     <section class="form-section reveal">
-        <!-- THE FORMSPREE ENDPOINT IS INJECTED HERE -->
-        <form class="application-form" action="https://formspree.io/f/mrejwply" method="POST">
-            
-            <!-- MAGIC REDIRECT -->
-            <!-- IMPORTANT NOTE: Once your GitHub Pages site is live, change the value below to your exact live URL (e.g., value="https://yourusername.github.io/your-repo/success.html") -->
-            <input type="hidden" name="_next" value="success.html">
+        
+        <!-- THE FORM -->
+        <form id="codot-form" class="application-form" action="https://formspree.io/f/mrejwply" method="POST">
             
             <!-- Anti-Spam Honeypot -->
             <input type="text" name="_gotcha" style="display:none" />
@@ -171,14 +202,28 @@
                 <textarea id="project" name="project" rows="5" required placeholder="Tell us about your business goals and what you need this website to achieve..."></textarea>
             </div>
 
-            <button type="submit" class="btn">Submit Application</button>
+            <button type="submit" id="submit-btn" class="btn">Submit Application</button>
         </form>
+
+        <!-- INLINE SUCCESS MESSAGE (Hidden initially) -->
+        <div id="form-success">
+            <div class="icon-circle">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h2>Application Received<span class="dot">.</span></h2>
+            <p>Thank you for applying. Our team will review your details and reach out within 48 hours with next steps.</p>
+            <a href="index.html" class="btn-outline">Return to Home</a>
+        </div>
+
     </section>
 
     <!-- FOOTER -->
     <footer><p>&copy; 2026 CODOT Agency. Built differently.</p></footer>
 
     <script>
+        // Scroll Reveal Logic
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
@@ -191,6 +236,43 @@
             }
         }
         window.addEventListener("scroll", reveal); reveal();
+
+        // AJAX Form Submission Logic (Bypasses Formspree Page)
+        var form = document.getElementById("codot-form");
+        var successMessage = document.getElementById("form-success");
+        var submitBtn = document.getElementById("submit-btn");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault(); // Stop normal redirect
+            submitBtn.innerHTML = "Sending...";
+            submitBtn.disabled = true;
+
+            var data = new FormData(event.target);
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Success: Hide form, show success message
+                    form.style.display = "none";
+                    successMessage.style.display = "block";
+                    form.reset();
+                } else {
+                    // Error from server
+                    alert("Oops! There was a problem submitting your form.");
+                    submitBtn.innerHTML = "Submit Application";
+                    submitBtn.disabled = false;
+                }
+            }).catch(error => {
+                // Network error
+                alert("Oops! There was a problem. Please check your connection.");
+                submitBtn.innerHTML = "Submit Application";
+                submitBtn.disabled = false;
+            });
+        });
     </script>
 </body>
 </html>
