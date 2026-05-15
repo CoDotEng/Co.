@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Application | CODOT</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
@@ -108,7 +107,7 @@
 
         /* --- STATUS RESULTS --- */
         #result-box {
-            display: none; /* Hidden until searched */
+            display: none;
             margin-top: 2rem;
             padding: 2rem;
             border-radius: 8px;
@@ -140,18 +139,13 @@
             font-size: 1rem;
         }
 
-        /* --- FOOTER --- */
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION -->
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
@@ -162,21 +156,18 @@
         </div>
     </nav>
 
-    <!-- HEADER -->
     <header class="page-header">
-        <h1 class="reveal">Track Your Build<span class="dot">.</span></h1>
-        <p class="reveal">Enter your unique ticket ID to see the live status of your application or web build.</p>
+        <h1>Track Your Build<span class="dot">.</span></h1>
+        <p>Enter your unique ticket ID to see the live status of your application.</p>
     </header>
 
-    <!-- TRACKING SECTION -->
     <section class="section">
-        <div class="track-card reveal">
+        <div class="track-card">
             <div class="input-group">
-                <input type="text" id="ticketInput" placeholder="Enter Ticket ID (e.g. CODOT-123)">
+                <input type="text" id="ticketInput" placeholder="Enter Ticket ID (e.g. CO-XXXXXX)">
                 <button id="trackBtn" class="btn-solid">Check Status</button>
             </div>
 
-            <!-- RESULT BOX -->
             <div id="result-box">
                 <h3 id="status-title">Status: Pending</h3>
                 <p id="status-desc">Your application is currently under review.</p>
@@ -184,33 +175,14 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <!-- SCROLL REVEAL SCRIPT -->
-    <script>
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                if (elementTop < windowHeight - 100) reveals[i].classList.add("active");
-            }
-        }
-        window.addEventListener("scroll", reveal);
-        reveal();
-    </script>
-
-    <!-- FIREBASE INTEGRATION -->
-    <!-- Notice type="module". This is required to use 'import' statements in HTML -->
     <script type="module">
-        // 1. Import Firebase Core and Firestore Database
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // 2. Your exact Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -220,69 +192,57 @@
             appId: "1:22678307444:web:59c72496bad5db86b3c721"
         };
 
-        // 3. Initialize Firebase & Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 4. Connect HTML elements to JavaScript
         const trackBtn = document.getElementById('trackBtn');
         const ticketInput = document.getElementById('ticketInput');
         const resultBox = document.getElementById('result-box');
         const statusTitle = document.getElementById('status-title');
         const statusDesc = document.getElementById('status-desc');
 
-        // 5. Run this when the user clicks "Check Status"
         trackBtn.addEventListener('click', async () => {
-            const ticketId = ticketInput.value.trim();
+            const ticketId = ticketInput.value.trim().toUpperCase();
             
-            // If empty, show an error and stop
             if (ticketId === "") {
                 showResult("Error", "Please enter a valid ticket ID.", false);
                 return;
             }
 
-            // Change button text while loading
             trackBtn.innerText = "Searching...";
             trackBtn.disabled = true;
 
             try {
-                // Look for a document in the "tickets" collection that matches the ID
-                const docRef = doc(db, "tickets", ticketId);
-                const docSnap = await getDoc(docRef);
+                // FIXED: Querying the "applications" collection for the "ticketID" field
+                const q = query(collection(db, "applications"), where("ticketID", "==", ticketId));
+                const querySnapshot = await getDocs(q);
 
-                if (docSnap.exists()) {
-                    // Ticket found! Get the data inside it
-                    const data = docSnap.data();
-                    showResult(
-                        `Status: ${data.status || "In Progress"}`, 
-                        data.message || "We are currently working on your project.", 
-                        true
-                    );
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        showResult(
+                            `Status: ${data.status || "Application Under Review"}`, 
+                            "Our team is currently processing your project requirements.", 
+                            true
+                        );
+                    });
                 } else {
-                    // Ticket not found
-                    showResult("Not Found", "We couldn't find a ticket with that ID. Please double-check it.", false);
+                    showResult("Not Found", "No application found with that ID. Please double-check your ticket.", false);
                 }
             } catch (error) {
                 console.error("Firebase Error:", error);
-                showResult("Database Error", "Could not connect to the database. Please try again later.", false);
+                showResult("Error", "Could not connect to the database. Try again later.", false);
             }
 
-            // Reset button text
             trackBtn.innerText = "Check Status";
             trackBtn.disabled = false;
         });
 
-        // Helper function to update the UI
         function showResult(title, desc, isSuccess) {
             resultBox.style.display = "block";
             statusTitle.innerText = title;
             statusDesc.innerText = desc;
-            
-            if (isSuccess) {
-                resultBox.className = "status-success";
-            } else {
-                resultBox.className = "status-error";
-            }
+            resultBox.className = isSuccess ? "status-success" : "status-error";
         }
     </script>
 </body>
