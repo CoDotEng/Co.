@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Application | CODOT</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE CSS --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #121212;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
+        
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+        }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* --- PAGE HEADER --- */
+        .page-header {
+            padding: 12rem 5% 6rem 5%;
+            text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* --- TRACKING CONTAINER --- */
+        .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; min-height: 50vh; }
+        
+        .track-card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            max-width: 400px;
+            padding: 1rem 1.5rem;
+            background: var(--bg-color);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-solid {
+            padding: 1rem 2rem;
+            background-color: var(--accent); color: var(--bg-color);
+            border: none; font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            border-radius: 4px; display: inline-block;
+        }
+        .btn-solid:hover { box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-solid:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- STATUS RESULTS --- */
+        #result-box {
+            display: none; /* Hidden until searched */
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: left;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .status-success {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid var(--accent);
+        }
+
+        .status-error {
+            background: rgba(255, 71, 87, 0.05);
+            border: 1px solid #ff4757;
+        }
+
+        #status-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-success #status-title { color: var(--accent); }
+        .status-error #status-title { color: #ff4757; }
+
+        #status-desc {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
+        <div class="nav-links">
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <h1 class="reveal">Track Your Build<span class="dot">.</span></h1>
+        <p class="reveal">Enter your unique ticket ID to see the live status of your application or web build.</p>
+    </header>
+
+    <!-- TRACKING SECTION -->
+    <section class="section">
+        <div class="track-card reveal">
+            <div class="input-group">
+                <input type="text" id="ticketInput" placeholder="Enter Ticket ID (e.g. CODOT-123)">
+                <button id="trackBtn" class="btn-solid">Check Status</button>
+            </div>
+
+            <!-- RESULT BOX -->
+            <div id="result-box">
+                <h3 id="status-title">Status: Pending</h3>
+                <p id="status-desc">Your application is currently under review.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
+
+    <!-- SCROLL REVEAL SCRIPT -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) reveals[i].classList.add("active");
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+    </script>
+
+    <!-- FIREBASE INTEGRATION -->
+    <!-- Notice type="module". This is required to use 'import' statements in HTML -->
+    <script type="module">
+        // 1. Import Firebase Core and Firestore Database
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 2. Your exact Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
+            authDomain: "codot-agency.firebaseapp.com",
+            projectId: "codot-agency",
+            storageBucket: "codot-agency.firebasestorage.app",
+            messagingSenderId: "22678307444",
+            appId: "1:22678307444:web:59c72496bad5db86b3c721"
+        };
+
+        // 3. Initialize Firebase & Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 4. Connect HTML elements to JavaScript
+        const trackBtn = document.getElementById('trackBtn');
+        const ticketInput = document.getElementById('ticketInput');
+        const resultBox = document.getElementById('result-box');
+        const statusTitle = document.getElementById('status-title');
+        const statusDesc = document.getElementById('status-desc');
+
+        // 5. Run this when the user clicks "Check Status"
+        trackBtn.addEventListener('click', async () => {
+            const ticketId = ticketInput.value.trim();
+            
+            // If empty, show an error and stop
+            if (ticketId === "") {
+                showResult("Error", "Please enter a valid ticket ID.", false);
+                return;
+            }
+
+            // Change button text while loading
+            trackBtn.innerText = "Searching...";
+            trackBtn.disabled = true;
+
+            try {
+                // Look for a document in the "tickets" collection that matches the ID
+                const docRef = doc(db, "tickets", ticketId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    // Ticket found! Get the data inside it
+                    const data = docSnap.data();
+                    showResult(
+                        `Status: ${data.status || "In Progress"}`, 
+                        data.message || "We are currently working on your project.", 
+                        true
+                    );
+                } else {
+                    // Ticket not found
+                    showResult("Not Found", "We couldn't find a ticket with that ID. Please double-check it.", false);
+                }
+            } catch (error) {
+                console.error("Firebase Error:", error);
+                showResult("Database Error", "Could not connect to the database. Please try again later.", false);
+            }
+
+            // Reset button text
+            trackBtn.innerText = "Check Status";
+            trackBtn.disabled = false;
+        });
+
+        // Helper function to update the UI
+        function showResult(title, desc, isSuccess) {
+            resultBox.style.display = "block";
+            statusTitle.innerText = title;
+            statusDesc.innerText = desc;
+            
+            if (isSuccess) {
+                resultBox.className = "status-success";
+            } else {
+                resultBox.className = "status-error";
+            }
+        }
+    </script>
+</body>
+</html>
