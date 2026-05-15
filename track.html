@@ -14,6 +14,7 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
+            --card-border: rgba(255,255,255,0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,7 +63,7 @@
         
         .track-card {
             background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 3rem;
             text-align: center;
@@ -103,7 +104,7 @@
             border-radius: 4px; display: inline-block;
         }
         .btn-solid:hover { box-shadow: 0 0 20px var(--accent-glow); }
-        .btn-solid:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-solid:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
         /* --- STATUS RESULTS --- */
         #result-box {
@@ -115,55 +116,36 @@
             animation: fadeIn 0.5s ease-out;
         }
 
-        .status-success {
-            background: rgba(0, 229, 255, 0.05);
-            border: 1px solid var(--accent);
-        }
-
-        .status-error {
-            background: rgba(255, 71, 87, 0.05);
-            border: 1px solid #ff4757;
-        }
-
-        #status-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
+        .status-success { background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent); }
+        .status-error { background: rgba(255, 71, 87, 0.05); border: 1px solid #ff4757; }
+        #status-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
         .status-success #status-title { color: var(--accent); }
         .status-error #status-title { color: #ff4757; }
+        #status-desc { color: var(--text-muted); font-size: 1rem; }
 
-        #status-desc {
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        /* --- UPLOAD UI & PREFERENCES --- */
+        /* --- PREMIUM UPLOAD UI & PREFERENCES --- */
         #upload-section {
             display: none;
             margin-top: 2rem;
-            padding: 2rem;
-            border: 1px dashed var(--accent);
-            border-radius: 8px;
-            background: rgba(0, 229, 255, 0.02);
-            text-align: center;
+            padding: 2.5rem;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.01);
+            text-align: left; /* Switched to left align for a more formal form feel */
             animation: fadeIn 0.5s ease-out;
         }
         
         #upload-section h3 {
             margin-bottom: 0.5rem;
             color: var(--text-main);
+            text-align: center;
         }
 
-        .pref-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
+        .pref-group { margin-bottom: 2rem; }
 
         .pref-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             color: var(--text-muted);
             font-size: 0.85rem;
             font-weight: 600;
@@ -171,11 +153,78 @@
             letter-spacing: 1px;
         }
 
-        .pref-group select, 
-        .pref-group textarea, 
-        .pref-group input[type="file"] {
+        /* --- CUSTOM RGB COLOR PICKERS --- */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+
+        .color-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .color-box span { font-size: 0.8rem; color: var(--text-main); }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+
+        /* --- VIBE CARDS --- */
+        .vibe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .vibe-card {
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vibe-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .vibe-card.active {
+            border-color: var(--accent);
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        .vibe-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .vibe-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; }
+
+        /* General Inputs */
+        textarea, input[type="file"] {
             width: 100%;
-            padding: 0.8rem 1rem;
+            padding: 1rem;
             background: var(--bg-color);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 4px;
@@ -186,20 +235,23 @@
             transition: all 0.3s ease;
         }
 
-        .pref-group select:focus, 
-        .pref-group textarea:focus {
+        textarea:focus {
             border-color: var(--accent);
             box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
         }
 
-        .pref-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+        textarea { resize: vertical; min-height: 100px; }
+        input[type="file"] { color: var(--text-muted); cursor: pointer; }
 
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .vibe-grid { grid-template-columns: 1fr; }
+            .color-grid { grid-template-columns: repeat(3, 1fr); }
+        }
     </style>
 </head>
 <body>
@@ -235,33 +287,53 @@
 
             <div id="upload-section">
                 <h3>Project Setup & Preferences</h3>
-                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Configure your project details and upload your assets to begin.</p>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem; text-align: center;">Configure your brand identity and upload your assets.</p>
                 
+                <!-- NEW RGB COLOR PALETTE -->
                 <div class="pref-group">
-                    <label>Primary Brand Theme</label>
-                    <select id="themeColor">
-                        <option value="Cyber Neon (Cyan/Blue)">Cyber Neon (Cyan/Blue)</option>
-                        <option value="Midnight Minimal (Black/White)">Midnight Minimal (Black/White)</option>
-                        <option value="Electric Purple / Pink">Electric Purple / Pink</option>
-                        <option value="Earthy & Natural (Greens/Browns)">Earthy & Natural (Greens/Browns)</option>
-                        <option value="Corporate Professional (Navy/Grey)">Corporate Professional (Navy/Grey)</option>
-                        <option value="Custom (Mention in notes)">Custom (Mention in notes)</option>
-                    </select>
+                    <label>Brand Palette (Pick your exact hex/rgb colors)</label>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <input type="color" id="primaryColor" value="#00e5ff">
+                            <span>Primary</span>
+                        </div>
+                        <div class="color-box">
+                            <input type="color" id="secondaryColor" value="#ff007f">
+                            <span>Secondary</span>
+                        </div>
+                        <div class="color-box">
+                            <input type="color" id="bgColor" value="#050505">
+                            <span>Background</span>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- NEW VIBE CARDS -->
                 <div class="pref-group">
-                    <label>Design Vibe / Tone</label>
-                    <select id="designVibe">
-                        <option value="Ultra Modern & Edgy">Ultra Modern & Edgy</option>
-                        <option value="Clean & Minimalist">Clean & Minimalist</option>
-                        <option value="Creative & Playful">Creative & Playful</option>
-                        <option value="Luxury & Premium">Luxury & Premium</option>
-                    </select>
+                    <label>Design Identity & Vibe</label>
+                    <div class="vibe-grid" id="vibeContainer">
+                        <div class="vibe-card active" data-vibe="Clean & Minimal">
+                            <div class="vibe-icon">✨</div>
+                            <div class="vibe-title">Clean & Minimal</div>
+                        </div>
+                        <div class="vibe-card" data-vibe="Dark & High-Tech">
+                            <div class="vibe-icon">⚡</div>
+                            <div class="vibe-title">Dark & High-Tech</div>
+                        </div>
+                        <div class="vibe-card" data-vibe="Bold & Brutalist">
+                            <div class="vibe-icon">🏗️</div>
+                            <div class="vibe-title">Bold & Brutalist</div>
+                        </div>
+                        <div class="vibe-card" data-vibe="Elegant & Luxury">
+                            <div class="vibe-icon">💎</div>
+                            <div class="vibe-title">Elegant & Luxury</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pref-group">
                     <label>Additional Notes & Instructions</label>
-                    <textarea id="clientNotes" placeholder="Competitor sites you like? Specific animations? Tell us here..."></textarea>
+                    <textarea id="clientNotes" placeholder="Drop competitor site links, specific animation requests, or extra context here..."></textarea>
                 </div>
 
                 <div class="pref-group">
@@ -269,7 +341,7 @@
                     <input type="file" id="fileInput" accept="image/*,.pdf,.zip" />
                 </div>
                 
-                <button id="uploadBtn" class="btn-solid" style="width: 100%; margin-top: 1rem;">Submit Details & Assets</button>
+                <button id="uploadBtn" class="btn-solid" style="width: 100%; margin-top: 1rem;">Lock In Preferences & Upload</button>
             </div>
         </div>
     </section>
@@ -305,10 +377,26 @@
         // Form Elements
         const uploadSection = document.getElementById('upload-section');
         const fileInput = document.getElementById('fileInput');
-        const themeColor = document.getElementById('themeColor');
-        const designVibe = document.getElementById('designVibe');
+        const primaryColor = document.getElementById('primaryColor');
+        const secondaryColor = document.getElementById('secondaryColor');
+        const bgColor = document.getElementById('bgColor');
         const clientNotes = document.getElementById('clientNotes');
         const uploadBtn = document.getElementById('uploadBtn');
+
+        // Vibe Card Logic
+        const vibeCards = document.querySelectorAll('.vibe-card');
+        let selectedVibe = "Clean & Minimal"; // Default
+
+        vibeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove active class from all
+                vibeCards.forEach(c => c.classList.remove('active'));
+                // Add to clicked
+                card.classList.add('active');
+                // Store the selected value
+                selectedVibe = card.getAttribute('data-vibe');
+            });
+        });
 
         let currentDocId = null;
         let currentTicketId = null;
@@ -341,7 +429,6 @@
                             true
                         );
 
-                        // Magic Trigger logic: Exposes form on exactly this status
                         if (data.status === "2. Awaiting Preferences & Assets") {
                             uploadSection.style.display = "block";
                         }
@@ -363,7 +450,7 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                alert("Please attach your assets file (.zip, .pdf, or image) before submitting.");
+                alert("Please attach your assets file (.zip, .png, or .pdf) before submitting.");
                 return;
             }
 
@@ -378,20 +465,22 @@
                 // 2. Get the download URL
                 const downloadURL = await getDownloadURL(storageRef);
 
-                // 3. Update Firestore with URL AND the new Form Preferences
+                // 3. Update Firestore with URL, Hex codes, Vibe string, and Notes
                 const docRef = doc(db, "applications", currentDocId);
                 await updateDoc(docRef, {
                     assetDownloadUrl: downloadURL,
-                    clientThemePref: themeColor.value,
-                    clientVibePref: designVibe.value,
+                    colorPrimary: primaryColor.value,
+                    colorSecondary: secondaryColor.value,
+                    colorBackground: bgColor.value,
+                    clientVibePref: selectedVibe, // Pulled from the interactive cards
                     clientCustomNotes: clientNotes.value,
                     status: "3. Preferences Received & Planning" 
                 });
 
-                // 4. Update UI to hide the form and show success
+                // 4. Update UI
                 uploadSection.innerHTML = `<div class="status-success" style="padding: 1rem; border-radius: 8px;">
                     <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Data & Assets Secured!</h4>
-                    <p style="color: var(--text-main); font-size: 0.9rem;">Your preferences have been logged. We are moving into the Planning & Prototyping phase.</p>
+                    <p style="color: var(--text-main); font-size: 0.9rem;">Your custom hex codes and design vibe have been locked in. We are moving into the Planning & Prototyping phase.</p>
                 </div>`;
                 
                 // Update Top status
@@ -400,7 +489,7 @@
             } catch (error) {
                 console.error("Submission Error: ", error);
                 alert("Submission failed. Please check your connection and try again.");
-                uploadBtn.innerText = "Submit Details & Assets";
+                uploadBtn.innerText = "Lock In Preferences & Upload";
                 uploadBtn.disabled = false;
             }
         });
