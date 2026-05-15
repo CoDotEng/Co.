@@ -169,6 +169,11 @@
             overflow: hidden;
         }
 
+        /* Make the 3rd card span full width to look better without the 4th item */
+        .type-card:nth-child(3) {
+            grid-column: 1 / -1;
+        }
+
         .type-card:hover {
             border-color: rgba(0, 229, 255, 0.5);
             background: var(--surface-light);
@@ -380,15 +385,15 @@
 </head>
 <body>
 
-     <nav>
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
-             <a href="estimate.html"class="active">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="estimate.html" class="nav-btn-secondary">Instant Quote</a>
+            <a href="apply.html" class="nav-btn-primary">Apply Now</a>
         </div>
     </nav>
 
@@ -417,13 +422,6 @@
                         </div>
                     </label>
                     <label class="type-card" onclick="selectCard(this)">
-                        <input type="radio" name="projectType" value="ecommerce">
-                        <div>
-                            <h4>E-Commerce</h4>
-                            <p>Full online store with payment gateways.</p>
-                        </div>
-                    </label>
-                    <label class="type-card" onclick="selectCard(this)">
                         <input type="radio" name="projectType" value="webapp">
                         <div>
                             <h4>Web Application</h4>
@@ -438,9 +436,9 @@
                 <div class="slider-container">
                     <div class="slider-header">
                         <span style="color: var(--text-muted)">Number of Pages / Screens</span>
-                        <span class="slider-value" id="pageOutput">5</span>
+                        <span class="slider-value" id="pageOutput">1</span>
                     </div>
-                    <input type="range" id="pageSlider" min="1" max="20" value="5">
+                    <input type="range" id="pageSlider" min="1" max="20" value="1">
                 </div>
             </div>
 
@@ -464,12 +462,12 @@
             
             <div class="result-item">
                 <div class="result-label">Estimated Timeline</div>
-                <div class="result-value" id="timeEstimate">2-3 Weeks</div>
+                <div class="result-value" id="timeEstimate">1-2 Weeks</div>
             </div>
 
             <div class="result-item">
                 <div class="result-label">Estimated Investment</div>
-                <div class="result-value highlight" id="priceEstimate">₹4,000</div>
+                <div class="result-value highlight" id="priceEstimate">₹1,560</div>
             </div>
 
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
@@ -481,12 +479,11 @@
     </div>
 
     <script>
-        // Data & Base Rates - SUPER CHEAP INR PRICING
+        // Data & Base Rates - Min ₹1000 base
         const rates = {
-            landing: { basePrice: 1500, baseWeeks: 1, perPagePrice: 300, perPageDays: 0.5 },
-            corporate: { basePrice: 3500, baseWeeks: 2, perPagePrice: 500, perPageDays: 1 },
-            ecommerce: { basePrice: 6500, baseWeeks: 3, perPagePrice: 800, perPageDays: 1.5 },
-            webapp: { basePrice: 9000, baseWeeks: 4, perPagePrice: 1200, perPageDays: 2 }
+            landing: { basePrice: 1000, baseWeeks: 1, perPagePrice: 200, perPageDays: 0.5 },
+            corporate: { basePrice: 2500, baseWeeks: 2, perPagePrice: 400, perPageDays: 1 },
+            webapp: { basePrice: 6000, baseWeeks: 4, perPagePrice: 800, perPageDays: 2 }
         };
 
         const customDesignMultiplier = 1.3; // 30% extra for custom UI/UX
@@ -524,6 +521,11 @@
             if(isCustom) {
                 totalPrice *= customDesignMultiplier;
                 totalDays *= 1.2; // Custom design takes 20% longer
+            }
+
+            // Ensure absolute minimum price is at least 1000 just in case
+            if(totalPrice < 1000) {
+                totalPrice = 1000;
             }
 
             // Format Timeline (Convert days to weeks)
