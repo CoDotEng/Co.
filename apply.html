@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apply for a Build | CODOT</title>
+    <title>Apply Now | CODOT</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
@@ -14,6 +15,7 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,245 +40,254 @@
         }
         .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
         .dot { color: var(--accent); }
+        
         .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a:hover { color: var(--accent); }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
         .nav-btn {
-            background-color: transparent; color: var(--accent) !important;
-            border: 1px solid var(--accent);
+            background-color: var(--accent); color: var(--bg-color) !important;
             padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
         }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
         /* --- PAGE HEADER --- */
         .page-header {
-            padding: 12rem 5% 4rem 5%;
+            padding: 12rem 5% 6rem 5%;
             text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
-        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
 
-        /* --- FORM STYLING --- */
-        .form-section { padding: 2rem 5% 6rem 5%; max-width: 800px; margin: 0 auto; }
+        /* --- FORM SECTION --- */
+        .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; }
         
-        .application-form {
+        .form-container {
             background: var(--surface-color);
-            padding: 3rem;
-            border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.05);
-            transition: opacity 0.5s ease;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block; margin-bottom: 0.5rem; font-weight: 600;
+            color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px;
+        }
         
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text-main);
+        .form-control {
+            width: 100%; padding: 1rem;
+            background-color: var(--bg-color); color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+            font-family: 'Inter', sans-serif; font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
         }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 1rem;
-            background: var(--bg-color);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            border-radius: 4px;
-            transition: border-color 0.3s ease;
-        }
+        textarea.form-control { resize: vertical; min-height: 120px; }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        select { appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto; }
-
-        .btn {
-            width: 100%; padding: 1.2rem; background-color: var(--accent); color: var(--bg-color);
+        .btn-submit {
+            width: 100%; padding: 1.2rem;
+            background-color: var(--accent); color: var(--bg-color);
+            border: none; border-radius: 6px;
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; border: none;
-            margin-top: 1rem;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;
         }
-        .btn:hover:not(:disabled) { box-shadow: 0 0 20px var(--accent-glow); }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* --- SUCCESS MESSAGE STYLING (Hidden by default) --- */
-        #form-success {
-            display: none;
-            text-align: center;
-            background: var(--surface-color);
-            padding: 4rem 2rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
-            animation: fadeIn 0.5s ease forwards;
+        /* --- SUCCESS MESSAGE --- */
+        .success-box {
+            display: none; text-align: center; padding: 3rem 2rem;
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px; animation: fadeIn 0.5s ease-out;
         }
-
-        .icon-circle {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: rgba(0, 229, 255, 0.1); border: 2px solid var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 2rem auto; color: var(--accent);
-            box-shadow: 0 0 30px var(--accent-glow);
+        .success-box svg { color: var(--success); margin-bottom: 1rem; width: 64px; height: 64px; }
+        .success-box h3 { font-size: 2rem; margin-bottom: 1rem; color: var(--text-main); }
+        .ticket-id {
+            background: var(--bg-color); padding: 1rem 2rem; border-radius: 8px;
+            font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent); letter-spacing: 2px; margin: 1.5rem 0;
+            display: inline-block; border: 1px dashed var(--accent);
         }
 
-        #form-success h2 { font-size: 2.5rem; margin-bottom: 1rem; }
-        #form-success p { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2rem auto; }
-
+        /* --- TRACK BANNER SECTION --- */
+        .track-banner {
+            margin-top: 4rem; padding: 4rem 5%;
+            text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 100%);
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .track-banner h3 { font-size: 2rem; margin-bottom: 1rem; }
+        .track-banner p { color: var(--text-muted); margin-bottom: 2rem; }
+        
         .btn-outline {
-            padding: 1rem 2rem; background-color: transparent; color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem; font-weight: 700; border-radius: 4px; transition: all 0.3s ease;
-            display: inline-block;
+            padding: 1rem 2rem; background-color: transparent; color: var(--accent);
+            border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            border-radius: 4px; display: inline-block;
         }
-        .btn-outline:hover { border-color: var(--text-main); }
+        .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
 
-        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
-
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) { .nav-links { display: none; } .application-form { padding: 2rem; } }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .form-container { padding: 2rem; }
+        }
     </style>
 </head>
 <body>
 
     <!-- NAVIGATION -->
-   <nav>
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
-            <a href="about.html">About</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="apply.html" class="nav-btn"class="active">Apply Now</a>
+            <a href="apply.html" class="nav-btn active">Apply Now</a>
         </div>
     </nav>
 
     <!-- HEADER -->
     <header class="page-header">
-        <h1 class="reveal">Apply for a Partnership<span class="dot">.</span></h1>
-        <p class="reveal">Tell us about your business. We accept a limited number of ad-supported projects each month based on growth potential and fit.</p>
+        <h1>Start Your Build<span class="dot">.</span></h1>
+        <p>Submit your details below. We'll review your project and get back to you with the next steps.</p>
     </header>
 
-    <!-- FORM SECTION -->
-    <section class="form-section reveal">
-        
-        <!-- THE FORM -->
-        <form id="codot-form" class="application-form" action="https://formspree.io/f/mrejwply" method="POST">
-            
-            <!-- Anti-Spam Honeypot -->
-            <input type="text" name="_gotcha" style="display:none" />
+    <!-- APPLICATION FORM -->
+    <section class="section">
+        <div class="form-container" id="formWrapper">
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                </div>
 
-            <div class="form-group">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" name="name" required placeholder="John Doe">
-            </div>
+                <div class="form-group">
+                    <label for="type">Project Type</label>
+                    <select id="type" class="form-control" required>
+                        <option value="" disabled selected>Select an option</option>
+                        <option value="Ad-Supported">Free Ad-Supported Build</option>
+                        <option value="Buyout">Direct Commission / Buyout</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Project Description</label>
+                    <textarea id="description" class="form-control" placeholder="Tell us about your business and what you need..." required></textarea>
+                </div>
 
-            <div class="form-group">
-                <label for="email">Work Email</label>
-                <input type="email" id="email" name="email" required placeholder="john@company.com">
-            </div>
-
-            <div class="form-group">
-                <label for="business">Business Name & Current Website (if any)</label>
-                <input type="text" id="business" name="business" required placeholder="e.g. Acme Corp - acme.com">
-            </div>
-
-            <div class="form-group">
-                <label for="traffic">Estimated Monthly Website Traffic</label>
-                <select id="traffic" name="traffic" required>
-                    <option value="" disabled selected>Select an option...</option>
-                    <option value="New Business (No Traffic)">New Business (No Traffic yet)</option>
-                    <option value="1k - 10k Visitors">1,000 - 10,000 Visitors / month</option>
-                    <option value="10k - 50k Visitors">10,000 - 50,000 Visitors / month</option>
-                    <option value="50k+ Visitors">50,000+ Visitors / month</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="project">Why are you a good fit for the CODOT Ad-Model?</label>
-                <textarea id="project" name="project" rows="5" required placeholder="Tell us about your business goals and what you need this website to achieve..."></textarea>
-            </div>
-
-            <button type="submit" id="submit-btn" class="btn">Submit Application</button>
-        </form>
-
-        <!-- INLINE SUCCESS MESSAGE (Hidden initially) -->
-        <div id="form-success">
-            <div class="icon-circle">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <h2>Application Received<span class="dot">.</span></h2>
-            <p>Thank you for applying. Our team will review your details and reach out within 48 hours with next steps.</p>
-            <a href="index.html" class="btn-outline">Return to Home</a>
+                <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
+            </form>
         </div>
 
+        <!-- SUCCESS MESSAGE -->
+        <div class="success-box" id="successBox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h3>Application Received!</h3>
+            <p style="color: var(--text-muted);">Please save your unique tracking ticket below. You can use it to check your project's status at any time.</p>
+            <div class="ticket-id" id="displayTicketID">CO-XXXXXX</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">We will also be in touch via email shortly.</p>
+        </div>
+    </section>
+
+    <!-- TRACK BANNER (Users find this by scrolling) -->
+    <section class="track-banner">
+        <h3>Already applied?</h3>
+        <p>Got your ticket number? Keep an eye on your project's progress.</p>
+        <a href="track.html" class="btn-outline">Track Your Status</a>
     </section>
 
     <!-- FOOTER -->
-    <footer><p>&copy; 2026 CODOT Agency. Built differently.</p></footer>
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
 
-    <script>
-        // Scroll Reveal Logic
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
+    <!-- FIREBASE & LOGIC SCRIPT -->
+    <script type="module">
+        // 1. Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // 2. Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
+            authDomain: "codot-agency.firebaseapp.com",
+            projectId: "codot-agency",
+            storageBucket: "codot-agency.firebasestorage.app",
+            messagingSenderId: "22678307444",
+            appId: "1:22678307444:web:59c72496bad5db86b3c721"
+        };
+
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 4. Form Logic
+        const form = document.getElementById('applicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formWrapper = document.getElementById('formWrapper');
+        const successBox = document.getElementById('successBox');
+        const displayTicketID = document.getElementById('displayTicketID');
+
+        // Function to generate a random 6-character alphanumeric string
+        function generateTicketID() {
+            return 'CO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         }
-        window.addEventListener("scroll", reveal); reveal();
 
-        // AJAX Form Submission Logic
-        var form = document.getElementById("codot-form");
-        var successMessage = document.getElementById("form-success");
-        var submitBtn = document.getElementById("submit-btn");
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent page refresh
 
-        form.addEventListener("submit", async function(event) {
-            event.preventDefault(); // Stops the page from loading the Formspree URL
-            
-            submitBtn.innerHTML = "Sending...";
+            // Disable button and show loading text
             submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
 
-            var data = new FormData(event.target);
-            fetch(event.target.action, {
-                method: form.method,
-                body: data,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    // 1. WIPE THE DATA COMPLETELY
-                    form.reset(); 
-                    
-                    // 2. Hide form and show success message
-                    form.style.display = "none";
-                    successMessage.style.display = "block";
-                    
-                    // 3. Reset the button text for the future
-                    submitBtn.innerHTML = "Submit Application";
-                    submitBtn.disabled = false;
-                } else {
-                    alert("Oops! There was a problem submitting your form.");
-                    submitBtn.innerHTML = "Submit Application";
-                    submitBtn.disabled = false;
-                }
-            }).catch(error => {
-                alert("Oops! There was a problem. Please check your connection.");
-                submitBtn.innerHTML = "Submit Application";
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const type = document.getElementById('type').value;
+            const description = document.getElementById('description').value;
+
+            // Generate Ticket ID
+            const ticketID = generateTicketID();
+
+            try {
+                // Save data to Firestore in a collection called "applications"
+                await addDoc(collection(db, "applications"), {
+                    ticketID: ticketID,
+                    name: name,
+                    email: email,
+                    type: type,
+                    description: description,
+                    status: "Application Under Review", // Default status for new entries
+                    timestamp: serverTimestamp()
+                });
+
+                // On Success: Hide form, show success box
+                formWrapper.style.display = "none";
+                successBox.style.display = "block";
+                displayTicketID.innerText = ticketID;
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Something went wrong. Please try again.");
                 submitBtn.disabled = false;
-            });
+                submitBtn.innerText = "Submit Application";
+            }
         });
     </script>
 </body>
