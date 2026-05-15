@@ -139,6 +139,28 @@
             font-size: 1rem;
         }
 
+        /* --- UPLOAD UI --- */
+        #upload-section {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            border: 1px dashed var(--accent);
+            border-radius: 8px;
+            background: rgba(0, 229, 255, 0.02);
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        #upload-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        input[type="file"] {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -174,6 +196,14 @@
                 <h3 id="status-title">Status: Pending</h3>
                 <p id="status-desc">Your application is currently under review.</p>
             </div>
+
+            <div id="upload-section">
+                <h3>Action Required: Upload Brand Assets</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Please upload any logos, brand guidelines, or specific images as a .zip or image file so our team can begin development.</p>
+                <input type="file" id="fileInput" accept="image/*,.pdf,.zip" />
+                <br/>
+                <button id="uploadBtn" class="btn-solid" style="padding: 0.8rem 1.5rem; font-size: 1rem;">Upload Assets</button>
+            </div>
         </div>
     </section>
 
@@ -183,7 +213,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Added doc and updateDoc for Firestore updates
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Added Storage imports
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
@@ -196,12 +229,22 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Initialize Storage
 
         const trackBtn = document.getElementById('trackBtn');
         const ticketInput = document.getElementById('ticketInput');
         const resultBox = document.getElementById('result-box');
         const statusTitle = document.getElementById('status-title');
         const statusDesc = document.getElementById('status-desc');
+        
+        // Upload Elements
+        const uploadSection = document.getElementById('upload-section');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        // State variables to remember which document we're working on
+        let currentDocId = null;
+        let currentTicketId = null;
 
         trackBtn.addEventListener('click', async () => {
             const ticketId = ticketInput.value.trim().toUpperCase();
@@ -213,20 +256,28 @@
 
             trackBtn.innerText = "Searching...";
             trackBtn.disabled = true;
+            uploadSection.style.display = "none"; // Hide upload UI on new search
 
             try {
-                // FIXED: Querying the "applications" collection for the "ticketID" field
                 const q = query(collection(db, "applications"), where("ticketID", "==", ticketId));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        currentDocId = docSnap.id;       // Save document ID for updates later
+                        currentTicketId = data.ticketID; // Save Ticket ID for folder structure
+
                         showResult(
                             `Status: ${data.status || "Application Under Review"}`, 
                             "Our team is currently processing your project requirements.", 
                             true
                         );
+
+                        // Trigger upload UI if status is exactly "Approved"
+                        if (data.status === "Approved") {
+                            uploadSection.style.display = "block";
+                        }
                     });
                 } else {
                     showResult("Not Found", "No application found with that ID. Please double-check your ticket.", false);
@@ -238,6 +289,50 @@
 
             trackBtn.innerText = "Check Status";
             trackBtn.disabled = false;
+        });
+
+        // --- UPLOAD LOGIC ---
+        uploadBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a file to upload first.");
+                return;
+            }
+
+            uploadBtn.innerText = "Uploading...";
+            uploadBtn.disabled = true;
+
+            try {
+                // 1. Upload to Firebase Storage
+                // Path format: assets/CO-XXXXXX/filename.ext
+                const storageRef = ref(storage, `assets/${currentTicketId}/${file.name}`);
+                await uploadBytes(storageRef, file);
+                
+                // 2. Get the file's download URL
+                const downloadURL = await getDownloadURL(storageRef);
+
+                // 3. Update Firestore Document
+                const docRef = doc(db, "applications", currentDocId);
+                await updateDoc(docRef, {
+                    assetDownloadUrl: downloadURL,
+                    status: "Assets Received - In Development" // Auto-progress status!
+                });
+
+                // 4. Update UI
+                uploadSection.innerHTML = `<div class="status-success" style="padding: 1rem; border-radius: 8px;">
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Assets Uploaded Successfully!</h4>
+                    <p style="color: var(--text-main); font-size: 0.9rem;">We will begin development shortly. Check back later for your live preview link.</p>
+                </div>`;
+                
+                // Update top status indicator too
+                showResult("Status: Assets Received - In Development", "Your assets have been securely received.", true);
+
+            } catch (error) {
+                console.error("Upload Error: ", error);
+                alert("Upload failed. Please try again.");
+                uploadBtn.innerText = "Upload Assets";
+                uploadBtn.disabled = false;
+            }
         });
 
         function showResult(title, desc, isSuccess) {
