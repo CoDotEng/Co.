@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODOT | Elevating Digital Experiences</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <title>CODOT | The Zero-Risk Web Agency</title>
+    <!-- Google Fonts: Space Grotesk for Headings, Inter for Body -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CSS VARIABLES & RESET --- */
         :root {
             --bg-color: #050505;
             --surface-color: #121212;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
-            --accent: #00e5ff;
-            --success: #10b981;
-            --error: #ef4444;
+            --accent: #00e5ff; /* Neon Cyan */
+            --accent-glow: rgba(0, 229, 255, 0.4);
         }
 
         * {
@@ -22,54 +23,78 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-color); 
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Navbar */
+        h1, h2, h3, .logo {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--text-main);
+            transition: color 0.3s ease;
+        }
+
+        /* --- NAVIGATION --- */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 5%;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(10px);
+            padding: 2rem 5%;
             position: fixed;
             width: 100%;
             top: 0;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
             z-index: 1000;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            color: var(--text-main);
-            text-decoration: none;
-            letter-spacing: 1px;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
         }
 
-        .logo span {
+        .dot {
             color: var(--accent);
         }
 
         .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
             margin-left: 2rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .nav-links a:hover {
             color: var(--accent);
         }
 
-        /* Hero Section */
+        .nav-btn {
+            background-color: var(--accent);
+            color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 700 !important;
+        }
+
+        .nav-btn:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* --- HERO SECTION --- */
         .hero {
             height: 100vh;
             display: flex;
@@ -77,316 +102,235 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 20px;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            padding: 0 5%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 70%);
         }
 
         .hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
             line-height: 1.1;
+            margin-bottom: 1.5rem;
         }
 
         .hero p {
-            color: var(--text-muted);
             font-size: 1.2rem;
-            max-width: 600px;
+            color: var(--text-muted);
+            max-width: 650px;
             margin-bottom: 2.5rem;
         }
 
-        .hero-btns {
-            display: flex;
-            gap: 1rem;
+        .btn {
+            padding: 1rem 2.5rem;
+            background-color: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            display: inline-block;
         }
 
-        .btn-primary {
-            background: var(--accent);
+        .btn:hover {
+            background-color: var(--accent);
             color: var(--bg-color);
-            padding: 1rem 2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-family: 'Space Grotesk', sans-serif;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* --- SECTIONS & GRIDS --- */
+        .section {
+            padding: 6rem 5%;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
             font-size: 1.1rem;
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
-            transform: translateY(-2px);
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-main);
-            padding: 1rem 2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-family: 'Space Grotesk', sans-serif;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+        .card {
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* Application Form Section */
-        .apply-section {
-            padding: 6rem 5%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .apply-section h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--accent);
-        }
-
-        .apply-section p.subtitle {
-            color: var(--text-muted);
-            margin-bottom: 3rem;
-        }
-
-        .form-container {
-            background: var(--surface-color); 
-            padding: 3rem; 
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05); 
-            width: 100%; 
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
-        
-        label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            color: var(--text-muted); 
-            font-size: 0.9rem; 
-            font-weight: 600;
-        }
-        
-        input, textarea {
-            width: 100%; 
-            padding: 1rem; 
-            background: var(--bg-color); 
-            color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 6px; 
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            resize: vertical;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
+        .card:hover {
+            transform: translateY(-10px);
             border-color: var(--accent);
         }
 
-        #submitBtn {
-            width: 100%;
-        }
-
-        #formMessage { 
-            margin-top: 1.5rem; 
-            text-align: center; 
-            font-weight: 600; 
-            font-size: 0.95rem;
-            min-height: 24px;
-        }
-
-        .ticket-display {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px dashed var(--accent);
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .ticket-display span {
-            display: block;
-            font-family: 'Space Grotesk', sans-serif;
+        .card h3 {
             font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .step-number {
             color: var(--accent);
-            margin-top: 0.5rem;
-            letter-spacing: 2px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+            display: block;
         }
 
-        /* Footer */
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-link {
+            color: var(--accent);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-link:hover {
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* --- CTA SECTION --- */
+        .cta-section {
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-color) 0%, var(--surface-color) 100%);
+            padding: 8rem 5%;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
         footer {
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 3rem 5%;
+            background-color: var(--surface-color);
             color: var(--text-muted);
-            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .nav-links { display: none; } /* Add a hamburger menu later if needed */
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="#" class="logo">CO<span>DOT</span></a>
+    <!-- NAVIGATION (Now fully linked for a multipage setup) -->
+  <nav>
+      <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#apply">Start Project</a>
-            <a href="track.html">Track Status</a>
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <h1>We Build Digital<br>Experiences.</h1>
-        <p>Premium web design, development, and branding for forward-thinking companies.</p>
-        <div class="hero-btns">
-            <a href="#apply" class="btn-primary">Start a Project</a>
-            <a href="track.html" class="btn-secondary">Track Ticket</a>
-        </div>
+    <!-- HERO: The Zero-Risk Pitch -->
+    <section class="hero">
+        <h1 class="reveal">We Build First.<br>You Pay If You Love It<span class="dot">.</span></h1>
+        <p class="reveal">High-performance, custom-coded websites built exclusively on our zero-risk, ad-supported partnership model.</p>
+        <a href="apply.html" class="btn reveal">Apply for a Website</a>
     </section>
 
-    <!-- Application Form Section -->
-    <section class="apply-section" id="apply">
-        <h2>Let's Work Together</h2>
-        <p class="subtitle">Fill out the form below to receive your project tracking ticket.</p>
+    <!-- THE PARTNERSHIP MODEL (Replaces generic services) -->
+    <section id="model" class="section" style="background-color: var(--surface-color);">
+        <h2 class="section-title reveal">The CODOT Partnership</h2>
+        <p class="section-subtitle reveal">A radically transparent way to get a premium website for your business.</p>
         
-        <div class="form-container">
-            <div class="form-group">
-                <label for="clientName">Full Name / Company</label>
-                <input type="text" id="clientName" placeholder="e.g. John Doe" required>
+        <div class="grid-3">
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">01</span>
+                <h3>The Free Build</h3>
+                <p>We design and code a blazing-fast, custom website tailored perfectly to your brand. You pay $0 upfront for our development time.</p>
             </div>
-
-            <div class="form-group">
-                <label for="clientEmail">Email Address</label>
-                <input type="email" id="clientEmail" placeholder="hello@company.com" required>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">02</span>
+                <h3>The Approval</h3>
+                <p>Review the live staging site. If you love it, you simply cover the cost of your custom domain and backend setup. Don't like it? Walk away, no questions asked.</p>
             </div>
-
-            <div class="form-group">
-                <label for="projectDetails">Project Details</label>
-                <textarea id="projectDetails" rows="4" placeholder="Briefly describe what you want to build..." required></textarea>
-            </div>
-
-            <button id="submitBtn" class="btn-primary">Submit Application</button>
-            <div id="formMessage"></div>
-
-            <div class="ticket-display" id="ticketDisplay">
-                Your Tracking Ticket ID:
-                <span id="generatedTicket"></span>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Please save this ID and use the 'Track Status' page to monitor progress.</p>
+            <div class="card reveal" style="background-color: var(--bg-color);">
+                <span class="step-number">03</span>
+                <h3>Ad-Supported Hosting</h3>
+                <p>We host and maintain your site for free forever. In exchange, we seamlessly integrate high-quality ad spaces. You get a world-class site; we share in the success.</p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- PROOF / WORK SECTION -->
+    <section id="work" class="section">
+        <h2 class="section-title reveal">Built for Speed.</h2>
+        <p class="section-subtitle reveal">See what an ad-supported, premium website looks like.</p>
+        
+        <div class="grid-3" style="grid-template-columns: 1fr; max-width: 800px;">
+            <!-- Project Highlight: Gravity Research -->
+            <div class="card reveal" style="text-align: center; padding: 4rem 2rem;">
+                <h3 style="font-size: 2rem;">Gravity Research</h3>
+                <p style="max-width: 500px; margin: 0 auto 2rem auto;">A modern, responsive landing environment built to present research insights. 100/100 Lighthouse performance score. Launched under the CODOT Partnership Model.</p>
+                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="card-link" style="font-size: 1.1rem;">View Live Site &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION (Funnels to the Apply Page) -->
+    <section class="cta-section">
+        <h2 class="reveal" style="font-size: 3rem; margin-bottom: 1.5rem;">Ready to upgrade your web presence?</h2>
+        <p class="reveal" style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">Because we cover the upfront development costs, we only take on a limited number of new partners each month. Submit your project details to see if we're a match.</p>
+        <a href="apply.html" class="btn reveal" style="background-color: var(--accent); color: var(--bg-color);">Start Your Application</a>
+    </section>
+
+    <!-- FOOTER -->
     <footer>
-        &copy; 2024 CODOT Agency. All rights reserved.
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <!-- FIREBASE SCRIPT -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Your Firebase Configuration (Matched with admin/track panel)
-        const firebaseConfig = {
-            apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
-            authDomain: "codot-agency.firebaseapp.com",
-            projectId: "codot-agency",
-            storageBucket: "codot-agency.firebasestorage.app",
-            messagingSenderId: "22678307444",
-            appId: "1:22678307444:web:59c72496bad5db86b3c721"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Function to generate a random Ticket ID (e.g., CO-A1B2C)
-        function generateTicketID() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = 'CO-';
-            for (let i = 0; i < 5; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+    <!-- JAVASCRIPT FOR SCROLL ANIMATIONS -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
             }
-            return result;
         }
-
-        // Handle Form Submission
-        document.getElementById('submitBtn').addEventListener('click', async () => {
-            const name = document.getElementById('clientName').value.trim();
-            const email = document.getElementById('clientEmail').value.trim();
-            const details = document.getElementById('projectDetails').value.trim();
-            const messageDiv = document.getElementById('formMessage');
-            const btn = document.getElementById('submitBtn');
-            const ticketDisplay = document.getElementById('ticketDisplay');
-            const generatedTicketSpan = document.getElementById('generatedTicket');
-
-            if (!name || !email || !details) {
-                messageDiv.innerText = "Please fill in all fields.";
-                messageDiv.style.color = "var(--error)";
-                return;
-            }
-
-            btn.innerText = "Submitting...";
-            btn.disabled = true;
-            messageDiv.innerText = "Generating ticket and saving application...";
-            messageDiv.style.color = "var(--text-muted)";
-            ticketDisplay.style.display = "none";
-
-            const newTicketID = generateTicketID();
-
-            try {
-                // Add a new document to the "applications" collection
-                await addDoc(collection(db, "applications"), {
-                    name: name,
-                    email: email,
-                    details: details,
-                    ticketID: newTicketID,
-                    status: "1. Application Under Review", // Initial default status
-                    timestamp: new Date()
-                });
-
-                // Success UI Updates
-                messageDiv.innerText = "Application submitted successfully!";
-                messageDiv.style.color = "var(--success)";
-                btn.innerText = "Submit Application";
-                btn.disabled = false;
-                
-                // Show the ticket to the user
-                generatedTicketSpan.innerText = newTicketID;
-                ticketDisplay.style.display = "block";
-
-                // Clear form fields
-                document.getElementById('clientName').value = '';
-                document.getElementById('clientEmail').value = '';
-                document.getElementById('projectDetails').value = '';
-
-            } catch (error) {
-                console.error("Error adding document: ", error);
-                messageDiv.innerText = "Error submitting application. Please try again.";
-                messageDiv.style.color = "var(--error)";
-                btn.innerText = "Submit Application";
-                btn.disabled = false;
-            }
-        });
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
     </script>
 </body>
 </html>
