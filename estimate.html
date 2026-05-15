@@ -33,7 +33,7 @@
             flex-direction: column;
         }
 
-        /* Navbar (Matches Index) */
+        /* Navbar */
         nav {
             display: flex;
             justify-content: space-between;
@@ -55,17 +55,65 @@
             letter-spacing: 1px;
         }
 
-        .logo span { color: var(--accent); }
+        .logo span, .logo .dot { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; 
+        }
 
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
-            margin-left: 2rem;
             font-weight: 600;
             transition: color 0.3s;
         }
 
         .nav-links a:hover { color: var(--accent); }
+        
+        .nav-links a.active {
+            color: var(--text-main);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        /* Secondary CTA (Instant Quote) */
+        .nav-btn-secondary {
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--accent) !important;
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn-secondary:hover {
+            background: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        /* Primary CTA (Apply Now) */
+        .nav-btn-primary {
+            background: var(--accent);
+            color: var(--bg-color) !important;
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn-primary:hover {
+            background: #00c6dd; 
+            border-color: #00c6dd;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+            transform: translateY(-2px);
+        }
 
         /* Estimator Layout */
         .container {
@@ -332,11 +380,15 @@
 </head>
 <body>
 
-    <nav>
-        <a href="index.html" class="logo">CO<span>DOT</span></a>
+     <nav>
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="index.html#apply">Start Project</a>
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+             <a href="estimate.html"class="active">Instant Quote</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
@@ -417,28 +469,27 @@
 
             <div class="result-item">
                 <div class="result-label">Estimated Investment</div>
-                <div class="result-value highlight" id="priceEstimate">$1,500</div>
+                <div class="result-value highlight" id="priceEstimate">₹4,000</div>
             </div>
 
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
                 * This is a rough estimate. Final pricing depends on specific feature requirements and complexity.
             </p>
 
-            <a href="index.html#apply" class="btn-primary">Lock in this Quote</a>
+            <a href="apply.html" class="btn-primary">Lock in this Quote</a>
         </div>
     </div>
 
     <script>
-        // Data & Base Rates
-        // Prices are completely customizable. Change these to match your actual agency rates!
+        // Data & Base Rates - SUPER CHEAP INR PRICING
         const rates = {
-            landing: { basePrice: 500, baseWeeks: 1, perPagePrice: 100, perPageDays: 1 },
-            corporate: { basePrice: 1000, baseWeeks: 2, perPagePrice: 150, perPageDays: 1.5 },
-            ecommerce: { basePrice: 2500, baseWeeks: 4, perPagePrice: 200, perPageDays: 2 },
-            webapp: { basePrice: 4000, baseWeeks: 6, perPagePrice: 300, perPageDays: 3 }
+            landing: { basePrice: 1500, baseWeeks: 1, perPagePrice: 300, perPageDays: 0.5 },
+            corporate: { basePrice: 3500, baseWeeks: 2, perPagePrice: 500, perPageDays: 1 },
+            ecommerce: { basePrice: 6500, baseWeeks: 3, perPagePrice: 800, perPageDays: 1.5 },
+            webapp: { basePrice: 9000, baseWeeks: 4, perPagePrice: 1200, perPageDays: 2 }
         };
 
-        const customDesignMultiplier = 1.4; // 40% extra for custom UI/UX
+        const customDesignMultiplier = 1.3; // 30% extra for custom UI/UX
 
         // DOM Elements
         const radios = document.querySelectorAll('input[name="projectType"]');
@@ -484,9 +535,9 @@
             pageOutput.innerText = pages;
             timeElement.innerText = `${minWeeks}-${maxWeeks} Weeks`;
             
-            // Format Price with commas
-            const formattedPrice = Math.round(totalPrice).toLocaleString();
-            priceElement.innerText = `$${formattedPrice}`;
+            // Format Price with Indian commas (e.g., 1,50,000) and INR symbol
+            const formattedPrice = Math.round(totalPrice).toLocaleString('en-IN');
+            priceElement.innerText = `₹${formattedPrice}`;
         }
 
         // Event Listeners
