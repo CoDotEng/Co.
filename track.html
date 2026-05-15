@@ -139,7 +139,7 @@
             font-size: 1rem;
         }
 
-        /* --- UPLOAD UI --- */
+        /* --- UPLOAD UI & PREFERENCES --- */
         #upload-section {
             display: none;
             margin-top: 2rem;
@@ -152,13 +152,49 @@
         }
         
         #upload-section h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             color: var(--text-main);
         }
 
-        input[type="file"] {
+        .pref-group {
             margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .pref-group label {
+            display: block;
+            margin-bottom: 0.5rem;
             color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pref-group select, 
+        .pref-group textarea, 
+        .pref-group input[type="file"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-color);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .pref-group select:focus, 
+        .pref-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+        }
+
+        .pref-group textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
@@ -198,11 +234,42 @@
             </div>
 
             <div id="upload-section">
-                <h3>Action Required: Upload Brand Assets</h3>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Please upload any logos, brand guidelines, or specific images as a .zip or image file so our team can begin development.</p>
-                <input type="file" id="fileInput" accept="image/*,.pdf,.zip" />
-                <br/>
-                <button id="uploadBtn" class="btn-solid" style="padding: 0.8rem 1.5rem; font-size: 1rem;">Upload Assets</button>
+                <h3>Project Setup & Preferences</h3>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Configure your project details and upload your assets to begin.</p>
+                
+                <div class="pref-group">
+                    <label>Primary Brand Theme</label>
+                    <select id="themeColor">
+                        <option value="Cyber Neon (Cyan/Blue)">Cyber Neon (Cyan/Blue)</option>
+                        <option value="Midnight Minimal (Black/White)">Midnight Minimal (Black/White)</option>
+                        <option value="Electric Purple / Pink">Electric Purple / Pink</option>
+                        <option value="Earthy & Natural (Greens/Browns)">Earthy & Natural (Greens/Browns)</option>
+                        <option value="Corporate Professional (Navy/Grey)">Corporate Professional (Navy/Grey)</option>
+                        <option value="Custom (Mention in notes)">Custom (Mention in notes)</option>
+                    </select>
+                </div>
+
+                <div class="pref-group">
+                    <label>Design Vibe / Tone</label>
+                    <select id="designVibe">
+                        <option value="Ultra Modern & Edgy">Ultra Modern & Edgy</option>
+                        <option value="Clean & Minimalist">Clean & Minimalist</option>
+                        <option value="Creative & Playful">Creative & Playful</option>
+                        <option value="Luxury & Premium">Luxury & Premium</option>
+                    </select>
+                </div>
+
+                <div class="pref-group">
+                    <label>Additional Notes & Instructions</label>
+                    <textarea id="clientNotes" placeholder="Competitor sites you like? Specific animations? Tell us here..."></textarea>
+                </div>
+
+                <div class="pref-group">
+                    <label>Upload Brand Assets (.zip, .png, .pdf)</label>
+                    <input type="file" id="fileInput" accept="image/*,.pdf,.zip" />
+                </div>
+                
+                <button id="uploadBtn" class="btn-solid" style="width: 100%; margin-top: 1rem;">Submit Details & Assets</button>
             </div>
         </div>
     </section>
@@ -213,9 +280,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // Added doc and updateDoc for Firestore updates
         import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // Added Storage imports
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         const firebaseConfig = {
@@ -229,7 +294,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app); // Initialize Storage
+        const storage = getStorage(app); 
 
         const trackBtn = document.getElementById('trackBtn');
         const ticketInput = document.getElementById('ticketInput');
@@ -237,12 +302,14 @@
         const statusTitle = document.getElementById('status-title');
         const statusDesc = document.getElementById('status-desc');
         
-        // Upload Elements
+        // Form Elements
         const uploadSection = document.getElementById('upload-section');
         const fileInput = document.getElementById('fileInput');
+        const themeColor = document.getElementById('themeColor');
+        const designVibe = document.getElementById('designVibe');
+        const clientNotes = document.getElementById('clientNotes');
         const uploadBtn = document.getElementById('uploadBtn');
 
-        // State variables to remember which document we're working on
         let currentDocId = null;
         let currentTicketId = null;
 
@@ -256,7 +323,7 @@
 
             trackBtn.innerText = "Searching...";
             trackBtn.disabled = true;
-            uploadSection.style.display = "none"; // Hide upload UI on new search
+            uploadSection.style.display = "none"; 
 
             try {
                 const q = query(collection(db, "applications"), where("ticketID", "==", ticketId));
@@ -265,8 +332,8 @@
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
-                        currentDocId = docSnap.id;       // Save document ID for updates later
-                        currentTicketId = data.ticketID; // Save Ticket ID for folder structure
+                        currentDocId = docSnap.id;       
+                        currentTicketId = data.ticketID; 
 
                         showResult(
                             `Status: ${data.status || "Application Under Review"}`, 
@@ -274,8 +341,7 @@
                             true
                         );
 
-                        // --- THIS IS THE MAGIC TRIGGER WE CHANGED! ---
-                        // Trigger upload UI if status is exactly what the Admin Panel sends
+                        // Magic Trigger logic: Exposes form on exactly this status
                         if (data.status === "2. Awaiting Preferences & Assets") {
                             uploadSection.style.display = "block";
                         }
@@ -292,46 +358,49 @@
             trackBtn.disabled = false;
         });
 
-        // --- UPLOAD LOGIC ---
+        // --- SUBMIT PREFERENCES & UPLOAD LOGIC ---
         uploadBtn.addEventListener('click', async () => {
             const file = fileInput.files[0];
+            
             if (!file) {
-                alert("Please select a file to upload first.");
+                alert("Please attach your assets file (.zip, .pdf, or image) before submitting.");
                 return;
             }
 
-            uploadBtn.innerText = "Uploading...";
+            uploadBtn.innerText = "Processing & Uploading...";
             uploadBtn.disabled = true;
 
             try {
-                // 1. Upload to Firebase Storage
-                // Path format: assets/CO-XXXXXX/filename.ext
+                // 1. Upload file to Storage
                 const storageRef = ref(storage, `assets/${currentTicketId}/${file.name}`);
                 await uploadBytes(storageRef, file);
                 
-                // 2. Get the file's download URL
+                // 2. Get the download URL
                 const downloadURL = await getDownloadURL(storageRef);
 
-                // 3. Update Firestore Document
+                // 3. Update Firestore with URL AND the new Form Preferences
                 const docRef = doc(db, "applications", currentDocId);
                 await updateDoc(docRef, {
                     assetDownloadUrl: downloadURL,
-                    status: "3. Preferences Received & Planning" // Auto-progress status to the next logical step!
+                    clientThemePref: themeColor.value,
+                    clientVibePref: designVibe.value,
+                    clientCustomNotes: clientNotes.value,
+                    status: "3. Preferences Received & Planning" 
                 });
 
-                // 4. Update UI
+                // 4. Update UI to hide the form and show success
                 uploadSection.innerHTML = `<div class="status-success" style="padding: 1rem; border-radius: 8px;">
-                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Assets Uploaded Successfully!</h4>
-                    <p style="color: var(--text-main); font-size: 0.9rem;">We will begin development shortly. Check back later for your live preview link.</p>
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Data & Assets Secured!</h4>
+                    <p style="color: var(--text-main); font-size: 0.9rem;">Your preferences have been logged. We are moving into the Planning & Prototyping phase.</p>
                 </div>`;
                 
-                // Update top status indicator too
-                showResult("Status: 3. Preferences Received & Planning", "Your assets have been securely received.", true);
+                // Update Top status
+                showResult("Status: 3. Preferences Received & Planning", "Your project setup is complete.", true);
 
             } catch (error) {
-                console.error("Upload Error: ", error);
-                alert("Upload failed. Please try again.");
-                uploadBtn.innerText = "Upload Assets";
+                console.error("Submission Error: ", error);
+                alert("Submission failed. Please check your connection and try again.");
+                uploadBtn.innerText = "Submit Details & Assets";
                 uploadBtn.disabled = false;
             }
         });
