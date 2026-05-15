@@ -274,8 +274,9 @@
                             true
                         );
 
-                        // Trigger upload UI if status is exactly "Approved"
-                        if (data.status === "Approved") {
+                        // --- THIS IS THE MAGIC TRIGGER WE CHANGED! ---
+                        // Trigger upload UI if status is exactly what the Admin Panel sends
+                        if (data.status === "2. Awaiting Preferences & Assets") {
                             uploadSection.style.display = "block";
                         }
                     });
@@ -315,7 +316,7 @@
                 const docRef = doc(db, "applications", currentDocId);
                 await updateDoc(docRef, {
                     assetDownloadUrl: downloadURL,
-                    status: "Assets Received - In Development" // Auto-progress status!
+                    status: "3. Preferences Received & Planning" // Auto-progress status to the next logical step!
                 });
 
                 // 4. Update UI
@@ -325,7 +326,7 @@
                 </div>`;
                 
                 // Update top status indicator too
-                showResult("Status: Assets Received - In Development", "Your assets have been securely received.", true);
+                showResult("Status: 3. Preferences Received & Planning", "Your assets have been securely received.", true);
 
             } catch (error) {
                 console.error("Upload Error: ", error);
