@@ -33,20 +33,71 @@
         /* --- NAVIGATION --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0;
             background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
             z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
         .dot { color: var(--accent); }
         
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-        .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; 
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+
+        .nav-links a {
+            color: var(--text-muted);
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        
+        .nav-links a.active {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        /* Secondary CTA (Instant Quote) */
+        .nav-btn-secondary {
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--accent) !important;
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: none !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn-secondary:hover {
+            background: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        /* Primary CTA (Apply Now) */
+        .nav-btn-primary {
+            background: var(--accent);
+            color: var(--bg-color) !important;
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: none !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn-primary:hover {
+            background: #00c6dd; 
+            border-color: #00c6dd;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+            transform: translateY(-2px);
+        }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -127,10 +178,11 @@
         .btn {
             padding: 1rem 2.5rem; background-color: var(--accent); color: var(--bg-color);
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 6px; display: inline-block;
             margin-top: 2rem;
+            border: none;
         }
-        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
+        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
 
         /* --- FOOTER --- */
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
@@ -152,19 +204,19 @@
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
-            <a href="model.html"class="active">How It Works</a>
+            <a href="model.html" class="active">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
-            <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="estimate.html" class="nav-btn-secondary">Instant Quote</a>
+            <a href="apply.html" class="nav-btn-primary">Apply Now</a>
         </div>
     </nav>
 
     <!-- HEADER -->
     <header class="page-header">
         <h1 class="reveal">Radical Transparency<span class="dot">.</span></h1>
-        <p class="reveal">We believe small businesses shouldn't have to risk thousands of dollars for a website that might not convert. Here is exactly how our partnership model works.</p>
+        <p class="reveal">We believe small businesses shouldn't have to risk lakhs of rupees for a website that might not convert. Here is exactly how our partnership model works.</p>
     </header>
 
     <!-- THE PROCESS -->
@@ -176,7 +228,7 @@
             <div class="step-content">
                 <h3>The Free Build</h3>
                 <p>After your application is accepted, our team gets to work. We design, code, and optimize a custom website for your brand. <span class="highlight">We do not use slow templates or clunky builders.</span> Every site is hard-coded for maximum speed and performance.</p>
-                <p><strong>Your Cost:</strong> $0.00</p>
+                <p><strong>Your Cost:</strong> ₹0</p>
             </div>
         </div>
 
@@ -193,8 +245,8 @@
             <div class="step-number">03</div>
             <div class="step-content">
                 <h3>Domain & Activation</h3>
-                <p>When you give the green light, we push the site live. <span class="highlight">You retain full ownership of your brand.</span> You simply purchase your own domain name (e.g., yourbusiness.com) and any necessary backend services (like email hosting). We handle the technical connection.</p>
-                <p><strong>Your Cost:</strong> Standard domain registrar fees (usually $10-$20/year).</p>
+                <p>When you give the green light, we push the site live. <span class="highlight">You retain full ownership of your brand.</span> You simply purchase your own domain name (e.g., yourbusiness.in) and any necessary backend services (like email hosting). We handle the technical connection.</p>
+                <p><strong>Your Cost:</strong> Standard domain registrar fees (usually ₹800 - ₹1,500/year).</p>
             </div>
         </div>
 
@@ -202,12 +254,12 @@
             <div class="step-number">04</div>
             <div class="step-content">
                 <h3>The Ad-Supported Partnership</h3>
-                <p>Instead of charging you $3,000+ for the website and $100/mo for maintenance, <span class="highlight">we host and maintain the site for free forever.</span> In exchange, CODOT integrates highly curated, non-intrusive ad spaces into the layout. We collect the ad revenue to cover our development and hosting costs. When your business grows and gets traffic, we both win.</p>
+                <p>Instead of charging you ₹50,000+ for the website and ₹3,000/mo for maintenance, <span class="highlight">we host and maintain the site for free forever.</span> In exchange, CODOT integrates highly curated, non-intrusive ad spaces into the layout. We collect the ad revenue to cover our development and hosting costs. When your business grows and gets traffic, we both win.</p>
             </div>
         </div>
     </section>
 
-    <!-- THE MUTUAL ADVANTAGE SECTION (Replaces the FAQ) -->
+    <!-- THE MUTUAL ADVANTAGE SECTION -->
     <section class="section" style="background-color: var(--bg-color);">
         <h2 class="section-title reveal">The Mutual Advantage.</h2>
         <p class="reveal" style="text-align: center; color: var(--text-muted); margin-bottom: 4rem; margin-top: -2rem;">Why our zero-risk model outperforms traditional web agencies.</p>
@@ -215,7 +267,7 @@
         <div class="advantage-grid">
             <div class="adv-card reveal">
                 <h3>Financial Freedom</h3>
-                <p>Keep your capital. Instead of dropping $5,000+ on a website build, you can invest that money directly into your marketing, product development, or team.</p>
+                <p>Keep your capital. Instead of dropping ₹50,000+ on a website build, you can invest that money directly into your marketing, product development, or team.</p>
             </div>
             
             <div class="adv-card reveal">
@@ -256,7 +308,7 @@
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal();
+        reveal(); // Trigger on load
     </script>
 </body>
 </html>
