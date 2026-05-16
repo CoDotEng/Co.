@@ -222,7 +222,6 @@
                 <h3>Project Setup & Preferences</h3>
                 <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 0.9rem; text-align: center;">Configure your brand identity and upload your assets.</p>
                 
-                <!-- UPGRADED COLOR GRID -->
                 <div class="pref-group">
                     <label>Brand Palette</label>
                     <div class="color-grid">
@@ -241,7 +240,6 @@
                     </div>
                 </div>
 
-                <!-- VIBE CARDS -->
                 <div class="pref-group">
                     <label>Design Identity & Vibe</label>
                     <div class="vibe-grid" id="vibeContainer">
@@ -269,9 +267,8 @@
                     <textarea id="clientNotes" placeholder="Drop competitor site links, specific animation requests, or extra context here..."></textarea>
                 </div>
 
-                <!-- UPGRADED CUSTOM FILE UPLOAD -->
                 <div class="pref-group">
-                    <label>Brand Assets (.zip, .png, .pdf)</label>
+                    <label>Brand Assets (.zip, .png, .pdf) - Optional</label>
                     <label for="fileInput" class="custom-file-upload" id="fileLabel">
                         📁 Click to Browse or Drag File Here
                     </label>
@@ -391,28 +388,25 @@
             trackBtn.disabled = false;
         });
 
-        // --- SUBMIT PREFERENCES & EXACT COLOR LOGIC ---
+        // --- FIXED SUBMIT PREFERENCES & EXACT COLOR LOGIC ---
         uploadBtn.addEventListener('click', async () => {
-            const file = fileInput.files[0];
             
-            if (!file) {
-                alert("Please attach your assets file (.zip, .png, or .pdf) before submitting.");
+            // Fix 1: Ensure currentDocId exists before trying to update Firestore
+            if (!currentDocId || !currentTicketId) {
+                alert("Error: Missing document reference. Please search your ticket ID again.");
                 return;
             }
+
+            const file = fileInput.files[0];
 
             uploadBtn.innerText = "Processing & Uploading...";
             uploadBtn.disabled = true;
 
             try {
-                const storageRef = ref(storage, `assets/${currentTicketId}/${file.name}`);
-                await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(storageRef);
-
                 const docRef = doc(db, "applications", currentDocId);
                 
-                // PUSHING EXACT DATA TO FIRESTORE
-                await updateDoc(docRef, {
-                    assetDownloadUrl: downloadURL,
+                // Fix 2: Build the base update payload independent of file upload
+                const updateData = {
                     colors: {
                         primary: primaryColor.value,    // Ex: "#00e5ff"
                         secondary: secondaryColor.value,  // Ex: "#ff007f"
@@ -421,7 +415,18 @@
                     clientVibePref: selectedVibe, 
                     clientCustomNotes: clientNotes.value,
                     status: "3. Preferences Received & Planning" 
-                });
+                };
+
+                // Fix 3: Optional File Upload logic
+                if (file) {
+                    const storageRef = ref(storage, `assets/${currentTicketId}/${file.name}`);
+                    await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(storageRef);
+                    updateData.assetDownloadUrl = downloadURL; // Only append URL if file uploaded
+                }
+
+                // Push exact data to Firestore
+                await updateDoc(docRef, updateData);
 
                 uploadSection.innerHTML = `<div class="status-success" style="padding: 1.5rem; border-radius: 8px;">
                     <h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.2rem;">🚀 Data & Assets Secured!</h4>
@@ -432,7 +437,7 @@
 
             } catch (error) {
                 console.error("Submission Error: ", error);
-                alert("Submission failed. Please check your connection and try again.");
+                alert("Submission failed. Please check your connection or Firebase Security Rules and try again.");
                 uploadBtn.innerText = "Lock In Preferences & Upload";
                 uploadBtn.disabled = false;
             }
