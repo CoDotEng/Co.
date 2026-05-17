@@ -14,7 +14,6 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
-            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,15 +77,17 @@
         .benefit-card h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
         .benefit-card p { color: var(--text-muted); font-size: 0.95rem; }
 
-        /* --- PRICING TIERS --- */
+        /* --- PRICING TIER (Centered for single item) --- */
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: 1fr;
+            max-width: 600px;
+            margin: 0 auto;
             gap: 2rem;
         }
         .pricing-card {
             background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--accent);
             border-radius: 12px;
             padding: 3rem;
             display: flex;
@@ -97,14 +98,13 @@
         }
         .pricing-card:hover {
             transform: translateY(-10px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
         }
         .pricing-tag {
             position: absolute;
             top: 1.5rem; right: 1.5rem;
-            background: rgba(0, 229, 255, 0.1);
-            color: var(--accent);
+            background: var(--accent);
+            color: var(--bg-color);
             padding: 0.3rem 0.8rem;
             border-radius: 50px;
             font-size: 0.8rem;
@@ -122,15 +122,6 @@
         .feature-list li { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem; color: var(--text-main); }
         .feature-list li svg { color: var(--accent); flex-shrink: 0; }
 
-        .btn-outline {
-            padding: 1rem; width: 100%; text-align: center;
-            background-color: transparent; color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
-            border-radius: 4px; display: inline-block;
-        }
-        .btn-outline:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-        
         .btn-solid {
             padding: 1rem; width: 100%; text-align: center;
             background-color: var(--accent); color: var(--bg-color);
@@ -149,7 +140,6 @@
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .pricing-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -214,23 +204,7 @@
         <div class="pricing-grid">
             
             <div class="pricing-card reveal">
-                <div class="pricing-tag">Existing Partners</div>
-                <h3>The Exit Clause</h3>
-                <div class="price">Custom <span>/ flat fee</span></div>
-                <p>For current CODOT partners who want to graduate from the ad-supported hosting model. <span class="disclaimer-text">*Valuation depends on current site metrics and generated revenue.</span></p>
-                
-                <ul class="feature-list">
-                    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete ad removal</li>
-                    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Codebase zip delivery</li>
-                    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Migration assistance</li>
-                    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Transfer of copyright</li>
-                </ul>
-                
-                <button id="assessmentBtn" class="btn-outline">Request Assessment</button>
-            </div>
-
-            <div class="pricing-card reveal" style="border-color: rgba(0, 229, 255, 0.3);">
-                <div class="pricing-tag" style="background: var(--accent); color: var(--bg-color);">Skip the Line</div>
+                <div class="pricing-tag">Skip the Line</div>
                 <h3>Direct Commission</h3>
                 <div class="price">₹2,000+ <span>/ base upfront</span></div>
                 <p>Bypass the Ad-Supported application process. Hire CODOT as a traditional agency for a custom, ad-free build. 
@@ -254,24 +228,6 @@
     </footer>
 
     <script>
-        // Interactive Request Assessment Button Logic
-        document.getElementById('assessmentBtn').addEventListener('click', function() {
-            const btn = this;
-            btn.innerText = "Processing...";
-            btn.style.opacity = "0.7";
-            
-            // Simulating an API call out to the backend
-            setTimeout(() => {
-                btn.innerText = "Request Sent ✓";
-                btn.style.opacity = "1";
-                btn.style.borderColor = "var(--success)";
-                btn.style.color = "var(--success)";
-                btn.style.cursor = "default";
-                btn.disabled = true;
-            }, 800);
-        });
-
-        // Scroll Reveal
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
