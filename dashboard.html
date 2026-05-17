@@ -143,7 +143,7 @@
             display: inline-block; width: 100%; text-align: center;
             background: rgba(255,255,255,0.05); color: var(--text-main);
             padding: 1rem; border-radius: 6px; font-weight: 600; margin-top: auto;
-            border: 1px solid var(--border-color); transition: all 0.3s ease;
+            border: 1px solid var(--border-color); transition: all 0.3s ease; cursor: pointer;
         }
         .btn-dash:hover { background: var(--accent); color: var(--bg-color); border-color: var(--accent); }
         
@@ -163,6 +163,27 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* --- TOAST NOTIFICATION SYSTEM --- */
+        #toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: var(--surface-color); color: var(--text-main);
+            border: 1px solid var(--border-color); border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem; border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem; font-weight: 600;
+            opacity: 0; transform: translateX(100%);
+            animation: slideIn 0.3s forwards; min-width: 280px;
+        }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--error); }
+        .toast.info { border-left-color: var(--accent); }
+
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideOut { to { opacity: 0; transform: translateX(100%); } }
+
         /* Footer */
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid var(--border-color); margin-top: auto; }
 
@@ -177,6 +198,9 @@
         <div class="spinner"></div>
         <p style="font-family: 'Space Grotesk', sans-serif; color: var(--text-muted);">Authenticating Client...</p>
     </div>
+
+    <div id="toast-container"></div>
+
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
@@ -205,6 +229,23 @@
                 }
             });
         });
+
+        // Global Toast Notification Function
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
     </script>
 
     <header class="dash-header">
@@ -303,8 +344,8 @@
 
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <a href="mailto:support@codotagency.com" class="btn-dash">Email Developer Support</a>
-                <a href="#" class="btn-dash" onclick="alert('Staging link will be available once development is complete.')">View Staging Environment</a>
-                <a href="#" class="btn-dash">Upload Brand Assets (Drive)</a>
+                <a href="#" class="btn-dash" onclick="event.preventDefault(); window.showToast('Staging link will be available once development is complete.', 'info');">View Staging Environment</a>
+                <a href="#" class="btn-dash" onclick="event.preventDefault(); window.showToast('Asset upload is handled securely in the Track Build panel.', 'info');">Upload Brand Assets (Drive)</a>
             </div>
         </div>
 
@@ -416,6 +457,7 @@
                 }
             } catch (error) {
                 console.error("Error fetching project data:", error);
+                window.showToast("Failed to fetch project details.", "error");
             }
         }
 
@@ -425,6 +467,7 @@
                 window.location.replace("login.html");
             }).catch((error) => {
                 console.error("Sign Out Error", error);
+                window.showToast("Error signing out.", "error");
             });
         });
 
