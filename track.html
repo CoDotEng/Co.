@@ -15,6 +15,7 @@
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
             --card-border: rgba(255,255,255,0.08);
+            --error: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,10 +100,10 @@
             border-radius: 8px; text-align: left; animation: fadeIn 0.5s ease-out;
         }
         .status-success { background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent); }
-        .status-error { background: rgba(255, 71, 87, 0.05); border: 1px solid #ff4757; }
+        .status-error { background: rgba(239, 68, 68, 0.05); border: 1px solid var(--error); }
         #status-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
         .status-success #status-title { color: var(--accent); }
-        .status-error #status-title { color: #ff4757; }
+        .status-error #status-title { color: var(--error); }
         #status-desc { color: var(--text-muted); font-size: 1rem; }
 
         /* --- PREMIUM UPLOAD UI & PREFERENCES --- */
@@ -203,20 +204,15 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
             let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Find all the links in the navigation
             const navLinks = document.querySelectorAll(".nav-links a");
             
             navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
+                    link.style.color = "var(--accent)"; 
                     
-                    // Add a bottom border to everything except the Apply button
                     if (!link.classList.contains("nav-btn")) {
                         link.style.borderBottom = "2px solid var(--accent)";
                         link.style.paddingBottom = "5px";
@@ -391,14 +387,28 @@
                         currentDocId = docSnap.id;       
                         currentTicketId = data.ticketID; 
 
-                        showResult(
-                            `Status: ${data.status || "Application Under Review"}`, 
-                            "Our team is currently processing your project requirements.", 
-                            true
-                        );
+                        const statusRaw = data.status || "1. Application Under Review";
 
-                        if (data.status === "2. Awaiting Preferences & Assets") {
-                            uploadSection.style.display = "block";
+                        // Handle Rejected State specifically
+                        if (statusRaw === "Rejected") {
+                            showResult(
+                                "Status: Rejected", 
+                                "Unfortunately, your application was not approved at this time. Please contact support for more details.", 
+                                false // triggers the red UI
+                            );
+                        } else {
+                            // Extract just the status text (e.g., "Application Under Review" from "1. Application Under Review")
+                            const cleanStatus = statusRaw.includes('. ') ? statusRaw.split('. ')[1] : statusRaw;
+                            
+                            showResult(
+                                `Status: ${cleanStatus}`, 
+                                "Our team is currently processing your project requirements.", 
+                                true // triggers the cyan UI
+                            );
+
+                            if (statusRaw === "2. Awaiting Preferences & Assets") {
+                                uploadSection.style.display = "block";
+                            }
                         }
                     });
                 } else {
@@ -413,10 +423,8 @@
             trackBtn.disabled = false;
         });
 
-        // --- FIXED SUBMIT PREFERENCES & EXACT COLOR LOGIC ---
+        // Submit Preferences & Colors
         uploadBtn.addEventListener('click', async () => {
-            
-            // Fix 1: Ensure currentDocId exists before trying to update Firestore
             if (!currentDocId || !currentTicketId) {
                 alert("Error: Missing document reference. Please search your ticket ID again.");
                 return;
@@ -430,27 +438,24 @@
             try {
                 const docRef = doc(db, "applications", currentDocId);
                 
-                // Fix 2: Build the base update payload independent of file upload
                 const updateData = {
                     colors: {
-                        primary: primaryColor.value,    // Ex: "#00e5ff"
-                        secondary: secondaryColor.value,  // Ex: "#ff007f"
-                        background: bgColor.value         // Ex: "#050505"
+                        primary: primaryColor.value,    
+                        secondary: secondaryColor.value,  
+                        background: bgColor.value         
                     },
                     clientVibePref: selectedVibe, 
                     clientCustomNotes: clientNotes.value,
                     status: "3. Preferences Received & Planning" 
                 };
 
-                // Fix 3: Optional File Upload logic
                 if (file) {
                     const storageRef = ref(storage, `assets/${currentTicketId}/${file.name}`);
                     await uploadBytes(storageRef, file);
                     const downloadURL = await getDownloadURL(storageRef);
-                    updateData.assetDownloadUrl = downloadURL; // Only append URL if file uploaded
+                    updateData.assetDownloadUrl = downloadURL; 
                 }
 
-                // Push exact data to Firestore
                 await updateDoc(docRef, updateData);
 
                 uploadSection.innerHTML = `<div class="status-success" style="padding: 1.5rem; border-radius: 8px;">
@@ -458,7 +463,7 @@
                     <p style="color: var(--text-main); font-size: 0.95rem;">Your exact color hex codes and design vibe have been synced to our backend. We are moving into the Planning & Prototyping phase.</p>
                 </div>`;
                 
-                showResult("Status: 3. Preferences Received & Planning", "Your project setup is complete.", true);
+                showResult("Status: Preferences Received & Planning", "Your project setup is complete.", true);
 
             } catch (error) {
                 console.error("Submission Error: ", error);
