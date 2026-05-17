@@ -17,6 +17,7 @@
             --border-color: rgba(255, 255, 255, 0.05);
             --success: #00e676;
             --warning: #ffea00;
+            --error: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -106,6 +107,7 @@
         }
         .badge.active { background: rgba(0, 229, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); }
         .badge.pending { background: rgba(255, 234, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .badge.rejected { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid var(--error); }
 
         /* Project Status Tracker */
         .status-track { margin-top: 1rem; }
@@ -126,6 +128,10 @@
         .step-text p { font-size: 0.85rem; color: var(--text-muted); }
         .status-step.completed .step-text h4 { color: var(--text-muted); }
         .status-step.current .step-text h4 { color: var(--accent); }
+
+        /* Rejected State Track Styling */
+        .status-step.rejected .step-dot { background: rgba(239, 68, 68, 0.1); border-color: var(--error); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .status-step.rejected .step-text h4 { color: var(--error); }
 
         /* Data Rows */
         .data-row { display: flex; justify-content: space-between; margin-bottom: 1rem; }
@@ -171,7 +177,7 @@
         <div class="spinner"></div>
         <p style="font-family: 'Space Grotesk', sans-serif; color: var(--text-muted);">Authenticating Client...</p>
     </div>
-<nav>
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
@@ -185,20 +191,13 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
             let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Find all the links in the navigation
             const navLinks = document.querySelectorAll(".nav-links a");
-            
             navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
+                    link.style.color = "var(--accent)";
                     if (!link.classList.contains("nav-btn")) {
                         link.style.borderBottom = "2px solid var(--accent)";
                         link.style.paddingBottom = "5px";
@@ -218,44 +217,44 @@
 
     <section class="dashboard-container">
         
-        <div class="dash-card reveal">
+        <div class="dash-card reveal" id="buildCard">
             <div class="card-header">
                 <h2>Active Build</h2>
-                <span class="badge pending">In Progress</span>
+                <span id="buildBadge" class="badge pending">Loading...</span>
             </div>
             
             <div class="data-row">
                 <span class="data-label">Project Name</span>
-                <span class="data-value">Custom Landing Page</span>
+                <span id="displayProjectName" class="data-value">Fetching...</span>
             </div>
             <div class="data-row">
                 <span class="data-label">Est. Delivery</span>
-                <span class="data-value">Nov 14, 2026</span>
+                <span id="displayEstDelivery" class="data-value">Fetching...</span>
             </div>
 
-            <div class="status-track">
-                <div class="status-step completed">
+            <div class="status-track" id="statusTrack">
+                <div class="status-step" id="step1">
                     <div class="step-dot"></div>
                     <div class="step-text">
-                        <h4>Design & Prototyping</h4>
-                        <p>UI/UX wireframes approved.</p>
+                        <h4>Planning & Design</h4>
+                        <p>UI/UX wireframes and assets.</p>
                     </div>
                 </div>
-                <div class="status-step current">
+                <div class="status-step" id="step2">
                     <div class="step-dot"></div>
                     <div class="step-text">
                         <h4>Development</h4>
-                        <p>Hard-coding your custom assets.</p>
+                        <p>Hard-coding your custom build.</p>
                     </div>
                 </div>
-                <div class="status-step">
+                <div class="status-step" id="step3">
                     <div class="step-dot"></div>
                     <div class="step-text">
-                        <h4>Staging Review</h4>
+                        <h4>Final Testing</h4>
                         <p>Pending your final approval.</p>
                     </div>
                 </div>
-                <div class="status-step">
+                <div class="status-step" id="step4">
                     <div class="step-dot"></div>
                     <div class="step-text">
                         <h4>Live Deployment</h4>
@@ -316,9 +315,9 @@
     </footer>
 
     <script type="module">
-        // --- 1. FIREBASE AUTHENTICATION PROTECTION ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
@@ -331,27 +330,94 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         // Check user state immediately on load
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in. Hide loader, show page.
                 document.getElementById('authLoader').style.display = 'none';
                 
-                // Set the client's name based on their login info
-                let displayName = user.displayName;
-                if (!displayName && user.email) {
-                    // Fallback to the first part of their email if no name is set
-                    displayName = user.email.split('@')[0];
-                }
-                if (displayName) {
-                    document.getElementById('clientName').innerText = displayName;
-                }
+                let displayName = user.displayName || user.email.split('@')[0];
+                document.getElementById('clientName').innerText = displayName;
+
+                // Fetch dynamic data from database
+                fetchClientProject(user.email);
             } else {
-                // User is NOT signed in. Kick them back to login page.
                 window.location.replace("login.html");
             }
         });
+
+        async function fetchClientProject(email) {
+            try {
+                const q = query(collection(db, "applications"), where("clientEmail", "==", email));
+                const snap = await getDocs(q);
+                
+                if (!snap.empty) {
+                    const data = snap.docs[0].data();
+                    const statusRaw = data.status || "1. Application Under Review";
+                    const isRejected = statusRaw === "Rejected";
+                    const cleanStatus = statusRaw.split('. ')[1] || statusRaw;
+
+                    document.getElementById('displayProjectName').innerText = data.projectName || "Pending Setup";
+                    document.getElementById('displayEstDelivery').innerText = data.estDelivery || "TBD";
+
+                    const badge = document.getElementById('buildBadge');
+                    const track = document.getElementById('statusTrack');
+
+                    if (isRejected) {
+                        badge.className = "badge rejected";
+                        badge.innerText = "Rejected";
+                        
+                        track.innerHTML = `
+                            <div class="status-step rejected">
+                                <div class="step-dot"></div>
+                                <div class="step-text">
+                                    <h4>Application Rejected</h4>
+                                    <p>Unfortunately, your project application was not approved at this time. Please contact support for more details.</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        badge.className = "badge active";
+                        badge.innerText = cleanStatus;
+                        
+                        const phaseNum = parseInt(statusRaw.charAt(0)) || 1;
+                        const step1 = document.getElementById('step1');
+                        const step2 = document.getElementById('step2');
+                        const step3 = document.getElementById('step3');
+                        const step4 = document.getElementById('step4');
+
+                        // Clear current progress
+                        [step1, step2, step3, step4].forEach(s => s.className = "status-step");
+
+                        // Apply new dynamic progress based on the 7 admin phases
+                        if(phaseNum <= 4) { step1.className = "status-step current"; }
+                        else if(phaseNum === 5) { 
+                            step1.className = "status-step completed"; 
+                            step2.className = "status-step current"; 
+                        }
+                        else if(phaseNum === 6) { 
+                            step1.className = "status-step completed"; 
+                            step2.className = "status-step completed"; 
+                            step3.className = "status-step current"; 
+                        }
+                        else if(phaseNum === 7) { 
+                            step1.className = "status-step completed"; 
+                            step2.className = "status-step completed"; 
+                            step3.className = "status-step completed"; 
+                            step4.className = "status-step completed"; 
+                        }
+                    }
+                } else {
+                    document.getElementById('displayProjectName').innerText = "No Application Found";
+                    document.getElementById('displayEstDelivery').innerText = "--";
+                    document.getElementById('buildBadge').className = "badge pending";
+                    document.getElementById('buildBadge').innerText = "No Data";
+                }
+            } catch (error) {
+                console.error("Error fetching project data:", error);
+            }
+        }
 
         // Logout Button Logic
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -362,9 +428,7 @@
             });
         });
 
-        // --- 2. UI SCRIPTS ---
-
-        // Auto-Highlight Nav
+        // UI Scripts
         document.addEventListener("DOMContentLoaded", () => {
             const navLinks = document.querySelectorAll(".nav-links a");
             navLinks.forEach(link => {
@@ -374,7 +438,6 @@
                     link.style.paddingBottom = "5px";
                 }
             });
-            // Update the "Client Login" link to point to the dashboard if they navigate away
             const loginLink = Array.from(navLinks).find(a => a.getAttribute('href') === 'login.html');
             if(loginLink) {
                 loginLink.textContent = "Dashboard";
@@ -382,7 +445,6 @@
             }
         });
 
-        // Scroll Reveal Animations
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
@@ -395,7 +457,7 @@
             }
         }
         window.addEventListener("scroll", reveal);
-        setTimeout(reveal, 500); // Trigger after auth loader clears
+        setTimeout(reveal, 500); 
     </script>
 </body>
 </html>
