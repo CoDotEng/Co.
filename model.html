@@ -204,14 +204,40 @@
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
-            <a href="model.html" class="active">How It Works</a>
+            <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
+            <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="estimate.html" class="nav-btn-secondary">Instant Quote</a>
-            <a href="apply.html" class="nav-btn-primary">Apply Now</a>
+            <a href="login.html">Client Login</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get the current file name from the URL
+            let currentPath = window.location.pathname.split("/").pop();
+            // Default to index.html if on the root path
+            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+
+            // Find all the links in the navigation
+            const navLinks = document.querySelectorAll(".nav-links a");
+            
+            navLinks.forEach(link => {
+                // If the link matches the current page, highlight it!
+                if (link.getAttribute("href") === currentPath) {
+                    link.style.color = "var(--accent)"; // Make text cyan
+                    
+                    // Add a bottom border to everything except the Apply button
+                    if (!link.classList.contains("nav-btn")) {
+                        link.style.borderBottom = "2px solid var(--accent)";
+                        link.style.paddingBottom = "5px";
+                    }
+                }
+            });
+        });
+    </script>
 
     <!-- HEADER -->
     <header class="page-header">
