@@ -3,388 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODOT | Project Estimator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <title>Instant Quote | CODOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CORE CSS (Matched globally) --- */
         :root {
             --bg-color: #050505;
             --surface-color: #121212;
-            --surface-light: #1a1a1a;
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.2);
-            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(0, 229, 255, 0.4);
+            --border-color: rgba(255, 255, 255, 0.05);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-color); 
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.6;
-            min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* Navbar */
+        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+
+        /* --- NAVIGATION --- */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid var(--border-color);
         }
-
-        .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            color: var(--text-main);
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-
-        .logo span, .logo .dot { color: var(--accent); }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem; 
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--accent); }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
         
-        .nav-links a.active {
-            color: var(--text-main);
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 2px;
-        }
-
-        /* Secondary CTA (Instant Quote) */
-        .nav-btn-secondary {
-            background: rgba(0, 229, 255, 0.05);
-            color: var(--accent) !important;
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
             border: 1px solid var(--accent);
-            padding: 0.5rem 1.2rem;
-            border-radius: 6px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
         }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
-        .nav-btn-secondary:hover {
-            background: rgba(0, 229, 255, 0.15);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        /* --- PAGE HEADER --- */
+        .page-header {
+            padding: 12rem 5% 6rem 5%;
+            text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid var(--border-color);
         }
+        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
 
-        /* Primary CTA (Apply Now) */
-        .nav-btn-primary {
-            background: var(--accent);
-            color: var(--bg-color) !important;
-            border: 1px solid var(--accent);
-            padding: 0.5rem 1.2rem;
-            border-radius: 6px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn-primary:hover {
-            background: #00c6dd; 
-            border-color: #00c6dd;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        /* Estimator Layout */
-        .container {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 5%;
+        /* --- ESTIMATOR LAYOUT --- */
+        .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        
+        .calc-container {
             display: grid;
             grid-template-columns: 1fr 400px;
             gap: 4rem;
-            flex-grow: 1;
         }
 
-        .header-text h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
-
-        .header-text p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 3rem;
-        }
-
-        /* Form Controls */
-        .input-group {
-            margin-bottom: 3rem;
-        }
-
-        .input-group h3 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
+        /* --- FORM CONTROLS --- */
+        .input-group { margin-bottom: 3rem; }
+        .input-group h3 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-main); }
 
         /* Custom Radio Cards */
-        .type-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
+        .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        
         .type-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            border-radius: 8px; padding: 1.5rem;
+            cursor: pointer; transition: all 0.3s ease;
         }
 
-        /* Make the 3rd card span full width to look better without the 4th item */
-        .type-card:nth-child(3) {
-            grid-column: 1 / -1;
-        }
-
-        .type-card:hover {
-            border-color: rgba(0, 229, 255, 0.5);
-            background: var(--surface-light);
-        }
-
-        .type-card input[type="radio"] {
-            display: none;
-        }
-
-        .type-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
-        }
-
-        .type-card p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+        .type-card:nth-child(3) { grid-column: 1 / -1; } /* Make 3rd card span full width */
+        .type-card:hover { border-color: rgba(0, 229, 255, 0.5); background: rgba(255,255,255,0.02); }
+        .type-card input[type="radio"] { display: none; }
+        .type-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        .type-card p { font-size: 0.85rem; color: var(--text-muted); }
 
         /* Active State for Radio Cards */
-        .type-card input[type="radio"]:checked + div {
-            border-color: var(--accent);
-        }
-        
+        .type-card input[type="radio"]:checked + div { border-color: var(--accent); }
         .type-card.active {
-            border-color: var(--accent);
-            background: rgba(0, 229, 255, 0.05);
+            border-color: var(--accent); background: rgba(0, 229, 255, 0.05);
             box-shadow: 0 0 20px var(--accent-glow);
         }
 
         /* Custom Slider */
         .slider-container {
-            background: var(--surface-color);
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            background: var(--surface-color); padding: 2rem;
+            border-radius: 8px; border: 1px solid var(--border-color);
         }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .slider-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--accent); }
 
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .slider-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            color: var(--accent);
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-            margin-top: -10px;
-            box-shadow: 0 0 10px var(--accent);
-            transition: transform 0.1s;
+            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+            background: var(--accent); cursor: pointer; margin-top: -10px;
+            box-shadow: 0 0 10px var(--accent-glow); transition: transform 0.1s;
         }
-
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: var(--surface-light);
-            border-radius: 2px;
+            width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px;
         }
 
         /* Toggle Switch */
         .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--surface-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--surface-color); padding: 1.5rem;
+            border-radius: 8px; border: 1px solid var(--border-color);
         }
-
         .toggle-text h4 { margin-bottom: 0.2rem; }
         .toggle-text p { font-size: 0.85rem; color: var(--text-muted); }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
-
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider-toggle {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--surface-light);
-            transition: .4s;
-            border-radius: 34px;
-            border: 1px solid var(--border-color);
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .4s;
+            border-radius: 34px; border: 1px solid var(--border-color);
         }
-
         .slider-toggle:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: var(--text-muted);
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+            background-color: var(--text-muted); transition: .4s; border-radius: 50%;
         }
-
-        input:checked + .slider-toggle {
-            background-color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        input:checked + .slider-toggle:before {
-            transform: translateX(22px);
-            background-color: var(--bg-color);
-        }
+        input:checked + .slider-toggle { background-color: var(--accent); border-color: var(--accent); }
+        input:checked + .slider-toggle:before { transform: translateX(22px); background-color: var(--bg-color); }
 
         /* Result Panel (Sticky) */
         .result-panel {
-            background: linear-gradient(145deg, var(--surface-color), #0a0a0a);
+            background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2.5rem;
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 12px; padding: 2.5rem;
+            position: sticky; top: 120px; /* Adjusted to stick right under the new fixed nav */
+            height: fit-content; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+        .result-panel h2 { font-size: 1.5rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .result-item { margin-bottom: 1.5rem; }
+        .result-label { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .result-value { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; color: var(--text-main); }
+        .result-value.highlight { color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
 
-        .result-panel h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+        .btn-submit {
+            display: block; width: 100%; text-align: center;
+            background: var(--accent); color: var(--bg-color);
+            padding: 1.2rem; border-radius: 6px; text-decoration: none;
+            font-weight: bold; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
+            margin-top: 2rem; transition: all 0.3s ease; border: none; cursor: pointer;
         }
+        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
 
-        .result-item {
-            margin-bottom: 1.5rem;
-        }
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid var(--border-color); }
 
-        .result-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            color: var(--text-main);
-        }
-
-        .result-value.highlight {
-            color: var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .btn-primary {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: var(--accent);
-            color: var(--bg-color);
-            padding: 1.2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
-            margin-top: 2rem;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
-            transform: translateY(-2px);
-        }
+        /* --- ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 900px) {
-            .container { grid-template-columns: 1fr; gap: 2rem; margin: 2rem auto; }
+            .nav-links { display: none; }
+            .calc-container { grid-template-columns: 1fr; gap: 2rem; }
             .type-grid { grid-template-columns: 1fr; }
             .result-panel { position: relative; top: 0; }
         }
     </style>
 </head>
 <body>
-<nav>
+
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
@@ -397,22 +193,102 @@
         </div>
     </nav>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
-            let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
-            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+    <header class="page-header">
+        <h1 class="reveal">Project Estimator<span class="dot">.</span></h1>
+        <p class="reveal">Adjust the parameters below to get a rough estimate of your investment and timeline. No hidden fees, just pure transparency.</p>
+    </header>
 
-            // Find all the links in the navigation
+    <section class="section">
+        <div class="calc-container">
+            <div class="calc-section">
+                <div class="input-group reveal">
+                    <h3>1. What are we building?</h3>
+                    <div class="type-grid">
+                        <label class="type-card active" onclick="selectCard(this)">
+                            <input type="radio" name="projectType" value="landing" checked>
+                            <div>
+                                <h4>Landing Page</h4>
+                                <p>High-converting single page website.</p>
+                            </div>
+                        </label>
+                        <label class="type-card" onclick="selectCard(this)">
+                            <input type="radio" name="projectType" value="corporate">
+                            <div>
+                                <h4>Corporate Website</h4>
+                                <p>Multi-page site for modern businesses.</p>
+                            </div>
+                        </label>
+                        <label class="type-card" onclick="selectCard(this)">
+                            <input type="radio" name="projectType" value="webapp">
+                            <div>
+                                <h4>Web Application</h4>
+                                <p>Custom software with user dashboards.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group reveal">
+                    <h3>2. How big is the project?</h3>
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span style="color: var(--text-muted)">Number of Pages / Screens</span>
+                            <span class="slider-value" id="pageOutput">1</span>
+                        </div>
+                        <input type="range" id="pageSlider" min="1" max="20" value="1">
+                    </div>
+                </div>
+
+                <div class="input-group reveal">
+                    <h3>3. Design Requirements</h3>
+                    <div class="toggle-container">
+                        <div class="toggle-text">
+                            <h4>Premium Custom UI/UX</h4>
+                            <p>Tailor-made designs instead of standard layouts.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="customDesign" checked>
+                            <span class="slider-toggle"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-panel reveal">
+                <h2>Your Estimate</h2>
+                
+                <div class="result-item">
+                    <div class="result-label">Estimated Timeline</div>
+                    <div class="result-value" id="timeEstimate">1-2 Weeks</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Estimated Investment</div>
+                    <div class="result-value highlight" id="priceEstimate">₹1,560</div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
+                    * This is a rough estimate. Final pricing depends on specific feature requirements and complexity.
+                </p>
+
+                <a href="apply.html" class="btn-submit">Lock in this Quote</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
+
+    <script>
+        // --- AUTO-HIGHLIGHT CURRENT PAGE SCRIPT ---
+        document.addEventListener("DOMContentLoaded", () => {
+            let currentPath = window.location.pathname.split("/").pop();
+            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
             const navLinks = document.querySelectorAll(".nav-links a");
-            
             navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
+                    link.style.color = "var(--accent)";
                     if (!link.classList.contains("nav-btn")) {
                         link.style.borderBottom = "2px solid var(--accent)";
                         link.style.paddingBottom = "5px";
@@ -420,100 +296,30 @@
                 }
             });
         });
-    </script>
 
-    <div class="container">
-        <div class="calc-section">
-            <div class="header-text">
-                <h1>Project Estimator</h1>
-                <p>Adjust the parameters below to get a rough estimate of your investment and timeline. No hidden fees, just pure transparency.</p>
-            </div>
+        // --- SCROLL REVEAL SCRIPT ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger once on load
 
-            <div class="input-group">
-                <h3>1. What are we building?</h3>
-                <div class="type-grid">
-                    <label class="type-card active" onclick="selectCard(this)">
-                        <input type="radio" name="projectType" value="landing" checked>
-                        <div>
-                            <h4>Landing Page</h4>
-                            <p>High-converting single page website.</p>
-                        </div>
-                    </label>
-                    <label class="type-card" onclick="selectCard(this)">
-                        <input type="radio" name="projectType" value="corporate">
-                        <div>
-                            <h4>Corporate Website</h4>
-                            <p>Multi-page site for modern businesses.</p>
-                        </div>
-                    </label>
-                    <label class="type-card" onclick="selectCard(this)">
-                        <input type="radio" name="projectType" value="webapp">
-                        <div>
-                            <h4>Web Application</h4>
-                            <p>Custom software with user dashboards.</p>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <h3>2. How big is the project?</h3>
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span style="color: var(--text-muted)">Number of Pages / Screens</span>
-                        <span class="slider-value" id="pageOutput">1</span>
-                    </div>
-                    <input type="range" id="pageSlider" min="1" max="20" value="1">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <h3>3. Design Requirements</h3>
-                <div class="toggle-container">
-                    <div class="toggle-text">
-                        <h4>Premium Custom UI/UX</h4>
-                        <p>Tailor-made designs instead of standard layouts.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="customDesign" checked>
-                        <span class="slider-toggle"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="result-panel">
-            <h2>Your Estimate</h2>
-            
-            <div class="result-item">
-                <div class="result-label">Estimated Timeline</div>
-                <div class="result-value" id="timeEstimate">1-2 Weeks</div>
-            </div>
-
-            <div class="result-item">
-                <div class="result-label">Estimated Investment</div>
-                <div class="result-value highlight" id="priceEstimate">₹1,560</div>
-            </div>
-
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
-                * This is a rough estimate. Final pricing depends on specific feature requirements and complexity.
-            </p>
-
-            <a href="apply.html" class="btn-primary">Lock in this Quote</a>
-        </div>
-    </div>
-
-    <script>
-        // Data & Base Rates - Min ₹1000 base
+        // --- ESTIMATOR LOGIC ---
         const rates = {
             landing: { basePrice: 1000, baseWeeks: 1, perPagePrice: 200, perPageDays: 0.5 },
             corporate: { basePrice: 2500, baseWeeks: 2, perPagePrice: 400, perPageDays: 1 },
             webapp: { basePrice: 6000, baseWeeks: 4, perPagePrice: 800, perPageDays: 2 }
         };
+        const customDesignMultiplier = 1.3;
 
-        const customDesignMultiplier = 1.3; // 30% extra for custom UI/UX
-
-        // DOM Elements
         const radios = document.querySelectorAll('input[name="projectType"]');
         const slider = document.getElementById('pageSlider');
         const pageOutput = document.getElementById('pageOutput');
@@ -521,16 +327,13 @@
         const priceElement = document.getElementById('priceEstimate');
         const timeElement = document.getElementById('timeEstimate');
 
-        // Visual toggle for the custom Radio buttons
         function selectCard(selectedLabel) {
             document.querySelectorAll('.type-card').forEach(card => card.classList.remove('active'));
             selectedLabel.classList.add('active');
             calculateEstimate();
         }
 
-        // Calculation Logic
         function calculateEstimate() {
-            // Get selected type
             let selectedType = 'landing';
             radios.forEach(r => { if(r.checked) selectedType = r.value; });
 
@@ -538,42 +341,31 @@
             const pages = parseInt(slider.value);
             const isCustom = customDesign.checked;
 
-            // Calculate Math
             let totalPrice = data.basePrice + (pages * data.perPagePrice);
             let totalDays = (data.baseWeeks * 7) + (pages * data.perPageDays);
 
-            // Apply Custom Design Multiplier
             if(isCustom) {
                 totalPrice *= customDesignMultiplier;
-                totalDays *= 1.2; // Custom design takes 20% longer
+                totalDays *= 1.2; 
             }
+            if(totalPrice < 1000) totalPrice = 1000;
 
-            // Ensure absolute minimum price is at least 1000 just in case
-            if(totalPrice < 1000) {
-                totalPrice = 1000;
-            }
-
-            // Format Timeline (Convert days to weeks)
             let minWeeks = Math.floor(totalDays / 7);
             let maxWeeks = minWeeks + 1;
             if(minWeeks < 1) minWeeks = 1, maxWeeks = 2;
 
-            // Animate / Update UI
             pageOutput.innerText = pages;
             timeElement.innerText = `${minWeeks}-${maxWeeks} Weeks`;
             
-            // Format Price with Indian commas (e.g., 1,50,000) and INR symbol
             const formattedPrice = Math.round(totalPrice).toLocaleString('en-IN');
             priceElement.innerText = `₹${formattedPrice}`;
         }
 
-        // Event Listeners
         slider.addEventListener('input', calculateEstimate);
         customDesign.addEventListener('change', calculateEstimate);
         radios.forEach(radio => radio.addEventListener('change', calculateEstimate));
 
-        // Initial Calc on load
-        calculateEstimate();
+        calculateEstimate(); // Initial Calc
     </script>
 </body>
 </html>
