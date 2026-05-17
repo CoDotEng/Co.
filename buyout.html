@@ -14,6 +14,7 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -128,7 +129,7 @@
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
             border-radius: 4px; display: inline-block;
         }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-outline:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
         
         .btn-solid {
             padding: 1rem; width: 100%; text-align: center;
@@ -168,20 +169,14 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
             let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Find all the links in the navigation
             const navLinks = document.querySelectorAll(".nav-links a");
             
             navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
+                    link.style.color = "var(--accent)";
                     if (!link.classList.contains("nav-btn")) {
                         link.style.borderBottom = "2px solid var(--accent)";
                         link.style.paddingBottom = "5px";
@@ -231,7 +226,7 @@
                     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Transfer of copyright</li>
                 </ul>
                 
-                <a href="mailto:codot12221@gmail.com?subject=CODOT%20Buyout%20Assessment%20Request" class="btn-outline">Request Assessment</a>
+                <button id="assessmentBtn" class="btn-outline">Request Assessment</button>
             </div>
 
             <div class="pricing-card reveal" style="border-color: rgba(0, 229, 255, 0.3);">
@@ -259,6 +254,24 @@
     </footer>
 
     <script>
+        // Interactive Request Assessment Button Logic
+        document.getElementById('assessmentBtn').addEventListener('click', function() {
+            const btn = this;
+            btn.innerText = "Processing...";
+            btn.style.opacity = "0.7";
+            
+            // Simulating an API call out to the backend
+            setTimeout(() => {
+                btn.innerText = "Request Sent ✓";
+                btn.style.opacity = "1";
+                btn.style.borderColor = "var(--success)";
+                btn.style.color = "var(--success)";
+                btn.style.cursor = "default";
+                btn.disabled = true;
+            }, 800);
+        });
+
+        // Scroll Reveal
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
