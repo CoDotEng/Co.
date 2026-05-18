@@ -8,11 +8,12 @@
     <style>
         /* --- CORE CSS --- */
         :root {
-            --bg-color: #030303; /* Absolute pitch black for premium feel */
+            --bg-color: #030303; 
             --surface-color: #0a0a0a;
             --text-main: #f3f4f6;
             --text-muted: #666666;
             --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.3);
             --success: #10b981;
         }
 
@@ -23,24 +24,18 @@
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); }
 
-        /* --- GOD-LEVEL NAVBAR --- */
+        /* --- THE NAVBAR --- */
         .elite-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            z-index: 10000; mix-blend-mode: difference; /* Ensures visibility on any background */
+            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
+            background: rgba(5, 5, 5, 0.95);
+            z-index: 10000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        /* Logo (Right) */
-        .elite-nav .logo { 
-            font-size: 2.5rem; font-weight: 700; letter-spacing: -2px; 
-            color: #fff; z-index: 10001; 
-        }
-        .elite-nav .dot { color: var(--accent); }
 
         /* Custom Two-Line Burger (Left) */
         .elite-burger {
             width: 40px; height: 40px; position: relative; cursor: pointer;
-            z-index: 10001; background: transparent; border: none; outline: none;
+            z-index: 10002; background: transparent; border: none; outline: none;
             display: flex; flex-direction: column; justify-content: center; gap: 8px;
         }
         .elite-burger .line {
@@ -48,70 +43,82 @@
             transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1), background 0.3s ease;
             transform-origin: center;
         }
-        
-        /* Burger to X Animation */
         .elite-burger.active .line:nth-child(1) { transform: translateY(5px) rotate(45deg); background: var(--accent); }
         .elite-burger.active .line:nth-child(2) { transform: translateY(-5px) rotate(-45deg); background: var(--accent); }
 
-        /* --- CLIP-PATH FULLSCREEN OVERLAY --- */
-        .elite-menu-overlay {
+        /* Logo (Right) */
+        .elite-nav .logo { 
+            font-size: 2.2rem; font-weight: 700; letter-spacing: -1.5px; 
+            color: #fff; z-index: 10001; 
+        }
+        .elite-nav .dot { color: var(--accent); }
+
+        /* --- THE DARK OVERLAY --- */
+        .nav-backdrop {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #050505; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            /* The Magic Physics: Starts as a 0px circle exactly at the burger's location */
-            clip-path: circle(0px at 5% 40px);
-            transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-            pointer-events: none;
+            background: rgba(0,0,0,0.85);
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+            z-index: 9998;
         }
-        .elite-menu-overlay.open {
-            /* Expands to cover the entire screen */
-            clip-path: circle(150% at 5% 40px);
-            pointer-events: all;
+        .nav-backdrop.open { opacity: 1; pointer-events: all; }
+
+        /* --- THE ELITE SIDEBAR --- */
+        .elite-sidebar {
+            position: fixed; top: 0; left: 0; 
+            width: 450px; max-width: 100vw; height: 100vh;
+            background: #050505; border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 2rem 3rem; z-index: 9999;
+            transform: translateX(-100%); 
+            transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+            box-shadow: 20px 0 50px rgba(0,0,0,0.8);
+            overflow-y: auto; /* Fixes height clipping on small screens */
         }
+        .elite-sidebar.open { transform: translateX(0); }
 
         /* --- MASKED TYPOGRAPHY MENU --- */
         .elite-menu-list {
-            display: flex; flex-direction: column; align-items: center; gap: 1rem;
-            list-style: none; width: 100%;
+            display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+            list-style: none; width: 100%; margin-top: 4rem; margin-bottom: 2rem;
         }
-        .menu-item-wrap {
-            overflow: hidden; /* This masks the text before it slides up */
-        }
+        .menu-item-wrap { overflow: hidden; }
         
         .menu-link {
             display: block; font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(3rem, 7vw, 6rem); font-weight: 700; text-transform: uppercase;
-            line-height: 1.1; letter-spacing: -2px;
+            font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 700; text-transform: uppercase;
+            line-height: 1.1; letter-spacing: -1.5px;
             /* Hollow Text Effect */
-            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4);
             /* Slide Animation Prep */
-            transform: translateY(120%);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, -webkit-text-stroke 0.3s ease;
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, -webkit-text-stroke 0.3s ease, padding 0.3s ease;
         }
 
-        /* Hover Effect: Floods with Color */
+        /* Hover & Active Effect: Floods with Color */
         .menu-link:hover, .menu-link.active-link {
-            color: var(--accent); -webkit-text-stroke: 0px var(--accent);
+            color: var(--accent); -webkit-text-stroke: 0px var(--accent); padding-left: 15px;
         }
 
         /* Staggered Entrance Animation when Open */
-        .elite-menu-overlay.open .menu-link { transform: translateY(0); }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(1) .menu-link { transition-delay: 0.1s; }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(2) .menu-link { transition-delay: 0.15s; }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(3) .menu-link { transition-delay: 0.2s; }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(4) .menu-link { transition-delay: 0.25s; }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(5) .menu-link { transition-delay: 0.3s; }
-        .elite-menu-overlay.open .menu-item-wrap:nth-child(6) .menu-link { transition-delay: 0.35s; }
+        .elite-sidebar.open .menu-link { transform: translateY(0); }
+        .elite-sidebar.open .menu-item-wrap:nth-child(1) .menu-link { transition-delay: 0.1s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(2) .menu-link { transition-delay: 0.15s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(3) .menu-link { transition-delay: 0.2s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(4) .menu-link { transition-delay: 0.25s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(5) .menu-link { transition-delay: 0.3s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(6) .menu-link { transition-delay: 0.35s; }
 
         /* Special Apply Button in Menu */
         .elite-menu-apply {
-            margin-top: 3rem; padding: 1rem 3rem; border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1.2rem; font-weight: 600;
-            color: #fff; text-transform: uppercase; letter-spacing: 2px;
-            transform: translateY(50px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 2rem; padding: 1.2rem 0; width: 100%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; 
+            font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 700;
+            color: #fff; text-transform: uppercase; letter-spacing: 1px;
+            transform: translateY(30px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-block;
         }
-        .elite-menu-overlay.open .elite-menu-apply { transform: translateY(0); opacity: 1; transition-delay: 0.5s; }
-        .elite-menu-apply:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+        .elite-sidebar.open .elite-menu-apply { transform: translateY(0); opacity: 1; transition-delay: 0.45s; }
+        .elite-menu-apply:hover { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -128,6 +135,7 @@
         .form-container {
             background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
             border-radius: 12px; padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
         .form-group { margin-bottom: 1.5rem; }
@@ -152,7 +160,7 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
             cursor: pointer; margin-top: 1.5rem; transition: all 0.3s ease;
         }
-        .btn-submit:hover { box-shadow: 0 0 30px var(--accent-glow); background-color: #fff; }
+        .btn-submit:hover { box-shadow: 0 0 30px var(--accent-glow); background-color: #fff; transform: translateY(-2px); }
 
         /* --- SUCCESS MESSAGE --- */
         .success-box {
@@ -186,10 +194,15 @@
 
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
         
-        @media (max-width: 768px) { .form-container { padding: 2rem; } }
+        @media (max-width: 768px) { 
+            .form-container { padding: 2rem; }
+            .elite-sidebar { padding: 2rem; width: 100vw; border-right: none; }
+        }
     </style>
 </head>
 <body>
+
+    <div class="nav-backdrop" id="navBackdrop"></div>
 
     <nav class="elite-nav">
         <button class="elite-burger" id="eliteBurger" aria-label="Toggle Navigation">
@@ -200,7 +213,7 @@
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
     </nav>
 
-    <div class="elite-menu-overlay" id="eliteMenu">
+    <div class="elite-sidebar" id="eliteSidebar">
         <ul class="elite-menu-list">
             <li class="menu-item-wrap"><a href="model.html" class="menu-link">How It Works</a></li>
             <li class="menu-item-wrap"><a href="work.html" class="menu-link">Work</a></li>
@@ -214,7 +227,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Auto-Marker Logic for new typography system
+            // Auto-Marker Logic
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
@@ -225,21 +238,27 @@
                 }
             });
 
-            // Elite Menu Controller
+            // Elite Sidebar Controller
             const eliteBurger = document.getElementById('eliteBurger');
-            const eliteMenu = document.getElementById('eliteMenu');
+            const eliteSidebar = document.getElementById('eliteSidebar');
+            const navBackdrop = document.getElementById('navBackdrop');
 
-            eliteBurger.addEventListener('click', () => {
+            function toggleNav() {
                 eliteBurger.classList.toggle('active');
-                eliteMenu.classList.toggle('open');
+                eliteSidebar.classList.toggle('open');
+                navBackdrop.classList.toggle('open');
                 
-                // Toggle scroll lock
-                if (eliteMenu.classList.contains('open')) {
+                if (eliteSidebar.classList.contains('open')) {
                     document.body.style.overflow = 'hidden';
                 } else {
                     document.body.style.overflow = '';
                 }
-            });
+            }
+
+            if (eliteBurger && eliteSidebar && navBackdrop) {
+                eliteBurger.addEventListener('click', toggleNav);
+                navBackdrop.addEventListener('click', toggleNav); // Click backdrop to close
+            }
         });
     </script>
 
