@@ -13,11 +13,11 @@
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.4);
             --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; } /* Kills horizontal scrolling bugs entirely */
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
@@ -29,29 +29,13 @@
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); }
 
-        /* --- PLAIN UNIVERSAL NAVIGATION --- */
+        /* --- THE NAVBAR --- */
         .codot-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            background: var(--surface-color); /* Solid opaque color */
-            z-index: 9999; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1.2rem 5%; position: fixed; width: 100%; top: 0; left: 0;
+            background: rgba(5, 5, 5, 0.95);
+            z-index: 9998; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        /* Plain Hamburger (Left) */
-        .menu-toggle {
-            display: flex; flex-direction: column; justify-content: space-between;
-            width: 30px; height: 21px; background: transparent; border: none; 
-            cursor: pointer; z-index: 10000;
-        }
-        .menu-toggle span {
-            display: block; height: 3px; width: 100%; background-color: var(--text-main);
-            border-radius: 2px;
-        }
-        
-        /* Instant X toggle */
-        .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-        .menu-toggle.active span:nth-child(2) { opacity: 0; }
-        .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
         /* Logo (Right) */
         .codot-nav .logo { 
@@ -60,37 +44,66 @@
         }
         .codot-nav .dot { color: var(--accent); }
 
-        /* Standard Dropdown Menu */
-        .nav-links {
-            display: none; /* Completely hidden by default */
-            position: absolute; top: 100%; left: 0; width: 100%;
+        /* Hamburger Button (Left) */
+        .menu-toggle {
+            display: flex; flex-direction: column; justify-content: space-between;
+            width: 32px; height: 22px; background: transparent; border: none; 
+            cursor: pointer; z-index: 10002; /* Must be highest to click it closed */
+        }
+        .menu-toggle span {
+            display: block; height: 2px; width: 100%; background-color: var(--text-main);
+            border-radius: 2px; transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-origin: left center;
+        }
+        
+        /* Hamburger X Animation */
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg); background-color: var(--accent); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg); background-color: var(--accent); }
+
+        /* --- THE SIDEBAR --- */
+        .nav-sidebar {
+            position: fixed; top: 0; left: 0; 
+            width: 320px; max-width: 85vw; height: 100vh;
             background: var(--surface-color);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 1.5rem 5%;
-            z-index: 9998;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; justify-content: flex-start;
+            padding: 6rem 2.5rem 2rem; gap: 1.8rem;
+            transform: translateX(-100%); /* Hides it off-screen smoothly */
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10001;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8);
         }
-        .nav-links.open { 
-            display: flex; flex-direction: column; gap: 1.5rem; 
-        }
+        .nav-sidebar.open { transform: translateX(0); } /* Slides it in */
 
-        /* Plain Links */
-        .nav-links a { 
+        /* Sidebar Links */
+        .nav-sidebar a { 
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            width: fit-content; padding-bottom: 5px;
+            font-size: 1.3rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); transition: color 0.2s ease;
+            width: fit-content;
         }
-        .nav-links a:hover { color: var(--accent); }
+        .nav-sidebar a:hover { color: var(--text-main); }
+        .nav-sidebar a.active-link { color: var(--accent); border-left: 2px solid var(--accent); padding-left: 10px; }
 
-        /* Nav Button */
-        .nav-links .nav-btn-plain {
+        .nav-sidebar .nav-btn {
             background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.8rem 1.5rem; border-radius: 6px; border: none; font-weight: 700 !important;
-            text-align: center; width: 100%; margin-top: 1rem;
+            padding: 1rem; border-radius: 6px; font-weight: 700 !important;
+            text-align: center; width: 100%; margin-top: 1rem; border: none;
         }
+
+        /* --- THE DARK OVERLAY --- */
+        .nav-backdrop {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7); /* Solid dark fade, NO BLUR */
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 10000;
+        }
+        .nav-backdrop.open { opacity: 1; pointer-events: all; }
 
         /* --- PAGE HEADER --- */
         .page-header {
-            padding: 12rem 5% 6rem 5%;
+            padding: 10rem 5% 4rem 5%;
             text-align: center;
             background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -106,7 +119,6 @@
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 12px;
             padding: 3rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .form-group { margin-bottom: 1.5rem; }
@@ -162,7 +174,6 @@
             font-size: 1.1rem; font-weight: 700; cursor: pointer; border-radius: 4px; display: inline-block;
         }
 
-        /* --- FOOTER --- */
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
         
         @media (max-width: 768px) {
@@ -172,6 +183,8 @@
 </head>
 <body>
 
+    <div class="nav-backdrop" id="navBackdrop"></div>
+
     <nav class="codot-nav">
         <button class="menu-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
             <span></span>
@@ -180,45 +193,54 @@
         </button>
 
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-
-        <div class="nav-links" id="navMenu">
-            <a href="model.html">How It Works</a>
-            <a href="work.html">Work</a>
-            <a href="about.html">About</a>
-            <a href="estimate.html">Instant Quote</a>
-            <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="apply.html" class="nav-btn-plain">Apply Now</a>
-        </div>
     </nav>
+
+    <div class="nav-sidebar" id="navSidebar">
+        <a href="model.html">How It Works</a>
+        <a href="work.html">Work</a>
+        <a href="about.html">About</a>
+        <a href="estimate.html">Instant Quote</a>
+        <a href="buyout.html">The Buyout</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="apply.html" class="nav-btn">Apply Now</a>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Restore Original Auto-Marker
+            // Auto-Marker Logic
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            const navLinks = document.querySelectorAll(".nav-links a");
-            
+            const navLinks = document.querySelectorAll(".nav-sidebar a");
             navLinks.forEach(link => {
-                if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; 
-                    
-                    if (!link.classList.contains("nav-btn-plain")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                    }
+                if (link.getAttribute("href") === currentPath && !link.classList.contains("nav-btn")) {
+                    link.classList.add("active-link");
                 }
             });
 
-            // Plain Dropdown Controller
+            // Sidebar Toggle Logic
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const navMenu = document.getElementById('navMenu');
+            const navSidebar = document.getElementById('navSidebar');
+            const navBackdrop = document.getElementById('navBackdrop');
 
-            if (mobileMenuBtn && navMenu) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    mobileMenuBtn.classList.toggle('active');
-                    navMenu.classList.toggle('open');
-                });
+            function toggleNav() {
+                mobileMenuBtn.classList.toggle('active');
+                navSidebar.classList.toggle('open');
+                navBackdrop.classList.toggle('open');
+                
+                // Stop page from scrolling in the background
+                if (navSidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (mobileMenuBtn && navSidebar && navBackdrop) {
+                // Click hamburger to open/close
+                mobileMenuBtn.addEventListener('click', toggleNav);
+                // Click dark overlay to close
+                navBackdrop.addEventListener('click', toggleNav);
             }
         });
     </script>
