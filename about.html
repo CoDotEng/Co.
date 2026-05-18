@@ -61,7 +61,7 @@
             box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transform: translateY(-2px); 
         }
 
-        /* --- Hamburger Button (Hidden on Desktop) --- */
+        /* --- Hamburger Button --- */
         .menu-toggle {
             display: none; flex-direction: column; justify-content: space-between;
             width: 30px; height: 20px; background: transparent; border: none; 
@@ -85,13 +85,11 @@
                 z-index: 10000;
             }
 
-            /* Active Mobile State */
             .nav-links.open { transform: translateY(0); opacity: 1; }
             
             .nav-links a { font-size: 1.5rem; }
             .nav-links .nav-btn { font-size: 1.2rem; padding: 1rem 3rem; width: 80%; text-align: center; }
 
-            /* Animated Hamburger to "X" */
             .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: var(--accent); }
             .menu-toggle.active span:nth-child(2) { opacity: 0; }
             .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: var(--accent); }
@@ -262,12 +260,9 @@
 
             if (mobileMenuBtn && navMenu) {
                 mobileMenuBtn.addEventListener('click', () => {
-                    // Toggle the 'X' animation on the button
                     mobileMenuBtn.classList.toggle('active');
-                    // Drop down the full-screen menu
                     navMenu.classList.toggle('open');
                     
-                    // Prevent the background page from scrolling while the menu is open
                     if (navMenu.classList.contains('open')) {
                         document.body.style.overflow = 'hidden';
                     } else {
