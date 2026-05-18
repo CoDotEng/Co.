@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | CODOT</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS (Matching previous pages) --- */
@@ -30,23 +29,73 @@
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- NAVIGATION --- */
-        nav {
+        /* --- RESPONSIVE NAVIGATION SYSTEM --- */
+        .codot-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
-            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
+            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 9999; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
-        .dot { color: var(--accent); }
-        
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        .codot-nav .logo { 
+            font-size: 2rem; font-weight: 700; letter-spacing: -1px; 
+            position: relative; z-index: 10001; 
+        }
+        .codot-nav .dot { color: var(--accent); }
+
+        .nav-links {
+            display: flex; align-items: center; gap: 2rem;
+        }
+
+        .nav-links a { 
+            font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; 
+        }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-        .nav-btn {
+
+        .nav-links .nav-btn {
             background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+            padding: 0.6rem 1.4rem; border-radius: 6px; font-weight: 700 !important;
+            transition: all 0.3s ease; border: none;
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+        .nav-links .nav-btn:hover { 
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transform: translateY(-2px); 
+        }
+
+        /* --- Hamburger Button (Hidden on Desktop) --- */
+        .menu-toggle {
+            display: none; flex-direction: column; justify-content: space-between;
+            width: 30px; height: 20px; background: transparent; border: none; 
+            cursor: pointer; z-index: 10001;
+        }
+        .menu-toggle span {
+            height: 2px; width: 100%; background-color: var(--text-main);
+            border-radius: 4px; transition: all 0.3s ease;
+        }
+
+        /* --- Mobile Overlay View --- */
+        @media (max-width: 850px) {
+            .menu-toggle { display: flex; }
+            
+            .nav-links {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background: var(--bg-color); flex-direction: column;
+                justify-content: center; align-items: center; gap: 2.5rem;
+                transform: translateY(-100%); opacity: 0; 
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+                z-index: 10000;
+            }
+
+            /* Active Mobile State */
+            .nav-links.open { transform: translateY(0); opacity: 1; }
+            
+            .nav-links a { font-size: 1.5rem; }
+            .nav-links .nav-btn { font-size: 1.2rem; padding: 1rem 3rem; width: 80%; text-align: center; }
+
+            /* Animated Hamburger to "X" */
+            .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: var(--accent); }
+            .menu-toggle.active span:nth-child(2) { opacity: 0; }
+            .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: var(--accent); }
+        }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -159,23 +208,28 @@
 
         @media (max-width: 900px) {
             .story-container { grid-template-columns: 1fr; gap: 2rem; }
-            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION -->
-    <!-- NAVIGATION -->
-<nav>
+    <nav class="codot-nav">
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-        <div class="nav-links">
+        
+        <button class="menu-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-links" id="navMenu">
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
@@ -201,16 +255,34 @@
                     }
                 }
             });
+
+            // Mobile Nav Controller
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+
+            if (mobileMenuBtn && navMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    // Toggle the 'X' animation on the button
+                    mobileMenuBtn.classList.toggle('active');
+                    // Drop down the full-screen menu
+                    navMenu.classList.toggle('open');
+                    
+                    // Prevent the background page from scrolling while the menu is open
+                    if (navMenu.classList.contains('open')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
         });
     </script>
 
-    <!-- HEADER -->
     <header class="page-header">
         <h1 class="reveal">The Industry is Broken<span class="dot">.</span></h1>
         <p class="reveal">We built CODOT to fix it. We believe premium web design shouldn't require a small business to take on massive financial risk.</p>
     </header>
 
-    <!-- THE STORY -->
     <section class="section">
         <div class="story-container">
             <div class="story-text reveal">
@@ -224,7 +296,6 @@
             </div>
         </div>
 
-        <!-- CORE VALUES -->
         <h2 class="values-title reveal">Our Core Directives</h2>
         <div class="grid-3">
             <div class="value-card reveal">
@@ -247,19 +318,16 @@
         </div>
     </section>
 
-    <!-- CTA -->
     <section class="cta-section">
         <h2 class="reveal">Let's build something incredible.</h2>
         <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">Stop paying upfront for websites that underperform.</p>
         <a href="apply.html" class="btn reveal">Start Your Free Build</a>
     </section>
 
-    <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <!-- SCROLL REVEAL SCRIPT -->
     <script>
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
