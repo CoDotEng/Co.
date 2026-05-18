@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | CODOT</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE CSS --- */
+        /* --- CORE CSS (Matching previous pages) --- */
         :root {
             --bg-color: #050505;
             --surface-color: #121212;
@@ -27,94 +28,25 @@
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
-        a { text-decoration: none; color: var(--text-main); transition: all 0.3s ease; }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- UNIVERSAL SIDE-DRAWER NAVIGATION SYSTEM --- */
-        .codot-nav {
+        /* --- NAVIGATION --- */
+        nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            z-index: 9998; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        /* Swapped: Logo is now on the right */
-        .codot-nav .logo { 
-            font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; 
-            position: relative; z-index: 10001; 
-        }
-        .codot-nav .dot { color: var(--accent); }
-
-        /* Swapped & Enlarged: Hamburger is now on the left */
-        .menu-toggle {
-            display: flex; flex-direction: column; justify-content: space-between;
-            width: 40px; height: 26px; background: transparent; border: none; 
-            cursor: pointer; z-index: 10002; /* Higher than drawer so X is clickable */
-        }
-        .menu-toggle span {
-            height: 3px; width: 100%; background-color: var(--text-main);
-            border-radius: 4px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: left center;
-        }
-
-        /* Animated Hamburger to "X" */
-        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg); background-color: var(--accent); }
-        .menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(20px); }
-        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg); background-color: var(--accent); }
-
-        /* Full Height Side Drawer */
-        .nav-sidebar {
-            position: fixed; top: 0; left: -100%; /* Hidden off-screen by default */
-            width: 400px; max-width: 85vw; height: 100vh;
-            background: var(--surface-color); 
-            border-right: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 2rem 4rem; gap: 2rem;
-            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10000;
-            box-shadow: 20px 0 50px rgba(0,0,0,0.8);
-        }
-        .nav-sidebar.open { left: 0; } /* Slides in */
-
-        /* Links inside Drawer */
-        .nav-sidebar a { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-            color: var(--text-muted);
-            transform: translateX(-20px); opacity: 0;
-            transition: all 0.3s ease;
-        }
-        .nav-sidebar.open a { transform: translateX(0); opacity: 1; }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
         
-        /* Staggered slide-in effect for links */
-        .nav-sidebar.open a:nth-child(1) { transition-delay: 0.1s; }
-        .nav-sidebar.open a:nth-child(2) { transition-delay: 0.15s; }
-        .nav-sidebar.open a:nth-child(3) { transition-delay: 0.2s; }
-        .nav-sidebar.open a:nth-child(4) { transition-delay: 0.25s; }
-        .nav-sidebar.open a:nth-child(5) { transition-delay: 0.3s; }
-        .nav-sidebar.open a:nth-child(6) { transition-delay: 0.35s; }
-        .nav-sidebar.open a:nth-child(7) { transition-delay: 0.4s; }
-
-        /* Hover states */
-        .nav-sidebar a:hover, .nav-sidebar a.active { color: var(--text-main); transform: translateX(10px) !important; }
-        .nav-sidebar a.active { border-left: 3px solid var(--accent); padding-left: 15px; color: var(--accent); }
-
-        .nav-sidebar .nav-btn {
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-btn {
             background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 1rem 2rem; border-radius: 6px; font-weight: 700 !important;
-            margin-top: 1rem; width: 100%; text-align: center; display: inline-block;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
         }
-        .nav-sidebar .nav-btn:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-3px) !important; color: var(--bg-color); }
-
-        /* Dark Screen Backdrop */
-        .nav-backdrop {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease;
-            z-index: 9999;
-        }
-        .nav-backdrop.open { opacity: 1; pointer-events: all; }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -130,39 +62,91 @@
         .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
         
         .story-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
-            align-items: center; margin-bottom: 6rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 6rem;
         }
-        .story-text h2 { font-size: 2.5rem; margin-bottom: 1.5rem; line-height: 1.2; }
-        .story-text p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+        .story-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .story-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .highlight-box {
-            background: var(--surface-color); padding: 3rem; border-radius: 8px;
-            border-left: 4px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem; line-height: 1.4;
+            background: var(--surface-color);
+            padding: 3rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            line-height: 1.4;
         }
 
         /* --- VALUES GRID --- */
-        .values-title { text-align: center; font-size: 2.5rem; margin-bottom: 4rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .values-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
         .value-card {
-            background: var(--surface-color); padding: 3rem 2rem; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.05); text-align: center;
+            background: var(--surface-color);
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
             transition: transform 0.3s ease, border-color 0.3s ease;
         }
-        .value-card:hover { transform: translateY(-10px); border-color: var(--accent); }
-        .value-icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 1.5rem; }
-        .value-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
-        .value-card p { color: var(--text-muted); }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .value-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-card p {
+            color: var(--text-muted);
+        }
 
         /* --- CTA --- */
         .cta-section {
-            text-align: center; padding: 6rem 5%; background: var(--surface-color);
-            border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4rem;
+            text-align: center;
+            padding: 6rem 5%;
+            background: var(--surface-color);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
         }
+
         .btn {
             padding: 1rem 2.5rem; background-color: var(--accent); color: var(--bg-color);
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block; margin-top: 2rem;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
+            margin-top: 2rem;
         }
         .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
 
@@ -175,79 +159,58 @@
 
         @media (max-width: 900px) {
             .story-container { grid-template-columns: 1fr; gap: 2rem; }
-            .nav-sidebar { padding: 2rem; } /* Less padding on small screens */
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="nav-backdrop" id="navBackdrop"></div>
-
-    <nav class="codot-nav">
-        <button class="menu-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
+    <!-- NAVIGATION -->
+    <!-- NAVIGATION -->
+<nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-
-        <div class="nav-sidebar" id="navMenu">
+        <div class="nav-links">
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get current path and auto-highlight active link
+            // Get the current file name from the URL
             let currentPath = window.location.pathname.split("/").pop();
+            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            const navLinks = document.querySelectorAll(".nav-sidebar a");
+            // Find all the links in the navigation
+            const navLinks = document.querySelectorAll(".nav-links a");
+            
             navLinks.forEach(link => {
-                if (link.getAttribute("href") === currentPath && !link.classList.contains("nav-btn")) {
-                    link.classList.add("active");
+                // If the link matches the current page, highlight it!
+                if (link.getAttribute("href") === currentPath) {
+                    link.style.color = "var(--accent)"; // Make text cyan
+                    
+                    // Add a bottom border to everything except the Apply button
+                    if (!link.classList.contains("nav-btn")) {
+                        link.style.borderBottom = "2px solid var(--accent)";
+                        link.style.paddingBottom = "5px";
+                    }
                 }
             });
-
-            // Advanced Side-Drawer Controller
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const navMenu = document.getElementById('navMenu');
-            const navBackdrop = document.getElementById('navBackdrop');
-
-            function toggleNav() {
-                mobileMenuBtn.classList.toggle('active');
-                navMenu.classList.toggle('open');
-                navBackdrop.classList.toggle('open');
-                
-                // Prevent background scrolling when drawer is open
-                if (navMenu.classList.contains('open')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            if (mobileMenuBtn && navMenu && navBackdrop) {
-                // Toggle via Hamburger
-                mobileMenuBtn.addEventListener('click', toggleNav);
-                // Close by clicking the dark backdrop outside the menu
-                navBackdrop.addEventListener('click', toggleNav);
-            }
         });
     </script>
 
+    <!-- HEADER -->
     <header class="page-header">
         <h1 class="reveal">The Industry is Broken<span class="dot">.</span></h1>
         <p class="reveal">We built CODOT to fix it. We believe premium web design shouldn't require a small business to take on massive financial risk.</p>
     </header>
 
+    <!-- THE STORY -->
     <section class="section">
         <div class="story-container">
             <div class="story-text reveal">
@@ -261,6 +224,7 @@
             </div>
         </div>
 
+        <!-- CORE VALUES -->
         <h2 class="values-title reveal">Our Core Directives</h2>
         <div class="grid-3">
             <div class="value-card reveal">
@@ -283,16 +247,19 @@
         </div>
     </section>
 
+    <!-- CTA -->
     <section class="cta-section">
         <h2 class="reveal">Let's build something incredible.</h2>
         <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">Stop paying upfront for websites that underperform.</p>
         <a href="apply.html" class="btn reveal">Start Your Free Build</a>
     </section>
 
+    <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
+    <!-- SCROLL REVEAL SCRIPT -->
     <script>
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
