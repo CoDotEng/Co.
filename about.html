@@ -33,7 +33,7 @@
         .codot-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: rgba(5, 5, 5, 0.98); /* Solid opaque background */
             z-index: 9999; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
@@ -46,7 +46,7 @@
         /* --- Hamburger Button (Visible Everywhere) --- */
         .menu-toggle {
             display: flex; flex-direction: column; justify-content: space-between;
-            width: 35px; height: 22px; background: transparent; border: none; 
+            width: 30px; height: 20px; background: transparent; border: none; 
             cursor: pointer; z-index: 10001;
         }
         .menu-toggle span {
@@ -54,40 +54,44 @@
             border-radius: 4px; transition: all 0.3s ease;
         }
 
-        /* --- Full Screen Overlay View --- */
+        /* --- Opaque Dropdown View (Not Full Screen) --- */
         .nav-links {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: absolute; top: calc(100% + 15px); left: 5%;
+            background: var(--surface-color); /* Fully opaque dropdown box */
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 2rem;
             display: flex; flex-direction: column;
-            justify-content: center; align-items: center; gap: 2.5rem;
-            transform: translateY(-100%); opacity: 0; 
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            justify-content: flex-start; align-items: flex-start; gap: 1.5rem;
+            min-width: 260px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            transform: translateY(-15px); opacity: 0; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             z-index: 10000;
         }
 
-        .nav-links.open { transform: translateY(0); opacity: 1; }
+        .nav-links.open { transform: translateY(0); opacity: 1; pointer-events: all; }
         
         .nav-links a { 
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 2.5rem); /* Scales perfectly on TV down to Mobile */
-            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; 
+            font-size: 1.1rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 1px; 
         }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
 
         .nav-links .nav-btn {
             background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 1rem 3rem; border-radius: 6px; font-weight: 700 !important;
-            transition: all 0.3s ease; border: none; font-size: clamp(1.2rem, 3vw, 1.8rem);
-            margin-top: 2rem;
+            padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: 700 !important;
+            transition: all 0.3s ease; border: none; width: 100%; text-align: center;
+            margin-top: 0.5rem;
         }
         .nav-links .nav-btn:hover { 
-            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); transform: translateY(-3px); 
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transform: translateY(-2px); 
         }
 
         /* --- Animated Hamburger to "X" --- */
-        .menu-toggle.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); background-color: var(--accent); }
+        .menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: var(--accent); }
         .menu-toggle.active span:nth-child(2) { opacity: 0; }
-        .menu-toggle.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); background-color: var(--accent); }
+        .menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: var(--accent); }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -206,13 +210,13 @@
 <body>
 
     <nav class="codot-nav">
-        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-        
         <button class="menu-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
             <span></span>
             <span></span>
             <span></span>
         </button>
+
+        <a href="index.html" class="logo">Co<span class="dot">.</span></a>
 
         <div class="nav-links" id="navMenu">
             <a href="model.html">How It Works</a>
@@ -257,11 +261,7 @@
                     mobileMenuBtn.classList.toggle('active');
                     navMenu.classList.toggle('open');
                     
-                    if (navMenu.classList.contains('open')) {
-                        document.body.style.overflow = 'hidden';
-                    } else {
-                        document.body.style.overflow = '';
-                    }
+                    // Removed body scroll lock so it behaves like a standard opaque dropdown
                 });
             }
         });
