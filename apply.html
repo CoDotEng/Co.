@@ -8,120 +8,115 @@
     <style>
         /* --- CORE CSS --- */
         :root {
-            --bg-color: #050505;
-            --surface-color: #0a0a0a; /* Deeper black for premium contrast */
+            --bg-color: #030303; /* Absolute pitch black for premium feel */
+            --surface-color: #0a0a0a;
             --text-main: #f3f4f6;
-            --text-muted: #888888;
+            --text-muted: #666666;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.3);
             --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; } /* Zero horizontal scrolling bugs */
+        html, body { overflow-x: hidden; background-color: var(--bg-color); color: var(--text-main); }
         html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-        }
-
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; }
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); }
 
-        /* --- THE NAVBAR --- */
-        .codot-nav {
+        /* --- GOD-LEVEL NAVBAR --- */
+        .elite-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            background: rgba(5, 5, 5, 0.95);
-            z-index: 9000; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0; left: 0;
+            z-index: 10000; mix-blend-mode: difference; /* Ensures visibility on any background */
         }
 
         /* Logo (Right) */
-        .codot-nav .logo { 
-            font-size: 2rem; font-weight: 700; letter-spacing: -1px; 
-            z-index: 9001; 
+        .elite-nav .logo { 
+            font-size: 2.5rem; font-weight: 700; letter-spacing: -2px; 
+            color: #fff; z-index: 10001; 
         }
-        .codot-nav .dot { color: var(--accent); }
+        .elite-nav .dot { color: var(--accent); }
 
-        /* Custom Hamburger Button (Left) */
-        .menu-toggle {
-            display: flex; flex-direction: column; justify-content: center; gap: 6px;
-            width: 40px; height: 40px; background: transparent; border: none; 
-            cursor: pointer; z-index: 10002; /* Must be highest to toggle drawer */
+        /* Custom Two-Line Burger (Left) */
+        .elite-burger {
+            width: 40px; height: 40px; position: relative; cursor: pointer;
+            z-index: 10001; background: transparent; border: none; outline: none;
+            display: flex; flex-direction: column; justify-content: center; gap: 8px;
         }
-        .menu-toggle span {
-            display: block; height: 2px; background-color: var(--text-main);
-            border-radius: 2px; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.4s ease, width 0.4s ease;
+        .elite-burger .line {
+            width: 100%; height: 2px; background: #fff;
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1), background 0.3s ease;
+            transform-origin: center;
         }
-        .menu-toggle span:nth-child(1) { width: 100%; transform-origin: left center; }
-        .menu-toggle span:nth-child(2) { width: 75%; }
-        .menu-toggle span:nth-child(3) { width: 100%; transform-origin: left center; }
         
-        .menu-toggle:hover span:nth-child(2) { width: 100%; }
+        /* Burger to X Animation */
+        .elite-burger.active .line:nth-child(1) { transform: translateY(5px) rotate(45deg); background: var(--accent); }
+        .elite-burger.active .line:nth-child(2) { transform: translateY(-5px) rotate(-45deg); background: var(--accent); }
 
-        /* X Animation */
-        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(2px, -2px); background-color: var(--accent); }
-        .menu-toggle.active span:nth-child(2) { opacity: 0; width: 0; }
-        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(2px, 2px); background-color: var(--accent); }
-
-        /* --- THE OFF-CANVAS DRAWER --- */
-        .nav-sidebar {
-            position: fixed; top: 0; left: 0; 
-            width: 400px; max-width: 85vw; height: 100vh;
-            background: var(--surface-color);
-            border-right: 1px solid rgba(255,255,255,0.03);
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 2rem 4rem; gap: 1.5rem;
-            transform: translateX(-100%); 
-            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-            z-index: 10001;
-            box-shadow: 10px 0 50px rgba(0,0,0,0.9);
-        }
-        .nav-sidebar.open { transform: translateX(0); }
-
-        /* Sidebar Links */
-        .nav-sidebar a { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 2.2rem); 
-            font-weight: 700; text-transform: uppercase; letter-spacing: -0.5px;
-            color: var(--text-muted); transition: all 0.3s ease;
-            width: fit-content; position: relative;
-        }
-        .nav-sidebar a:hover { color: var(--text-main); transform: translateX(10px); }
-        
-        /* Auto-Marker Active State */
-        .nav-sidebar a.active-link { color: var(--text-main); transform: translateX(10px); }
-        .nav-sidebar a.active-link::before {
-            content: ''; position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
-            width: 8px; height: 8px; background-color: var(--accent); border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .nav-sidebar .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 1.2rem 2rem; border-radius: 4px; font-weight: 700 !important;
-            text-align: center; width: 100%; margin-top: 2rem; font-size: 1.2rem;
-            transition: all 0.3s ease; border: none;
-        }
-        .nav-sidebar .nav-btn:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-3px); }
-        .nav-sidebar .nav-btn.active-link::before { display: none; } /* Removes dot from button */
-
-        /* --- THE DARK OVERLAY --- */
-        .nav-backdrop {
+        /* --- CLIP-PATH FULLSCREEN OVERLAY --- */
+        .elite-menu-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); /* Deep solid fade, no blur bugs */
-            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-            z-index: 10000;
+            background: #050505; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            /* The Magic Physics: Starts as a 0px circle exactly at the burger's location */
+            clip-path: circle(0px at 5% 40px);
+            transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            pointer-events: none;
         }
-        .nav-backdrop.open { opacity: 1; pointer-events: all; }
+        .elite-menu-overlay.open {
+            /* Expands to cover the entire screen */
+            clip-path: circle(150% at 5% 40px);
+            pointer-events: all;
+        }
+
+        /* --- MASKED TYPOGRAPHY MENU --- */
+        .elite-menu-list {
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
+            list-style: none; width: 100%;
+        }
+        .menu-item-wrap {
+            overflow: hidden; /* This masks the text before it slides up */
+        }
+        
+        .menu-link {
+            display: block; font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 7vw, 6rem); font-weight: 700; text-transform: uppercase;
+            line-height: 1.1; letter-spacing: -2px;
+            /* Hollow Text Effect */
+            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            /* Slide Animation Prep */
+            transform: translateY(120%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, -webkit-text-stroke 0.3s ease;
+        }
+
+        /* Hover Effect: Floods with Color */
+        .menu-link:hover, .menu-link.active-link {
+            color: var(--accent); -webkit-text-stroke: 0px var(--accent);
+        }
+
+        /* Staggered Entrance Animation when Open */
+        .elite-menu-overlay.open .menu-link { transform: translateY(0); }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(1) .menu-link { transition-delay: 0.1s; }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(2) .menu-link { transition-delay: 0.15s; }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(3) .menu-link { transition-delay: 0.2s; }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(4) .menu-link { transition-delay: 0.25s; }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(5) .menu-link { transition-delay: 0.3s; }
+        .elite-menu-overlay.open .menu-item-wrap:nth-child(6) .menu-link { transition-delay: 0.35s; }
+
+        /* Special Apply Button in Menu */
+        .elite-menu-apply {
+            margin-top: 3rem; padding: 1rem 3rem; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1.2rem; font-weight: 600;
+            color: #fff; text-transform: uppercase; letter-spacing: 2px;
+            transform: translateY(50px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .elite-menu-overlay.open .elite-menu-apply { transform: translateY(0); opacity: 1; transition-delay: 0.5s; }
+        .elite-menu-apply:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
         /* --- PAGE HEADER --- */
         .page-header {
-            padding: 12rem 5% 6rem 5%;
-            text-align: center;
-            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            padding: 12rem 5% 6rem 5%; text-align: center;
+            background: radial-gradient(circle at top, #111 0%, var(--bg-color) 70%);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
@@ -131,11 +126,8 @@
         .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; }
         
         .form-container {
-            background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 3rem;
         }
 
         .form-group { margin-bottom: 1.5rem; }
@@ -145,8 +137,8 @@
         }
         
         .form-control {
-            width: 100%; padding: 1rem 1.2rem;
-            background-color: var(--bg-color); color: var(--text-main);
+            width: 100%; padding: 1.2rem;
+            background-color: #030303; color: var(--text-main);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
             font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
         }
@@ -155,23 +147,22 @@
 
         .btn-submit {
             width: 100%; padding: 1.2rem;
-            background-color: var(--accent); color: var(--bg-color);
+            background-color: var(--accent); color: #000;
             border: none; border-radius: 6px;
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
             cursor: pointer; margin-top: 1.5rem; transition: all 0.3s ease;
         }
-        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-submit:hover { box-shadow: 0 0 30px var(--accent-glow); background-color: #fff; }
 
         /* --- SUCCESS MESSAGE --- */
         .success-box {
             display: none; text-align: center; padding: 3rem 2rem;
-            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 12px; 
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; 
         }
         .success-box svg { color: var(--success); margin-bottom: 1rem; width: 64px; height: 64px; }
         .success-box h3 { font-size: 2rem; margin-bottom: 1rem; color: var(--text-main); }
         .ticket-id {
-            background: var(--bg-color); padding: 1rem 2rem; border-radius: 8px;
+            background: #030303; padding: 1rem 2rem; border-radius: 8px;
             font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;
             color: var(--accent); letter-spacing: 2px; margin: 1.5rem 0;
             display: inline-block; border: 1px dashed var(--accent);
@@ -179,8 +170,8 @@
 
         /* --- TRACK BANNER SECTION --- */
         .track-banner {
-            margin-top: 4rem; padding: 4rem 5%;
-            text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 100%);
+            margin-top: 4rem; padding: 4rem 5%; text-align: center; 
+            background: radial-gradient(circle at center, #111 0%, var(--bg-color) 100%);
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .track-banner h3 { font-size: 2rem; margin-bottom: 1rem; }
@@ -188,80 +179,67 @@
         
         .btn-outline {
             padding: 1rem 2.5rem; background-color: transparent; color: var(--accent);
-            border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
+            border: 1px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; border-radius: 50px; display: inline-block;
         }
-        .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-outline:hover { background-color: var(--accent); color: #000; }
 
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
         
-        @media (max-width: 768px) {
-            .form-container { padding: 2rem; }
-            .nav-sidebar { padding: 2rem; width: 100vw; max-width: 100vw; border-right: none; }
-        }
+        @media (max-width: 768px) { .form-container { padding: 2rem; } }
     </style>
 </head>
 <body>
 
-    <div class="nav-backdrop" id="navBackdrop"></div>
-
-    <nav class="codot-nav">
-        <button class="menu-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="elite-nav">
+        <button class="elite-burger" id="eliteBurger" aria-label="Toggle Navigation">
+            <div class="line"></div>
+            <div class="line"></div>
         </button>
 
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
     </nav>
 
-    <div class="nav-sidebar" id="navSidebar">
-        <a href="model.html">How It Works</a>
-        <a href="work.html">Work</a>
-        <a href="about.html">About</a>
-        <a href="estimate.html">Instant Quote</a>
-        <a href="buyout.html">The Buyout</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="apply.html" class="nav-btn">Apply Now</a>
+    <div class="elite-menu-overlay" id="eliteMenu">
+        <ul class="elite-menu-list">
+            <li class="menu-item-wrap"><a href="model.html" class="menu-link">How It Works</a></li>
+            <li class="menu-item-wrap"><a href="work.html" class="menu-link">Work</a></li>
+            <li class="menu-item-wrap"><a href="about.html" class="menu-link">About</a></li>
+            <li class="menu-item-wrap"><a href="estimate.html" class="menu-link">Quote</a></li>
+            <li class="menu-item-wrap"><a href="buyout.html" class="menu-link">Buyout</a></li>
+            <li class="menu-item-wrap"><a href="dashboard.html" class="menu-link">Dashboard</a></li>
+            <a href="apply.html" class="elite-menu-apply">Apply Now</a>
+        </ul>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Auto-Marker Logic
+            // Auto-Marker Logic for new typography system
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            const navLinks = document.querySelectorAll(".nav-sidebar a");
+            const navLinks = document.querySelectorAll(".menu-link");
             navLinks.forEach(link => {
                 if (link.getAttribute("href") === currentPath) {
                     link.classList.add("active-link");
                 }
             });
 
-            // Sidebar Toggle Logic
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const navSidebar = document.getElementById('navSidebar');
-            const navBackdrop = document.getElementById('navBackdrop');
+            // Elite Menu Controller
+            const eliteBurger = document.getElementById('eliteBurger');
+            const eliteMenu = document.getElementById('eliteMenu');
 
-            function toggleNav() {
-                mobileMenuBtn.classList.toggle('active');
-                navSidebar.classList.toggle('open');
-                navBackdrop.classList.toggle('open');
+            eliteBurger.addEventListener('click', () => {
+                eliteBurger.classList.toggle('active');
+                eliteMenu.classList.toggle('open');
                 
-                // Stop page from scrolling in the background
-                if (navSidebar.classList.contains('open')) {
+                // Toggle scroll lock
+                if (eliteMenu.classList.contains('open')) {
                     document.body.style.overflow = 'hidden';
                 } else {
                     document.body.style.overflow = '';
                 }
-            }
-
-            if (mobileMenuBtn && navSidebar && navBackdrop) {
-                // Click hamburger to open/close
-                mobileMenuBtn.addEventListener('click', toggleNav);
-                // Click dark overlay to close
-                navBackdrop.addEventListener('click', toggleNav);
-            }
+            });
         });
     </script>
 
