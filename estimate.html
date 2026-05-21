@@ -8,117 +8,51 @@
     <style>
         /* --- CORE CSS --- */
         :root {
-            --bg-color: #030303; 
-            --surface-color: #0a0a0a;
+            --bg-color: #050505;
+            --surface-color: #121212;
             --text-main: #f3f4f6;
-            --text-muted: #666666;
+            --text-muted: #9ca3af;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.3);
+            --accent-glow: rgba(0, 229, 255, 0.4);
             --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; background-color: var(--bg-color); color: var(--text-main); }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Inter', sans-serif; line-height: 1.6; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
-        a { text-decoration: none; color: var(--text-main); }
+        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- THE NAVBAR --- */
-        .elite-nav {
+        /* --- ORIGINAL NAVIGATION --- */
+        nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
-            background: rgba(5, 5, 5, 0.95);
-            z-index: 10000; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        /* Custom Two-Line Burger (Left) */
-        .elite-burger {
-            width: 40px; height: 40px; position: relative; cursor: pointer;
-            z-index: 10002; background: transparent; border: none; outline: none;
-            display: flex; flex-direction: column; justify-content: center; gap: 8px;
-        }
-        .elite-burger .line {
-            width: 100%; height: 2px; background: #fff;
-            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1), background 0.3s ease;
-            transform-origin: center;
-        }
-        .elite-burger.active .line:nth-child(1) { transform: translateY(5px) rotate(45deg); background: var(--accent); }
-        .elite-burger.active .line:nth-child(2) { transform: translateY(-5px) rotate(-45deg); background: var(--accent); }
-
-        /* Logo (Right) */
-        .elite-nav .logo { 
-            font-size: 2.2rem; font-weight: 700; letter-spacing: -1.5px; 
-            color: #fff; z-index: 10001; 
-        }
-        .elite-nav .dot { color: var(--accent); }
-
-        /* --- THE DARK OVERLAY --- */
-        .nav-backdrop {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85);
-            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-            z-index: 9998;
-        }
-        .nav-backdrop.open { opacity: 1; pointer-events: all; }
-
-        /* --- THE ELITE SIDEBAR --- */
-        .elite-sidebar {
-            position: fixed; top: 0; left: 0; 
-            width: 450px; max-width: 100vw; height: 100vh;
-            background: #050505; border-right: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 2rem 3rem; z-index: 9999;
-            transform: translateX(-100%); 
-            transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
-            box-shadow: 20px 0 50px rgba(0,0,0,0.8);
-            overflow-y: auto;
-        }
-        .elite-sidebar.open { transform: translateX(0); }
-
-        /* --- MASKED TYPOGRAPHY MENU --- */
-        .elite-menu-list {
-            display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
-            list-style: none; width: 100%; margin-top: 4rem; margin-bottom: 2rem;
-        }
-        .menu-item-wrap { overflow: hidden; }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .dot { color: var(--accent); }
         
-        .menu-link {
-            display: block; font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 700; text-transform: uppercase;
-            line-height: 1.1; letter-spacing: -1.5px;
-            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4);
-            transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, -webkit-text-stroke 0.3s ease, padding 0.3s ease;
+        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
         }
-
-        .menu-link:hover, .menu-link.active-link {
-            color: var(--accent); -webkit-text-stroke: 0px var(--accent); padding-left: 15px;
-        }
-
-        .elite-sidebar.open .menu-link { transform: translateY(0); }
-        .elite-sidebar.open .menu-item-wrap:nth-child(1) .menu-link { transition-delay: 0.1s; }
-        .elite-sidebar.open .menu-item-wrap:nth-child(2) .menu-link { transition-delay: 0.15s; }
-        .elite-sidebar.open .menu-item-wrap:nth-child(3) .menu-link { transition-delay: 0.2s; }
-        .elite-sidebar.open .menu-item-wrap:nth-child(4) .menu-link { transition-delay: 0.25s; }
-        .elite-sidebar.open .menu-item-wrap:nth-child(5) .menu-link { transition-delay: 0.3s; }
-        .elite-sidebar.open .menu-item-wrap:nth-child(6) .menu-link { transition-delay: 0.35s; }
-
-        .elite-menu-apply {
-            margin-top: 2rem; padding: 1.2rem 0; width: 100%; text-align: center;
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; 
-            font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 700;
-            color: #fff; text-transform: uppercase; letter-spacing: 1px;
-            transform: translateY(30px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            display: inline-block;
-        }
-        .elite-sidebar.open .elite-menu-apply { transform: translateY(0); opacity: 1; transition-delay: 0.45s; }
-        .elite-menu-apply:hover { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
         /* --- PAGE HEADER --- */
         .page-header {
-            padding: 12rem 5% 6rem 5%; text-align: center;
-            background: radial-gradient(circle at top, #111 0%, var(--bg-color) 70%);
+            padding: 12rem 5% 6rem 5%;
+            text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
@@ -128,9 +62,11 @@
         .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; }
         
         .form-container {
-            background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            background: var(--surface-color);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .form-group { margin-bottom: 2rem; }
@@ -143,11 +79,11 @@
         
         .form-control {
             width: 100%; padding: 1.2rem;
-            background-color: #030303; color: var(--text-main);
+            background-color: var(--bg-color); color: var(--text-main);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
             font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
         }
-        .form-control:focus { outline: none; border-color: var(--accent); }
+        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
         textarea.form-control { resize: vertical; min-height: 100px; }
 
         /* Custom Slider Range */
@@ -170,7 +106,7 @@
         /* Custom Toggles */
         .toggle-container {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.2rem; background: #030303; border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.2rem; background: var(--bg-color); border: 1px solid rgba(255,255,255,0.1);
             border-radius: 6px; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;
         }
         .toggle-container:hover { border-color: rgba(255,255,255,0.3); }
@@ -188,7 +124,7 @@
             background-color: #888; transition: .4s; border-radius: 50%;
         }
         input:checked + .slider { background-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-        input:checked + .slider:before { transform: translateX(24px); background-color: #000; }
+        input:checked + .slider:before { transform: translateX(24px); background-color: var(--bg-color); }
 
         /* Live Price Display */
         .price-display-wrapper {
@@ -203,103 +139,97 @@
 
         .btn-submit {
             width: 100%; padding: 1.2rem;
-            background-color: var(--accent); color: #000;
+            background-color: var(--accent); color: var(--bg-color);
             border: none; border-radius: 6px;
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
             cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-submit:hover { box-shadow: 0 0 30px var(--accent-glow); background-color: #fff; transform: translateY(-2px); }
+        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* --- SUCCESS MESSAGE --- */
         .success-box {
             display: none; text-align: center; padding: 3rem 2rem;
-            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; 
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px; animation: fadeIn 0.5s ease-out;
         }
         .success-box svg { color: var(--success); margin-bottom: 1rem; width: 64px; height: 64px; }
         .success-box h3 { font-size: 2rem; margin-bottom: 1rem; color: var(--text-main); }
         .ticket-id {
-            background: #030303; padding: 1rem 2rem; border-radius: 8px;
+            background: var(--bg-color); padding: 1rem 2rem; border-radius: 8px;
             font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;
             color: var(--accent); letter-spacing: 2px; margin: 1.5rem 0;
             display: inline-block; border: 1px dashed var(--accent);
         }
 
-        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+        /* --- TRACK BANNER SECTION --- */
+        .track-banner {
+            margin-top: 4rem; padding: 4rem 5%;
+            text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 100%);
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .track-banner h3 { font-size: 2rem; margin-bottom: 1rem; }
+        .track-banner p { color: var(--text-muted); margin-bottom: 2rem; }
         
-        @media (max-width: 768px) { 
+        .btn-outline {
+            padding: 1rem 2rem; background-color: transparent; color: var(--accent);
+            border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            border-radius: 4px; display: inline-block;
+        }
+        .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* Original Mobile Hide Behavior */
             .form-container { padding: 2rem; }
-            .elite-sidebar { padding: 2rem; width: 100vw; max-width: 100vw; border-right: none; }
             .form-row { grid-template-columns: 1fr; gap: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="nav-backdrop" id="navBackdrop"></div>
-
-    <nav class="elite-nav">
-        <button class="elite-burger" id="eliteBurger" aria-label="Toggle Navigation">
-            <div class="line"></div>
-            <div class="line"></div>
-        </button>
-
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
+        <div class="nav-links">
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="estimate.html">Instant Quote</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
     </nav>
-
-    <div class="elite-sidebar" id="eliteSidebar">
-        <ul class="elite-menu-list">
-            <li class="menu-item-wrap"><a href="model.html" class="menu-link">How It Works</a></li>
-            <li class="menu-item-wrap"><a href="work.html" class="menu-link">Work</a></li>
-            <li class="menu-item-wrap"><a href="about.html" class="menu-link">About</a></li>
-            <li class="menu-item-wrap"><a href="estimate.html" class="menu-link">Quote</a></li>
-            <li class="menu-item-wrap"><a href="buyout.html" class="menu-link">Buyout</a></li>
-            <li class="menu-item-wrap"><a href="dashboard.html" class="menu-link">Dashboard</a></li>
-            <a href="apply.html" class="elite-menu-apply">Apply Now</a>
-        </ul>
-    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Auto-Marker Logic
+            // Original Auto-Marker Logic
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            const navLinks = document.querySelectorAll(".menu-link");
+            const navLinks = document.querySelectorAll(".nav-links a");
+            
             navLinks.forEach(link => {
                 if (link.getAttribute("href") === currentPath) {
-                    link.classList.add("active-link");
+                    link.style.color = "var(--accent)"; 
+                    
+                    if (!link.classList.contains("nav-btn")) {
+                        link.style.borderBottom = "2px solid var(--accent)";
+                        link.style.paddingBottom = "5px";
+                    }
                 }
             });
 
-            // Elite Sidebar Controller
-            const eliteBurger = document.getElementById('eliteBurger');
-            const eliteSidebar = document.getElementById('eliteSidebar');
-            const navBackdrop = document.getElementById('navBackdrop');
-
-            function toggleNav() {
-                eliteBurger.classList.toggle('active');
-                eliteSidebar.classList.toggle('open');
-                navBackdrop.classList.toggle('open');
-                
-                if (eliteSidebar.classList.contains('open')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            if (eliteBurger && eliteSidebar && navBackdrop) {
-                eliteBurger.addEventListener('click', toggleNav);
-                navBackdrop.addEventListener('click', toggleNav);
-            }
-
-            // --- INSTANT QUOTE CALCULATOR LOGIC (LOW BUDGET TIER) ---
+            // --- INSTANT QUOTE CALCULATOR LOGIC (INR) ---
             const pagesSlider = document.getElementById('pagesSlider');
             const pagesOutput = document.getElementById('pagesOutput');
             const toggles = document.querySelectorAll('.feature-toggle');
             const livePrice = document.getElementById('livePrice');
 
-            // Recalibrated Engine Pricing 
             const BASE_PRICE = 0; 
             const PRICE_PER_PAGE = 750; 
 
@@ -319,13 +249,9 @@
                 livePrice.innerText = "₹" + total.toLocaleString('en-IN');
             }
 
-            // Event Listeners for Live Updates
             pagesSlider.addEventListener('input', calculateQuote);
-            toggles.forEach(toggle => {
-                toggle.addEventListener('change', calculateQuote);
-            });
+            toggles.forEach(toggle => toggle.addEventListener('change', calculateQuote));
 
-            // Initialize on load
             calculateQuote();
         });
     </script>
