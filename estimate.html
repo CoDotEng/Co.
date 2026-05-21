@@ -6,297 +6,412 @@
     <title>Instant Quote | CODOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE CSS (Matched globally) --- */
+        /* --- CORE CSS --- */
         :root {
-            --bg-color: #050505;
-            --surface-color: #121212;
+            --bg-color: #030303; 
+            --surface-color: #0a0a0a;
             --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --text-muted: #666666;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.4);
-            --border-color: rgba(255, 255, 255, 0.05);
+            --accent-glow: rgba(0, 229, 255, 0.3);
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; background-color: var(--bg-color); color: var(--text-main); }
         html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; }
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
-        a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
+        a { text-decoration: none; color: var(--text-main); }
 
-        /* --- NAVIGATION --- */
-        nav {
+        /* --- THE NAVBAR --- */
+        .elite-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
-            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            z-index: 1000; border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 5%; position: fixed; width: 100%; top: 0; left: 0;
+            background: rgba(5, 5, 5, 0.95);
+            z-index: 10000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
-        .dot { color: var(--accent); }
+
+        /* Custom Two-Line Burger (Left) */
+        .elite-burger {
+            width: 40px; height: 40px; position: relative; cursor: pointer;
+            z-index: 10002; background: transparent; border: none; outline: none;
+            display: flex; flex-direction: column; justify-content: center; gap: 8px;
+        }
+        .elite-burger .line {
+            width: 100%; height: 2px; background: #fff;
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1), background 0.3s ease;
+            transform-origin: center;
+        }
+        .elite-burger.active .line:nth-child(1) { transform: translateY(5px) rotate(45deg); background: var(--accent); }
+        .elite-burger.active .line:nth-child(2) { transform: translateY(-5px) rotate(-45deg); background: var(--accent); }
+
+        /* Logo (Right) */
+        .elite-nav .logo { 
+            font-size: 2.2rem; font-weight: 700; letter-spacing: -1.5px; 
+            color: #fff; z-index: 10001; 
+        }
+        .elite-nav .dot { color: var(--accent); }
+
+        /* --- THE DARK OVERLAY --- */
+        .nav-backdrop {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+            z-index: 9998;
+        }
+        .nav-backdrop.open { opacity: 1; pointer-events: all; }
+
+        /* --- THE ELITE SIDEBAR --- */
+        .elite-sidebar {
+            position: fixed; top: 0; left: 0; 
+            width: 450px; max-width: 100vw; height: 100vh;
+            background: #050505; border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 2rem 3rem; z-index: 9999;
+            transform: translateX(-100%); 
+            transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+            box-shadow: 20px 0 50px rgba(0,0,0,0.8);
+            overflow-y: auto;
+        }
+        .elite-sidebar.open { transform: translateX(0); }
+
+        /* --- MASKED TYPOGRAPHY MENU --- */
+        .elite-menu-list {
+            display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+            list-style: none; width: 100%; margin-top: 4rem; margin-bottom: 2rem;
+        }
+        .menu-item-wrap { overflow: hidden; }
         
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a:hover { color: var(--accent); }
-        .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
-            border: 1px solid var(--accent);
+        .menu-link {
+            display: block; font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 700; text-transform: uppercase;
+            line-height: 1.1; letter-spacing: -1.5px;
+            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4);
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, -webkit-text-stroke 0.3s ease, padding 0.3s ease;
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+
+        .menu-link:hover, .menu-link.active-link {
+            color: var(--accent); -webkit-text-stroke: 0px var(--accent); padding-left: 15px;
+        }
+
+        .elite-sidebar.open .menu-link { transform: translateY(0); }
+        .elite-sidebar.open .menu-item-wrap:nth-child(1) .menu-link { transition-delay: 0.1s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(2) .menu-link { transition-delay: 0.15s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(3) .menu-link { transition-delay: 0.2s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(4) .menu-link { transition-delay: 0.25s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(5) .menu-link { transition-delay: 0.3s; }
+        .elite-sidebar.open .menu-item-wrap:nth-child(6) .menu-link { transition-delay: 0.35s; }
+
+        .elite-menu-apply {
+            margin-top: 2rem; padding: 1.2rem 0; width: 100%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; 
+            font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 700;
+            color: #fff; text-transform: uppercase; letter-spacing: 1px;
+            transform: translateY(30px); opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-block;
+        }
+        .elite-sidebar.open .elite-menu-apply { transform: translateY(0); opacity: 1; transition-delay: 0.45s; }
+        .elite-menu-apply:hover { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
 
         /* --- PAGE HEADER --- */
         .page-header {
-            padding: 12rem 5% 6rem 5%;
-            text-align: center;
-            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
-            border-bottom: 1px solid var(--border-color);
+            padding: 12rem 5% 6rem 5%; text-align: center;
+            background: radial-gradient(circle at top, #111 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
         .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
 
-        /* --- ESTIMATOR LAYOUT --- */
-        .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        /* --- CALCULATOR FORM SECTION --- */
+        .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; }
         
-        .calc-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 4rem;
+        .form-container {
+            background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        /* --- FORM CONTROLS --- */
-        .input-group { margin-bottom: 3rem; }
-        .input-group h3 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-main); }
-
-        /* Custom Radio Cards */
-        .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-group { margin-bottom: 2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
         
-        .type-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 1.5rem;
-            cursor: pointer; transition: all 0.3s ease;
+        .form-group label {
+            display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-weight: 600;
+            color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase;
         }
-
-        .type-card:nth-child(3) { grid-column: 1 / -1; } /* Make 3rd card span full width */
-        .type-card:hover { border-color: rgba(0, 229, 255, 0.5); background: rgba(255,255,255,0.02); }
-        .type-card input[type="radio"] { display: none; }
-        .type-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
-        .type-card p { font-size: 0.85rem; color: var(--text-muted); }
-
-        /* Active State for Radio Cards */
-        .type-card input[type="radio"]:checked + div { border-color: var(--accent); }
-        .type-card.active {
-            border-color: var(--accent); background: rgba(0, 229, 255, 0.05);
-            box-shadow: 0 0 20px var(--accent-glow);
+        
+        .form-control {
+            width: 100%; padding: 1.2rem;
+            background-color: #030303; color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+            font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
         }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
 
-        /* Custom Slider */
-        .slider-container {
-            background: var(--surface-color); padding: 2rem;
-            border-radius: 8px; border: 1px solid var(--border-color);
+        /* Custom Slider Range */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent; margin: 15px 0;
         }
-        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .slider-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--accent); }
-
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer; background: #222;
+            border-radius: 3px; border: 1px solid rgba(255,255,255,0.05);
+        }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
-            background: var(--accent); cursor: pointer; margin-top: -10px;
-            box-shadow: 0 0 10px var(--accent-glow); transition: transform 0.1s;
+            height: 24px; width: 24px; border-radius: 50%;
+            background: var(--accent); cursor: pointer; -webkit-appearance: none;
+            margin-top: -10px; box-shadow: 0 0 15px var(--accent-glow);
+            transition: transform 0.2s ease;
         }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px;
-        }
 
-        /* Toggle Switch */
+        /* Custom Toggles */
         .toggle-container {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--surface-color); padding: 1.5rem;
-            border-radius: 8px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.2rem; background: #030303; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;
         }
-        .toggle-text h4 { margin-bottom: 0.2rem; }
-        .toggle-text p { font-size: 0.85rem; color: var(--text-muted); }
-
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .toggle-container:hover { border-color: rgba(255,255,255,0.3); }
+        .toggle-info h4 { font-size: 1rem; color: var(--text-main); font-weight: 600; margin-bottom: 0.2rem; }
+        .toggle-info p { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider-toggle {
+        .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.1); transition: .4s;
-            border-radius: 34px; border: 1px solid var(--border-color);
+            background-color: #222; transition: .4s; border-radius: 34px;
         }
-        .slider-toggle:before {
-            position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
-            background-color: var(--text-muted); transition: .4s; border-radius: 50%;
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
+            background-color: #888; transition: .4s; border-radius: 50%;
         }
-        input:checked + .slider-toggle { background-color: var(--accent); border-color: var(--accent); }
-        input:checked + .slider-toggle:before { transform: translateX(22px); background-color: var(--bg-color); }
+        input:checked + .slider { background-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: #000; }
 
-        /* Result Panel (Sticky) */
-        .result-panel {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 2.5rem;
-            position: sticky; top: 120px; /* Adjusted to stick right under the new fixed nav */
-            height: fit-content; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* Live Price Display */
+        .price-display-wrapper {
+            text-align: center; margin: 3rem 0 2rem 0; padding: 2rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .result-panel h2 { font-size: 1.5rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
-        .result-item { margin-bottom: 1.5rem; }
-        .result-label { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
-        .result-value { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; color: var(--text-main); }
-        .result-value.highlight { color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
+        .price-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .live-price {
+            font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700;
+            color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); line-height: 1.1; margin-top: 0.5rem;
+        }
 
         .btn-submit {
-            display: block; width: 100%; text-align: center;
-            background: var(--accent); color: var(--bg-color);
-            padding: 1.2rem; border-radius: 6px; text-decoration: none;
-            font-weight: bold; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
-            margin-top: 2rem; transition: all 0.3s ease; border: none; cursor: pointer;
+            width: 100%; padding: 1.2rem;
+            background-color: var(--accent); color: #000;
+            border: none; border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-submit:hover { box-shadow: 0 0 30px var(--accent-glow); background-color: #fff; transform: translateY(-2px); }
 
-        /* --- FOOTER --- */
-        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid var(--border-color); }
+        /* --- SUCCESS MESSAGE --- */
+        .success-box {
+            display: none; text-align: center; padding: 3rem 2rem;
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; 
+        }
+        .success-box svg { color: var(--success); margin-bottom: 1rem; width: 64px; height: 64px; }
+        .success-box h3 { font-size: 2rem; margin-bottom: 1rem; color: var(--text-main); }
+        .ticket-id {
+            background: #030303; padding: 1rem 2rem; border-radius: 8px;
+            font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent); letter-spacing: 2px; margin: 1.5rem 0;
+            display: inline-block; border: 1px dashed var(--accent);
+        }
 
-        /* --- ANIMATIONS --- */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 900px) {
-            .nav-links { display: none; }
-            .calc-container { grid-template-columns: 1fr; gap: 2rem; }
-            .type-grid { grid-template-columns: 1fr; }
-            .result-panel { position: relative; top: 0; }
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+        
+        @media (max-width: 768px) { 
+            .form-container { padding: 2rem; }
+            .elite-sidebar { padding: 2rem; width: 100vw; max-width: 100vw; border-right: none; }
+            .form-row { grid-template-columns: 1fr; gap: 1rem; }
         }
     </style>
 </head>
 <body>
 
-   <nav>
+    <div class="nav-backdrop" id="navBackdrop"></div>
+
+    <nav class="elite-nav">
+        <button class="elite-burger" id="eliteBurger" aria-label="Toggle Navigation">
+            <div class="line"></div>
+            <div class="line"></div>
+        </button>
+
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-        <div class="nav-links">
-            <a href="model.html">How It Works</a>
-            <a href="work.html">Work</a>
-            <a href="about.html">About</a>
-            <a href="estimate.html">Instant Quote</a>
-            <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
-        </div>
     </nav>
+
+    <div class="elite-sidebar" id="eliteSidebar">
+        <ul class="elite-menu-list">
+            <li class="menu-item-wrap"><a href="model.html" class="menu-link">How It Works</a></li>
+            <li class="menu-item-wrap"><a href="work.html" class="menu-link">Work</a></li>
+            <li class="menu-item-wrap"><a href="about.html" class="menu-link">About</a></li>
+            <li class="menu-item-wrap"><a href="estimate.html" class="menu-link">Quote</a></li>
+            <li class="menu-item-wrap"><a href="buyout.html" class="menu-link">Buyout</a></li>
+            <li class="menu-item-wrap"><a href="dashboard.html" class="menu-link">Dashboard</a></li>
+            <a href="apply.html" class="elite-menu-apply">Apply Now</a>
+        </ul>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
+            // Auto-Marker Logic
             let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Find all the links in the navigation
-            const navLinks = document.querySelectorAll(".nav-links a");
-            
+            const navLinks = document.querySelectorAll(".menu-link");
             navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
-                    if (!link.classList.contains("nav-btn")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                        link.style.paddingBottom = "5px";
-                    }
+                    link.classList.add("active-link");
                 }
             });
+
+            // Elite Sidebar Controller
+            const eliteBurger = document.getElementById('eliteBurger');
+            const eliteSidebar = document.getElementById('eliteSidebar');
+            const navBackdrop = document.getElementById('navBackdrop');
+
+            function toggleNav() {
+                eliteBurger.classList.toggle('active');
+                eliteSidebar.classList.toggle('open');
+                navBackdrop.classList.toggle('open');
+                
+                if (eliteSidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (eliteBurger && eliteSidebar && navBackdrop) {
+                eliteBurger.addEventListener('click', toggleNav);
+                navBackdrop.addEventListener('click', toggleNav);
+            }
+
+            // --- INSTANT QUOTE CALCULATOR LOGIC ---
+            const pagesSlider = document.getElementById('pagesSlider');
+            const pagesOutput = document.getElementById('pagesOutput');
+            const toggles = document.querySelectorAll('.feature-toggle');
+            const livePrice = document.getElementById('livePrice');
+
+            // Pricing Configuration (Adjust these values to your agency's actual pricing)
+            const BASE_PRICE = 500; 
+            const PRICE_PER_PAGE = 150; 
+
+            function calculateQuote() {
+                let pages = parseInt(pagesSlider.value);
+                pagesOutput.innerText = pages + (pages === 20 ? "+" : ""); // Adds a + if maxed
+
+                let total = BASE_PRICE + (pages * PRICE_PER_PAGE);
+
+                toggles.forEach(toggle => {
+                    if (toggle.checked) {
+                        total += parseInt(toggle.getAttribute('data-price'));
+                    }
+                });
+
+                // Animate text update
+                livePrice.innerText = "$" + total.toLocaleString();
+            }
+
+            // Event Listeners for Live Updates
+            pagesSlider.addEventListener('input', calculateQuote);
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', calculateQuote);
+            });
+
+            // Initialize on load
+            calculateQuote();
         });
     </script>
 
     <header class="page-header">
-        <h1 class="reveal">Project Estimator<span class="dot">.</span></h1>
-        <p class="reveal">Adjust the parameters below to get a rough estimate of your investment and timeline. No hidden fees, just pure transparency.</p>
+        <h1>Instant Quote<span class="dot">.</span></h1>
+        <p>Configure your project architecture below. Our engine calculates your build cost in real-time.</p>
     </header>
 
     <section class="section">
-        <div class="calc-container">
-            <div class="calc-section">
-                <div class="input-group reveal">
-                    <h3>1. What are we building?</h3>
-                    <div class="type-grid">
-                        <label class="type-card active" onclick="selectCard(this)">
-                            <input type="radio" name="projectType" value="landing" checked>
-                            <div>
-                                <h4>Landing Page</h4>
-                                <p>High-converting single page website.</p>
-                            </div>
-                        </label>
-                        <label class="type-card" onclick="selectCard(this)">
-                            <input type="radio" name="projectType" value="corporate">
-                            <div>
-                                <h4>Corporate Website</h4>
-                                <p>Multi-page site for modern businesses.</p>
-                            </div>
-                        </label>
-                        <label class="type-card" onclick="selectCard(this)">
-                            <input type="radio" name="projectType" value="webapp">
-                            <div>
-                                <h4>Web Application</h4>
-                                <p>Custom software with user dashboards.</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="input-group reveal">
-                    <h3>2. How big is the project?</h3>
-                    <div class="slider-container">
-                        <div class="slider-header">
-                            <span style="color: var(--text-muted)">Number of Pages / Screens</span>
-                            <span class="slider-value" id="pageOutput">1</span>
-                        </div>
-                        <input type="range" id="pageSlider" min="1" max="20" value="1">
-                    </div>
-                </div>
-
-                <div class="input-group reveal">
-                    <h3>3. Design Requirements</h3>
-                    <div class="toggle-container">
-                        <div class="toggle-text">
-                            <h4>Premium Custom UI/UX</h4>
-                            <p>Tailor-made designs instead of standard layouts.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="customDesign" checked>
-                            <span class="slider-toggle"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="result-panel reveal">
-                <h2>Your Estimate</h2>
+        <div class="form-container" id="formWrapper">
+            <form id="applicationForm">
                 
-                <div class="result-item">
-                    <div class="result-label">Estimated Timeline</div>
-                    <div class="result-value" id="timeEstimate">1-2 Weeks</div>
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                    </div>
                 </div>
 
-                <div class="result-item">
-                    <div class="result-label">Estimated Investment</div>
-                    <div class="result-value highlight" id="priceEstimate">₹1,560</div>
+                <div class="form-group">
+                    <label for="pagesSlider"><span>Architecture Scale (Pages)</span> <span id="pagesOutput" style="color: var(--accent); font-size: 1.2rem;">1</span></label>
+                    <input type="range" id="pagesSlider" min="1" max="20" value="1" step="1">
                 </div>
 
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
-                    * This is a rough estimate. Final pricing depends on specific feature requirements and complexity.
-                </p>
+                <div class="form-group">
+                    <label>Premium Modules</label>
+                    
+                    <label class="toggle-container">
+                        <div class="toggle-info">
+                            <h4>E-Commerce & Payments</h4>
+                            <p>Stripe integration, product catalogs, and secure checkout.</p>
+                        </div>
+                        <div class="switch">
+                            <input type="checkbox" class="feature-toggle" value="E-Commerce" data-price="800">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
 
-                <a href="apply.html" class="btn-submit">Lock in this Quote</a>
-            </div>
+                    <label class="toggle-container">
+                        <div class="toggle-info">
+                            <h4>Advanced WebGL Animations</h4>
+                            <p>Custom 3D scroll-jacking, physics, and cinematic transitions.</p>
+                        </div>
+                        <div class="switch">
+                            <input type="checkbox" class="feature-toggle" value="WebGL Animation" data-price="500">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="toggle-container">
+                        <div class="toggle-info">
+                            <h4>SEO & Elite Copywriting</h4>
+                            <p>High-converting, search-engine-optimized brand messaging.</p>
+                        </div>
+                        <div class="switch">
+                            <input type="checkbox" class="feature-toggle" value="SEO Copywriting" data-price="400">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Additional Details (Optional)</label>
+                    <textarea id="description" class="form-control" placeholder="Any specific requirements or inspirations?"></textarea>
+                </div>
+
+                <div class="price-display-wrapper">
+                    <div class="price-label">Estimated Build Cost</div>
+                    <div class="live-price" id="livePrice">$0</div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Submit Quote Request</button>
+            </form>
+        </div>
+
+        <div class="success-box" id="successBox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h3>Architecture Submitted!</h3>
+            <p style="color: var(--text-muted);">Please save your secure tracking ticket below. Use it to monitor your project status.</p>
+            <div class="ticket-id" id="displayTicketID">CO-XXXXXX</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly.</p>
         </div>
     </section>
 
@@ -304,92 +419,79 @@
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <script>
-        // --- AUTO-HIGHLIGHT CURRENT PAGE SCRIPT ---
-        document.addEventListener("DOMContentLoaded", () => {
-            let currentPath = window.location.pathname.split("/").pop();
-            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
-            const navLinks = document.querySelectorAll(".nav-links a");
-            navLinks.forEach(link => {
-                if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)";
-                    if (!link.classList.contains("nav-btn")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                        link.style.paddingBottom = "5px";
-                    }
-                }
-            });
-        });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- SCROLL REVEAL SCRIPT ---
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
-        }
-        window.addEventListener("scroll", reveal);
-        reveal(); // Trigger once on load
-
-        // --- ESTIMATOR LOGIC ---
-        const rates = {
-            landing: { basePrice: 1000, baseWeeks: 1, perPagePrice: 200, perPageDays: 0.5 },
-            corporate: { basePrice: 2500, baseWeeks: 2, perPagePrice: 400, perPageDays: 1 },
-            webapp: { basePrice: 6000, baseWeeks: 4, perPagePrice: 800, perPageDays: 2 }
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
+            authDomain: "codot-agency.firebaseapp.com",
+            projectId: "codot-agency",
+            storageBucket: "codot-agency.firebasestorage.app",
+            messagingSenderId: "22678307444",
+            appId: "1:22678307444:web:59c72496bad5db86b3c721"
         };
-        const customDesignMultiplier = 1.3;
 
-        const radios = document.querySelectorAll('input[name="projectType"]');
-        const slider = document.getElementById('pageSlider');
-        const pageOutput = document.getElementById('pageOutput');
-        const customDesign = document.getElementById('customDesign');
-        const priceElement = document.getElementById('priceEstimate');
-        const timeElement = document.getElementById('timeEstimate');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        function selectCard(selectedLabel) {
-            document.querySelectorAll('.type-card').forEach(card => card.classList.remove('active'));
-            selectedLabel.classList.add('active');
-            calculateEstimate();
+        const form = document.getElementById('applicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formWrapper = document.getElementById('formWrapper');
+        const successBox = document.getElementById('successBox');
+        const displayTicketID = document.getElementById('displayTicketID');
+
+        function generateTicketID() {
+            return 'CO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        function calculateEstimate() {
-            let selectedType = 'landing';
-            radios.forEach(r => { if(r.checked) selectedType = r.value; });
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            const data = rates[selectedType];
-            const pages = parseInt(slider.value);
-            const isCustom = customDesign.checked;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Encrypting Payload...";
 
-            let totalPrice = data.basePrice + (pages * data.perPagePrice);
-            let totalDays = (data.baseWeeks * 7) + (pages * data.perPageDays);
-
-            if(isCustom) {
-                totalPrice *= customDesignMultiplier;
-                totalDays *= 1.2; 
-            }
-            if(totalPrice < 1000) totalPrice = 1000;
-
-            let minWeeks = Math.floor(totalDays / 7);
-            let maxWeeks = minWeeks + 1;
-            if(minWeeks < 1) minWeeks = 1, maxWeeks = 2;
-
-            pageOutput.innerText = pages;
-            timeElement.innerText = `${minWeeks}-${maxWeeks} Weeks`;
+            // Gather Data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const pages = document.getElementById('pagesSlider').value;
+            const description = document.getElementById('description').value;
+            const calculatedPrice = document.getElementById('livePrice').innerText;
             
-            const formattedPrice = Math.round(totalPrice).toLocaleString('en-IN');
-            priceElement.innerText = `₹${formattedPrice}`;
-        }
+            // Gather Selected Features
+            const toggles = document.querySelectorAll('.feature-toggle');
+            const selectedFeatures = [];
+            toggles.forEach(toggle => {
+                if (toggle.checked) selectedFeatures.push(toggle.value);
+            });
 
-        slider.addEventListener('input', calculateEstimate);
-        customDesign.addEventListener('change', calculateEstimate);
-        radios.forEach(radio => radio.addEventListener('change', calculateEstimate));
+            const ticketID = generateTicketID();
 
-        calculateEstimate(); // Initial Calc
+            try {
+                // Push Enhanced Data to Firestore
+                await addDoc(collection(db, "applications"), {
+                    ticketID: ticketID,
+                    name: name,
+                    email: email,
+                    pagesRequested: pages,
+                    features: selectedFeatures,
+                    estimatedPrice: calculatedPrice,
+                    description: description,
+                    status: "1. Architecture Under Review",
+                    timestamp: serverTimestamp()
+                });
+
+                formWrapper.style.display = "none";
+                successBox.style.display = "block";
+                displayTicketID.innerText = ticketID;
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Database transmission failed. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Quote Request";
+            }
+        });
     </script>
 </body>
 </html>
