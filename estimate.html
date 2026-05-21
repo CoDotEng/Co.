@@ -293,19 +293,19 @@
                 navBackdrop.addEventListener('click', toggleNav);
             }
 
-            // --- INSTANT QUOTE CALCULATOR LOGIC ---
+            // --- INSTANT QUOTE CALCULATOR LOGIC (LOW BUDGET TIER) ---
             const pagesSlider = document.getElementById('pagesSlider');
             const pagesOutput = document.getElementById('pagesOutput');
             const toggles = document.querySelectorAll('.feature-toggle');
             const livePrice = document.getElementById('livePrice');
 
-            // Pricing Configuration (Adjust these values to your agency's actual pricing)
-            const BASE_PRICE = 500; 
-            const PRICE_PER_PAGE = 150; 
+            // Recalibrated Engine Pricing 
+            const BASE_PRICE = 0; 
+            const PRICE_PER_PAGE = 750; 
 
             function calculateQuote() {
                 let pages = parseInt(pagesSlider.value);
-                pagesOutput.innerText = pages + (pages === 20 ? "+" : ""); // Adds a + if maxed
+                pagesOutput.innerText = pages + (pages === 20 ? "+" : "");
 
                 let total = BASE_PRICE + (pages * PRICE_PER_PAGE);
 
@@ -315,8 +315,8 @@
                     }
                 });
 
-                // Animate text update
-                livePrice.innerText = "$" + total.toLocaleString();
+                // Format with Indian Numbering System
+                livePrice.innerText = "₹" + total.toLocaleString('en-IN');
             }
 
             // Event Listeners for Live Updates
@@ -361,10 +361,10 @@
                     <label class="toggle-container">
                         <div class="toggle-info">
                             <h4>E-Commerce & Payments</h4>
-                            <p>Stripe integration, product catalogs, and secure checkout.</p>
+                            <p>Razorpay integration, product catalogs, and secure checkout.</p>
                         </div>
                         <div class="switch">
-                            <input type="checkbox" class="feature-toggle" value="E-Commerce" data-price="800">
+                            <input type="checkbox" class="feature-toggle" value="E-Commerce" data-price="3000">
                             <span class="slider"></span>
                         </div>
                     </label>
@@ -375,7 +375,7 @@
                             <p>Custom 3D scroll-jacking, physics, and cinematic transitions.</p>
                         </div>
                         <div class="switch">
-                            <input type="checkbox" class="feature-toggle" value="WebGL Animation" data-price="500">
+                            <input type="checkbox" class="feature-toggle" value="WebGL Animation" data-price="2000">
                             <span class="slider"></span>
                         </div>
                     </label>
@@ -386,7 +386,7 @@
                             <p>High-converting, search-engine-optimized brand messaging.</p>
                         </div>
                         <div class="switch">
-                            <input type="checkbox" class="feature-toggle" value="SEO Copywriting" data-price="400">
+                            <input type="checkbox" class="feature-toggle" value="SEO Copywriting" data-price="1000">
                             <span class="slider"></span>
                         </div>
                     </label>
@@ -399,7 +399,7 @@
 
                 <div class="price-display-wrapper">
                     <div class="price-label">Estimated Build Cost</div>
-                    <div class="live-price" id="livePrice">$0</div>
+                    <div class="live-price" id="livePrice">₹0</div>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Quote Request</button>
@@ -413,6 +413,12 @@
             <div class="ticket-id" id="displayTicketID">CO-XXXXXX</div>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly.</p>
         </div>
+    </section>
+
+    <section class="track-banner">
+        <h3>Already applied?</h3>
+        <p>Got your ticket number? Keep an eye on your project's progress.</p>
+        <a href="track.html" class="btn-outline">Track Your Status</a>
     </section>
 
     <footer>
@@ -451,14 +457,12 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Encrypting Payload...";
 
-            // Gather Data
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const pages = document.getElementById('pagesSlider').value;
             const description = document.getElementById('description').value;
             const calculatedPrice = document.getElementById('livePrice').innerText;
             
-            // Gather Selected Features
             const toggles = document.querySelectorAll('.feature-toggle');
             const selectedFeatures = [];
             toggles.forEach(toggle => {
@@ -468,7 +472,6 @@
             const ticketID = generateTicketID();
 
             try {
-                // Push Enhanced Data to Firestore
                 await addDoc(collection(db, "applications"), {
                     ticketID: ticketID,
                     name: name,
