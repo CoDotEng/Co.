@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard | CODOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* --- CORE CSS --- */
         :root {
@@ -187,6 +188,12 @@
                         <canvas id="phaseProgressRing" width="30" height="30" style="background: rgba(0, 229, 255, 0.1); border-radius: 50%;"></canvas>
                     </div>
                 </div>
+                <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
+                    <button id="downloadPdfBtn" class="btn-submit" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); width: 100%;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Architecture Brief (PDF)
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -222,6 +229,8 @@
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         const logoutBtn = document.getElementById('logoutBtn');
         const overlay = document.getElementById('transitionOverlay');
+        
+        let currentProjectData = null; // Stores data for the PDF generator
 
         // Visual Progress Ring Engine
         function drawProgressRing(canvasId, percentage, coreColor) {
@@ -282,34 +291,29 @@
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    // No projects found -> Show Empty State
                     showView(emptyUI);
                 } else {
-                    // Projects found -> Load the most recent one into the UI
                     let latestProject = null;
                     querySnapshot.forEach((doc) => {
                         latestProject = doc.data(); 
-                        // Note: If you have multiple, this just grabs the last one in the loop. 
-                        // For a student project, this is perfect.
                     });
+
+                    // Store the data globally for the PDF engine
+                    currentProjectData = latestProject;
 
                     // Inject data into the UI
                     document.getElementById('displayTicketID').innerText = latestProject.ticketID || "CO-ACTIVE";
                     document.getElementById('displayPrice').innerText = latestProject.estimatedPrice || "Pending";
                     
-                    // Clean up the status text to look premium (e.g., "1. Architecture Under Review" -> "Architecture Review")
                     let rawStatus = latestProject.status || "Review Pending";
                     let cleanStatus = rawStatus.replace(/^\d+\.\s*/, ''); 
                     document.getElementById('displayStatus').innerText = cleanStatus;
 
                     showView(activeUI);
-                    
-                    // Draw the ring (25% for phase 1)
                     setTimeout(() => drawProgressRing('phaseProgressRing', 0.25, '#00e5ff'), 100);
                 }
             } catch (error) {
                 console.error("Error fetching project data: ", error);
-                // Fallback to empty state if DB fails
                 showView(emptyUI);
             }
         }
@@ -317,18 +321,14 @@
         // Master Auth State Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is logged in. Initialize Dashboard.
                 userEmailDisplay.innerText = user.email;
                 logoutBtn.style.display = 'inline-flex';
                 
-                // Show loading ring while querying DB
                 showView(loadingUI);
                 drawProgressRing('loadingProgressRing', 0.7, '#00e5ff');
                 
-                // Fetch their actual data
                 fetchClientArchitecture(user.email);
             } else {
-                // Not logged in? Bounce back to login.html
                 window.location.href = "login.html";
             }
         });
@@ -340,6 +340,112 @@
             }).catch(error => console.error("Logout Error:", error));
         });
 
+        // --- AUTOMATED PDF GENERATOR ENGINE ---
+        document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+            if (!currentProjectData) {
+                alert("Project data is still loading. Please wait a moment.");
+                return;
+            }
+            
+            // Initialize jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const p = currentProjectData; // Shorthand
+
+            // 1. CODOT Dark Header Box
+            doc.setFillColor(5, 5, 5); // Pitch Black
+            doc.rect(0, 0, 210, 45, 'F');
+            
+            // Cyan Accent Line under header
+            doc.setDrawColor(0, 229, 255);
+            doc.setLineWidth(1);
+            doc.line(0, 45, 210, 45);
+
+            // 2. Branding & Title (White text inside dark box)
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(28);
+            doc.text("CODOT.", 15, 25);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text("OFFICIAL ARCHITECTURE BRIEF", 130, 25);
+
+            // 3. Document Meta Data (Black text on white paper)
+            doc.setTextColor(40, 40, 40);
+            doc.setFontSize(10);
+            
+            // Timestamp
+            const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            doc.text(`Generated: ${date}`, 15, 60);
+            doc.text(`Client Email: ${p.email || 'N/A'}`, 15, 68);
+            
+            // Ticket ID (Highlighted)
+            doc.setFont("helvetica", "bold");
+            doc.text(`TICKET ID: ${p.ticketID || 'CO-ACTIVE'}`, 130, 60);
+            const statusText = p.status ? p.status.replace(/^\d+\.\s*/, '') : 'Review Pending';
+            doc.text(`STATUS: ${statusText}`, 130, 68);
+
+            // Divider Line
+            doc.setDrawColor(220, 220, 220);
+            doc.line(15, 78, 195, 78);
+
+            // 4. Project Scope Section
+            doc.setFontSize(14);
+            doc.text("Project Parameters", 15, 90);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.text(`Scale: ${p.pagesRequested || 'Standard'} Pages Required`, 15, 100);
+            
+            // Features Loop
+            let yPos = 110;
+            doc.setFont("helvetica", "bold");
+            doc.text("Integrated Premium Modules:", 15, yPos);
+            doc.setFont("helvetica", "normal");
+            
+            if (p.features && p.features.length > 0) {
+                p.features.forEach((feature, index) => {
+                    yPos += 8;
+                    // Draw a tiny cyan square as a bullet point
+                    doc.setFillColor(0, 229, 255);
+                    doc.rect(15, yPos - 3, 3, 3, 'F');
+                    doc.text(feature, 22, yPos);
+                });
+            } else {
+                yPos += 8;
+                doc.text("Standard Architecture (No Premium Modules)", 22, yPos);
+            }
+
+            // 5. Client Notes Section
+            yPos += 20;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("Client Directives", 15, yPos);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            const clientNotes = p.description ? p.description : "No additional specifications provided during initialization.";
+            
+            // Auto-wrap text so it doesn't run off the page
+            const splitNotes = doc.splitTextToSize(clientNotes, 180);
+            doc.text(splitNotes, 15, yPos + 10);
+
+            // 6. Financial Summary (Bottom)
+            doc.setFillColor(245, 245, 245);
+            doc.rect(15, 240, 180, 25, 'F');
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("ESTIMATED BUILD COST", 25, 250);
+            
+            doc.setFontSize(16);
+            doc.setTextColor(0, 150, 160); // Darker Cyan for white paper contrast
+            doc.text(p.estimatedPrice || 'Pending', 150, 251);
+
+            // 7. Force Download
+            doc.save(`CODOT_Architecture_${p.ticketID || 'Brief'}.pdf`);
+        });
     </script>
 </body>
 </html>
