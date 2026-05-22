@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Portal | CODOT</title>
+    <title>Client Vault | CODOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
@@ -14,7 +14,8 @@
             --text-muted: #9ca3af;
             --accent: #00e5ff;
             --accent-glow: rgba(0, 229, 255, 0.4);
-            --error: #ff4757;
+            --danger: #ef4444;
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,15 +26,12 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- NAVIGATION --- */
+        /* --- ORIGINAL NAVIGATION --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 2rem 5%; position: fixed; width: 100%; top: 0;
@@ -51,110 +49,81 @@
         }
         .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
-        /* --- AUTH SECTION --- */
-        .auth-wrapper {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8rem 5% 4rem 5%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg-color) 100%);
+        /* --- PAGE HEADER --- */
+        .page-header {
+            padding: 12rem 5% 4rem 5%; text-align: center;
+            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
+        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* --- VAULT SECTIONS --- */
+        .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; min-height: 50vh; }
+        .box-container {
+            background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
         }
 
-        .auth-card {
-            background: var(--surface-color);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            text-align: center;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .auth-card h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-card p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        /* --- FORM CONTROLS --- */
+        /* Forms & Inputs */
         .form-group { margin-bottom: 1.5rem; text-align: left; }
         .form-group label {
-            display: block; margin-bottom: 0.5rem; font-weight: 600;
-            color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.5px; text-transform: uppercase;
+            display: block; margin-bottom: 0.8rem; font-weight: 600;
+            color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase;
         }
-        
         .form-control {
-            width: 100%; padding: 1rem;
-            background-color: var(--bg-color); color: var(--text-main);
+            width: 100%; padding: 1.2rem; background-color: var(--bg-color); color: var(--text-main);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
-            font-family: 'Inter', sans-serif; font-size: 1rem;
-            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
         }
+        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 1.2rem; background-color: var(--accent); color: var(--bg-color);
+            border: none; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; 
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
+        }
+        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         
-        .form-control:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+        .btn-logout { background-color: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 2rem; }
+        .btn-logout:hover { background-color: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+
+        /* Toggle & Error Messages */
+        .auth-toggle { margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; transition: color 0.3s; }
+        .auth-toggle:hover { color: var(--accent); text-decoration: underline; }
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; font-weight: 600; }
+
+        /* Spinner Animation */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { 
+            display: inline-block; width: 15px; height: 15px; border: 2px solid #000; 
+            border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px; 
         }
 
-        .btn-submit {
-            width: 100%; padding: 1.2rem;
-            background-color: var(--accent); color: var(--bg-color);
-            border: none; border-radius: 6px;
-            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease; margin-top: 0.5rem;
-        }
-        .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
-        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* --- OAUTH BUTTONS --- */
-        .divider {
-            display: flex; align-items: center; text-align: center; margin: 2rem 0; color: var(--text-muted); font-size: 0.85rem;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .divider:not(:empty)::before { margin-right: 1rem; }
-        .divider:not(:empty)::after { margin-left: 1rem; }
-
-        .oauth-btn {
-            width: 100%; padding: 1rem; margin-bottom: 1rem;
-            background-color: transparent; color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
-            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
-        }
+        /* UI States */
+        #auth-ui, #dashboard-ui, #loading-ui { display: none; }
         
-        .oauth-btn:hover { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
-        .oauth-btn svg { width: 20px; height: 20px; }
-
-        /* --- ERROR MESSAGE --- */
-        #errorMsg {
-            color: var(--error); font-size: 0.9rem; margin-top: 1rem; display: none; background: rgba(255, 71, 87, 0.1); padding: 0.8rem; border-radius: 4px; border: 1px solid rgba(255, 71, 87, 0.2);
+        /* Dashboard Layout */
+        .dashboard-header { text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+        .dashboard-header h2 { color: var(--accent); }
+        .status-card {
+            background: var(--bg-color); border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 8px; padding: 2rem; margin-top: 2rem; text-align: left;
+        }
+        .status-badge {
+            display: inline-block; padding: 0.4rem 1rem; background: rgba(0, 229, 255, 0.1);
+            color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-top: 1rem;
         }
 
-        /* --- FOOTER --- */
-        footer { text-align: center; padding: 2rem 5%; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .auth-card { padding: 2rem; }
-        }
+        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
+        @media (max-width: 768px) { .nav-links { display: none; } .box-container { padding: 2rem; } }
     </style>
 </head>
 <body>
 
-   <nav>
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         <div class="nav-links">
             <a href="model.html">How It Works</a>
@@ -162,92 +131,74 @@
             <a href="about.html">About</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="login.html" class="active">Dashboard</a> 
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
-            let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
-            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+    <header class="page-header">
+        <h1>Client Vault<span class="dot">.</span></h1>
+        <p>Encrypted portal. Enter your credentials to access your active architecture builds.</p>
+    </header>
 
-            // Find all the links in the navigation
-            const navLinks = document.querySelectorAll(".nav-links a");
-            
-            navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
-                if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
-                    if (!link.classList.contains("nav-btn")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                        link.style.paddingBottom = "5px";
-                    }
-                }
-            });
-        });
-    </script>
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <h2>Welcome Back<span class="dot">.</span></h2>
-            <p>Sign in to access your client dashboard.</p>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" class="form-control" placeholder="client@agency.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
-                </div>
-
-                <button type="submit" class="btn-submit" id="loginBtn">Sign In</button>
-            </form>
-
-            <div id="errorMsg">Invalid email or password. Please try again.</div>
-
-            <div class="divider">OR CONTINUE WITH</div>
-
-            <button class="oauth-btn" id="googleBtn">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Sign in with Google
-            </button>
-
-            <button class="oauth-btn" id="githubBtn">
-                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-                Sign in with GitHub
-            </button>
+    <section class="section">
+        
+        <div id="loading-ui" class="box-container" style="display: block;">
+            <h3 style="color: var(--accent);">Authenticating...</h3>
+            <p style="color: var(--text-muted); margin-top: 1rem;">Verifying cryptographic signature.</p>
         </div>
-    </div>
+
+        <div id="auth-ui" class="box-container">
+            <h2 id="authTitle" style="margin-bottom: 2rem;">Secure Login</h2>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="loginEmail">Authorized Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="client@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Encryption Key (Password)</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required minlength="6">
+                </div>
+                <div id="errorMsg" class="error-msg">Authentication Failed.</div>
+                
+                <button type="submit" class="btn" id="authBtn">Enter Vault</button>
+            </form>
+            <p class="auth-toggle" id="toggleAuthMode">First time here? Initialize your vault.</p>
+        </div>
+
+        <div id="dashboard-ui" class="box-container">
+            <div class="dashboard-header">
+                <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; color: var(--text-muted);">Secure Connection Established</p>
+                <h2>Welcome back.</h2>
+                <p id="userEmailDisplay" style="color: var(--text-muted);"></p>
+            </div>
+
+            <div class="status-card">
+                <h3 style="margin-bottom: 0.5rem;">Active Project Architecture</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Your current build status and timeline will appear here once our engineers finalize the initial review.</p>
+                <div class="status-badge">Phase 1: Architecture Review</div>
+            </div>
+
+            <button id="logoutBtn" class="btn btn-logout">Terminate Session</button>
+        </div>
+
+    </section>
 
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
             getAuth, 
             signInWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            GithubAuthProvider, 
-            signInWithPopup 
+            createUserWithEmailAndPassword,
+            onAuthStateChanged, 
+            signOut 
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Your specific Firebase Configuration
+        // Your Exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -257,79 +208,129 @@
             appId: "1:22678307444:web:59c72496bad5db86b3c721"
         };
 
-        // Initialize Firebase & Auth
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // DOM Elements
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const googleBtn = document.getElementById('googleBtn');
-        const githubBtn = document.getElementById('githubBtn');
+        // UI Elements
+        const loadingUI = document.getElementById('loading-ui');
+        const authUI = document.getElementById('auth-ui');
+        const dashboardUI = document.getElementById('dashboard-ui');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
         const errorMsg = document.getElementById('errorMsg');
+        
+        const authForm = document.getElementById('authForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const authBtn = document.getElementById('authBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        const authTitle = document.getElementById('authTitle');
+        const toggleAuthMode = document.getElementById('toggleAuthMode');
 
-        // Helper function to handle redirects
-        const handleSuccess = (user) => {
-            console.log("Logged in successfully:", user);
-            window.location.href = "index.html"; // Redirecting back to home page upon success
-        };
+        // State Variable for Sign In vs Sign Up
+        let isSignUpMode = false;
 
-        // Helper function to display errors
-        const handleError = (error) => {
-            console.error("Auth Error:", error);
-            errorMsg.style.display = 'block';
-            // Customizing error text based on Firebase code
-            if (error.code === 'auth/invalid-credential') {
-                errorMsg.innerText = "Invalid credentials. Please check your email and password.";
-            } else if (error.code === 'auth/account-exists-with-different-credential') {
-                errorMsg.innerText = "An account already exists with the same email address but different sign-in credentials.";
-            } else {
-                errorMsg.innerText = "Authentication failed. Please try again.";
+        // Auto-Marker Nav Logic
+        let currentPath = window.location.pathname.split("/").pop();
+        if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+        const navLinks = document.querySelectorAll(".nav-links a");
+        navLinks.forEach(link => {
+            if (link.getAttribute("href") === currentPath) {
+                link.style.color = "var(--accent)"; 
+                if (!link.classList.contains("nav-btn")) {
+                    link.style.borderBottom = "2px solid var(--accent)";
+                    link.style.paddingBottom = "5px";
+                }
             }
-        };
+        });
 
-        // 1. Email/Password Sign In
-        loginForm.addEventListener('submit', async (e) => {
+        // UI Switcher
+        function showUI(element) {
+            loadingUI.style.display = 'none';
+            authUI.style.display = 'none';
+            dashboardUI.style.display = 'none';
+            element.style.display = 'block';
+        }
+
+        // Toggle Between Login and Registration
+        toggleAuthMode.addEventListener('click', () => {
+            isSignUpMode = !isSignUpMode;
+            errorMsg.style.display = 'none';
+            loginPassword.value = ''; // clear password on switch
+            
+            if (isSignUpMode) {
+                authTitle.innerText = "Initialize Vault";
+                authBtn.innerText = "Set Key & Create Vault";
+                toggleAuthMode.innerText = "Already have access? Enter Vault.";
+            } else {
+                authTitle.innerText = "Secure Login";
+                authBtn.innerText = "Enter Vault";
+                toggleAuthMode.innerText = "First time here? Initialize your vault.";
+            }
+        });
+
+        // Handle Form Submission
+        authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.style.display = 'none';
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            loginBtn.disabled = true;
-            loginBtn.innerText = "Signing In...";
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+
+            authBtn.disabled = true;
+            authBtn.innerHTML = '<span class="spinner"></span> Encrypting...';
 
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                handleSuccess(userCredential.user);
+                if (isSignUpMode) {
+                    // Create New User
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    // Log In Existing User
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                // If successful, the onAuthStateChanged listener will automatically flip the UI.
             } catch (error) {
-                handleError(error);
-                loginBtn.disabled = false;
-                loginBtn.innerText = "Sign In";
+                console.error("Auth Error:", error.code);
+                authBtn.disabled = false;
+                authBtn.innerText = isSignUpMode ? "Set Key & Create Vault" : "Enter Vault";
+                
+                // Format Firebase error codes into human-readable text
+                errorMsg.style.display = 'block';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg.innerText = "Email already in use. Please log in.";
+                } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMsg.innerText = "Invalid credentials. Access denied.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg.innerText = "Encryption key too weak. Must be at least 6 characters.";
+                } else {
+                    errorMsg.innerText = "Authentication failed. Try again.";
+                }
             }
         });
 
-        // 2. Google Sign In
-        googleBtn.addEventListener('click', async () => {
-            errorMsg.style.display = 'none';
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                handleSuccess(result.user);
-            } catch (error) {
-                handleError(error);
-            }
+        // Logout Logic
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                showUI(authUI);
+                loginPassword.value = ''; // clear out password field
+            }).catch(error => {
+                console.error("Logout Error:", error);
+            });
         });
 
-        // 3. GitHub Sign In
-        githubBtn.addEventListener('click', async () => {
-            errorMsg.style.display = 'none';
-            const provider = new GithubAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                handleSuccess(result.user);
-            } catch (error) {
-                handleError(error);
+        // Master Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                userEmailDisplay.innerText = user.email;
+                showUI(dashboardUI);
+                
+                // Reset form state in background
+                authBtn.disabled = false;
+                authBtn.innerText = "Enter Vault";
+            } else {
+                // User is signed out
+                showUI(authUI);
             }
         });
     </script>
