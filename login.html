@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Vault | CODOT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <title>Client Dashboard | CODOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
         :root {
             --bg-color: #050505;
-            --surface-color: #121212;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --card-bg: #111111;
+            --input-bg: #050505;
+            --text-main: #ffffff;
+            --text-muted: #888888;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.4);
-            --danger: #ef4444;
-            --success: #10b981;
+            --border-color: #222222;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-border: rgba(239, 68, 68, 0.3);
+            --error-text: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,100 +27,95 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- ORIGINAL NAVIGATION --- */
+        /* --- NAVIGATION (Matched to screenshot) --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
-            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid var(--border-color);
         }
         .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
         .dot { color: var(--accent); }
         
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links { display: flex; align-items: center; gap: 2.5rem; }
+        .nav-links a { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
         .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+            background-color: var(--accent); color: #000 !important;
+            padding: 0.7rem 1.5rem; border-radius: 4px; font-weight: 700 !important;
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+        .nav-btn:hover { opacity: 0.9; }
 
-        /* --- PAGE HEADER --- */
-        .page-header {
-            padding: 12rem 5% 4rem 5%; text-align: center;
-            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .page-header h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1rem; }
-        .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
-
-        /* --- VAULT SECTIONS --- */
-        .section { padding: 4rem 5%; max-width: 800px; margin: 0 auto; min-height: 50vh; }
-        .box-container {
-            background: var(--surface-color); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; padding: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+        /* --- AUTH CONTAINER --- */
+        .main-content {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 4rem 1rem;
         }
 
-        /* Forms & Inputs */
+        .auth-card {
+            background-color: var(--card-bg);
+            width: 100%; max-width: 440px;
+            padding: 3rem; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+            text-align: center;
+        }
+
+        .auth-card h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        .auth-card .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+
+        /* --- FORMS --- */
         .form-group { margin-bottom: 1.5rem; text-align: left; }
         .form-group label {
-            display: block; margin-bottom: 0.8rem; font-weight: 600;
-            color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase;
+            display: block; margin-bottom: 0.6rem; font-size: 0.7rem; font-weight: 600;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
         }
         .form-control {
-            width: 100%; padding: 1.2rem; background-color: var(--bg-color); color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
-            font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
+            width: 100%; padding: 1rem 1.2rem; background-color: var(--input-bg); color: var(--text-main);
+            border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s;
         }
-        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
+        .form-control:focus { outline: none; border-color: var(--accent); }
 
-        /* Buttons */
-        .btn {
-            width: 100%; padding: 1.2rem; background-color: var(--accent); color: var(--bg-color);
-            border: none; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; 
-            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
+        .btn-submit {
+            width: 100%; padding: 1rem; background-color: var(--accent); color: #000;
+            border: none; border-radius: 6px; font-family: 'Inter', sans-serif; 
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem;
         }
-        .btn:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- ERROR MESSAGE (Matched to screenshot) --- */
+        .error-box {
+            display: none; background-color: var(--error-bg); border: 1px solid var(--error-border);
+            color: var(--error-text); padding: 1rem; border-radius: 6px; font-size: 0.85rem; margin-top: 1.5rem; text-align: center;
+        }
+
+        /* --- TOGGLE (First Time Setup) --- */
+        .divider {
+            display: flex; align-items: center; margin: 2rem 0; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid var(--border-color); }
+        .divider:not(:empty)::before { margin-right: 1rem; }
+        .divider:not(:empty)::after { margin-left: 1rem; }
+
+        .toggle-btn {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
+            width: 100%; padding: 1rem; border-radius: 6px; font-weight: 500; cursor: pointer; transition: border-color 0.3s;
+        }
+        .toggle-btn:hover { border-color: var(--accent); }
+
+        /* --- DASHBOARD UI (Logged In) --- */
+        #dashboard-ui { display: none; text-align: left; }
+        #auth-ui { display: block; }
+        #loading-ui { display: none; }
+
+        .btn-logout { background: transparent; border: 1px solid var(--error-text); color: var(--error-text); margin-top: 2rem; width: auto; padding: 0.8rem 1.5rem; }
         
-        .btn-logout { background-color: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 2rem; }
-        .btn-logout:hover { background-color: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
-
-        /* Toggle & Error Messages */
-        .auth-toggle { margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; transition: color 0.3s; }
-        .auth-toggle:hover { color: var(--accent); text-decoration: underline; }
-        .error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; font-weight: 600; }
-
-        /* Spinner Animation */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner { 
-            display: inline-block; width: 15px; height: 15px; border: 2px solid #000; 
-            border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px; 
-        }
-
-        /* UI States */
-        #auth-ui, #dashboard-ui, #loading-ui { display: none; }
-        
-        /* Dashboard Layout */
-        .dashboard-header { text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; margin-bottom: 2rem; }
-        .dashboard-header h2 { color: var(--accent); }
-        .status-card {
-            background: var(--bg-color); border: 1px dashed rgba(255,255,255,0.2);
-            border-radius: 8px; padding: 2rem; margin-top: 2rem; text-align: left;
-        }
-        .status-badge {
-            display: inline-block; padding: 0.4rem 1rem; background: rgba(0, 229, 255, 0.1);
-            color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-top: 1rem;
-        }
-
-        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
-        @media (max-width: 768px) { .nav-links { display: none; } .box-container { padding: 2rem; } }
+        @media (max-width: 768px) { .nav-links { display: none; } .auth-card { padding: 2rem; border: none; } }
     </style>
 </head>
 <body>
@@ -136,57 +133,52 @@
         </div>
     </nav>
 
-    <header class="page-header">
-        <h1>Client Vault<span class="dot">.</span></h1>
-        <p>Encrypted portal. Enter your credentials to access your active architecture builds.</p>
-    </header>
-
-    <section class="section">
+    <main class="main-content">
         
-        <div id="loading-ui" class="box-container" style="display: block;">
-            <h3 style="color: var(--accent);">Authenticating...</h3>
-            <p style="color: var(--text-muted); margin-top: 1rem;">Verifying cryptographic signature.</p>
+        <div id="loading-ui" class="auth-card">
+            <h2>Loading<span class="dot">.</span></h2>
+            <p class="subtitle">Verifying connection...</p>
         </div>
 
-        <div id="auth-ui" class="box-container">
-            <h2 id="authTitle" style="margin-bottom: 2rem;">Secure Login</h2>
+        <div id="auth-ui" class="auth-card">
+            <h2 id="authTitle">Welcome Back<span class="dot">.</span></h2>
+            <p id="authSubtitle" class="subtitle">Sign in to access your client dashboard.</p>
+
             <form id="authForm">
                 <div class="form-group">
-                    <label for="loginEmail">Authorized Email Address</label>
-                    <input type="email" id="loginEmail" class="form-control" placeholder="client@company.com" required>
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Encryption Key (Password)</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required minlength="6">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" required minlength="6">
                 </div>
-                <div id="errorMsg" class="error-msg">Authentication Failed.</div>
                 
-                <button type="submit" class="btn" id="authBtn">Enter Vault</button>
+                <button type="submit" class="btn-submit" id="authBtn">Sign In</button>
+                
+                <div id="errorBox" class="error-box">
+                    Invalid credentials. Please check your email and password.
+                </div>
             </form>
-            <p class="auth-toggle" id="toggleAuthMode">First time here? Initialize your vault.</p>
+
+            <div class="divider">Or Continue With</div>
+            <button type="button" class="toggle-btn" id="toggleAuthMode">First time here? Set up vault</button>
         </div>
 
-        <div id="dashboard-ui" class="box-container">
-            <div class="dashboard-header">
-                <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; color: var(--text-muted);">Secure Connection Established</p>
-                <h2>Welcome back.</h2>
-                <p id="userEmailDisplay" style="color: var(--text-muted);"></p>
+        <div id="dashboard-ui" class="auth-card" style="max-width: 600px;">
+            <h2>Dashboard<span class="dot">.</span></h2>
+            <p class="subtitle" id="userEmailDisplay"></p>
+            
+            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 8px; margin-top: 2rem;">
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">Active Architecture</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Your project status will update here once our engineers finalize the initial review.</p>
+                <div style="display: inline-block; padding: 0.4rem 1rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-top: 1rem;">Phase 1: Architecture Review</div>
             </div>
 
-            <div class="status-card">
-                <h3 style="margin-bottom: 0.5rem;">Active Project Architecture</h3>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Your current build status and timeline will appear here once our engineers finalize the initial review.</p>
-                <div class="status-badge">Phase 1: Architecture Review</div>
-            </div>
-
-            <button id="logoutBtn" class="btn btn-logout">Terminate Session</button>
+            <button id="logoutBtn" class="btn-submit btn-logout">Sign Out</button>
         </div>
 
-    </section>
-
-    <footer>
-        <p>&copy; 2026 CODOT Agency. Built differently.</p>
-    </footer>
+    </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -216,7 +208,7 @@
         const authUI = document.getElementById('auth-ui');
         const dashboardUI = document.getElementById('dashboard-ui');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
-        const errorMsg = document.getElementById('errorMsg');
+        const errorBox = document.getElementById('errorBox');
         
         const authForm = document.getElementById('authForm');
         const loginEmail = document.getElementById('loginEmail');
@@ -225,24 +217,10 @@
         const logoutBtn = document.getElementById('logoutBtn');
         
         const authTitle = document.getElementById('authTitle');
+        const authSubtitle = document.getElementById('authSubtitle');
         const toggleAuthMode = document.getElementById('toggleAuthMode');
 
-        // State Variable for Sign In vs Sign Up
         let isSignUpMode = false;
-
-        // Auto-Marker Nav Logic
-        let currentPath = window.location.pathname.split("/").pop();
-        if (currentPath === "" || currentPath === "/") currentPath = "index.html";
-        const navLinks = document.querySelectorAll(".nav-links a");
-        navLinks.forEach(link => {
-            if (link.getAttribute("href") === currentPath) {
-                link.style.color = "var(--accent)"; 
-                if (!link.classList.contains("nav-btn")) {
-                    link.style.borderBottom = "2px solid var(--accent)";
-                    link.style.paddingBottom = "5px";
-                }
-            }
-        });
 
         // UI Switcher
         function showUI(element) {
@@ -255,55 +233,53 @@
         // Toggle Between Login and Registration
         toggleAuthMode.addEventListener('click', () => {
             isSignUpMode = !isSignUpMode;
-            errorMsg.style.display = 'none';
-            loginPassword.value = ''; // clear password on switch
+            errorBox.style.display = 'none';
+            loginPassword.value = ''; 
             
             if (isSignUpMode) {
-                authTitle.innerText = "Initialize Vault";
-                authBtn.innerText = "Set Key & Create Vault";
-                toggleAuthMode.innerText = "Already have access? Enter Vault.";
+                authTitle.innerHTML = 'Initialize Vault<span class="dot">.</span>';
+                authSubtitle.innerText = "Set your email and password to create your client account.";
+                authBtn.innerText = "Create Account";
+                toggleAuthMode.innerText = "Already have an account? Sign In";
             } else {
-                authTitle.innerText = "Secure Login";
-                authBtn.innerText = "Enter Vault";
-                toggleAuthMode.innerText = "First time here? Initialize your vault.";
+                authTitle.innerHTML = 'Welcome Back<span class="dot">.</span>';
+                authSubtitle.innerText = "Sign in to access your client dashboard.";
+                authBtn.innerText = "Sign In";
+                toggleAuthMode.innerText = "First time here? Set up vault";
             }
         });
 
         // Handle Form Submission
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            errorMsg.style.display = 'none';
+            errorBox.style.display = 'none';
             
             const email = loginEmail.value.trim();
             const password = loginPassword.value.trim();
 
             authBtn.disabled = true;
-            authBtn.innerHTML = '<span class="spinner"></span> Encrypting...';
+            authBtn.innerText = 'Authenticating...';
 
             try {
                 if (isSignUpMode) {
-                    // Create New User
                     await createUserWithEmailAndPassword(auth, email, password);
                 } else {
-                    // Log In Existing User
                     await signInWithEmailAndPassword(auth, email, password);
                 }
-                // If successful, the onAuthStateChanged listener will automatically flip the UI.
             } catch (error) {
                 console.error("Auth Error:", error.code);
                 authBtn.disabled = false;
-                authBtn.innerText = isSignUpMode ? "Set Key & Create Vault" : "Enter Vault";
+                authBtn.innerText = isSignUpMode ? "Create Account" : "Sign In";
                 
-                // Format Firebase error codes into human-readable text
-                errorMsg.style.display = 'block';
+                errorBox.style.display = 'block';
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMsg.innerText = "Email already in use. Please log in.";
+                    errorBox.innerText = "Email already in use. Please sign in.";
                 } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    errorMsg.innerText = "Invalid credentials. Access denied.";
+                    errorBox.innerText = "Invalid credentials. Please check your email and password.";
                 } else if (error.code === 'auth/weak-password') {
-                    errorMsg.innerText = "Encryption key too weak. Must be at least 6 characters.";
+                    errorBox.innerText = "Password must be at least 6 characters.";
                 } else {
-                    errorMsg.innerText = "Authentication failed. Try again.";
+                    errorBox.innerText = "Authentication failed. Please try again.";
                 }
             }
         });
@@ -312,24 +288,18 @@
         logoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
                 showUI(authUI);
-                loginPassword.value = ''; // clear out password field
-            }).catch(error => {
-                console.error("Logout Error:", error);
-            });
+                loginPassword.value = ''; 
+            }).catch(error => console.error("Logout Error:", error));
         });
 
         // Master Auth State Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in
-                userEmailDisplay.innerText = user.email;
+                userEmailDisplay.innerText = "Signed in as: " + user.email;
                 showUI(dashboardUI);
-                
-                // Reset form state in background
                 authBtn.disabled = false;
-                authBtn.innerText = "Enter Vault";
+                authBtn.innerText = "Sign In";
             } else {
-                // User is signed out
                 showUI(authUI);
             }
         });
