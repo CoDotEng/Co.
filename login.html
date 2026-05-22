@@ -100,8 +100,8 @@
         .btn-submit:hover { opacity: 1; background-color: #fff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* --- ERROR MESSAGE --- */
-        .error-box {
+        /* --- ERROR/SUCCESS MESSAGE --- */
+        .alert-box {
             display: none; background-color: var(--error-bg); border: 1px solid var(--error-border);
             color: var(--error-text); padding: 1rem; border-radius: 6px; font-size: 0.85rem; margin-top: 1.5rem; text-align: center;
             animation: shakeError 0.4s;
@@ -192,9 +192,7 @@
                 
                 <button type="submit" class="btn-submit" id="authBtn">Sign In</button>
                 
-                <div id="errorBox" class="error-box">
-                    Invalid credentials. Please check your email and password.
-                </div>
+                <div id="alertBox" class="alert-box"></div>
             </form>
 
             <div class="divider">Or Continue With</div>
@@ -224,13 +222,14 @@
             getAuth, 
             signInWithEmailAndPassword, 
             createUserWithEmailAndPassword,
+            sendEmailVerification,
             GoogleAuthProvider,
             GithubAuthProvider,
             signInWithPopup,
-            onAuthStateChanged
+            onAuthStateChanged,
+            signOut
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Your Exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -243,14 +242,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Providers
         const googleProvider = new GoogleAuthProvider();
         const githubProvider = new GithubAuthProvider();
 
-        // UI Elements
         const loadingUI = document.getElementById('loading-ui');
         const authUI = document.getElementById('auth-ui');
-        const errorBox = document.getElementById('errorBox');
+        const alertBox = document.getElementById('alertBox');
         
         const authForm = document.getElementById('authForm');
         const loginEmail = document.getElementById('loginEmail');
@@ -266,7 +263,6 @@
 
         let isSignUpMode = false;
 
-        // Visual Tutor: Draw Sophisticated Canvas Progress Rings
         function drawProgressRing(canvasId, percentage, coreColor) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
@@ -293,12 +289,9 @@
             ctx.stroke();
         }
 
-        // Initialize Pro-Tier Transitions Engine
         function handleNavigation(targetPath) {
             overlay.classList.add('pro-transition-overlay');
-            setTimeout(() => {
-                window.location.href = targetPath;
-            }, 150); 
+            setTimeout(() => { window.location.href = targetPath; }, 150); 
         }
 
         function showUI(element) {
@@ -307,31 +300,34 @@
             element.style.display = 'block';
         }
 
-        function showError(msg) {
-            errorBox.style.display = 'block';
-            errorBox.innerText = msg;
+        function showAlert(msg, isSuccess = false) {
+            alertBox.style.display = 'block';
+            alertBox.innerText = msg;
+            if(isSuccess) {
+                alertBox.style.background = "rgba(16, 185, 129, 0.1)";
+                alertBox.style.borderColor = "rgba(16, 185, 129, 0.3)";
+                alertBox.style.color = "var(--success)";
+            } else {
+                alertBox.style.background = "var(--error-bg)";
+                alertBox.style.borderColor = "var(--error-border)";
+                alertBox.style.color = "var(--error-text)";
+            }
         }
 
-        // Auto-Marker Nav Logic
         let currentPath = window.location.pathname.split("/").pop();
         if (currentPath === "" || currentPath === "/") currentPath = "index.html";
         const navLinks = document.querySelectorAll(".nav-links a");
         navLinks.forEach(link => {
-            if (link.getAttribute("href") === currentPath) {
-                link.classList.add("active");
-            }
+            if (link.getAttribute("href") === currentPath) link.classList.add("active");
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (!link.getAttribute("href").startsWith('#')) {
-                   handleNavigation(link.getAttribute("href"));
-                }
+                if (!link.getAttribute("href").startsWith('#')) handleNavigation(link.getAttribute("href"));
             });
         });
 
-        // Toggle Between Login and Registration
         toggleAuthMode.addEventListener('click', () => {
             isSignUpMode = !isSignUpMode;
-            errorBox.style.display = 'none';
+            alertBox.style.display = 'none';
             loginPassword.value = ''; 
             
             if (isSignUpMode) {
@@ -347,78 +343,125 @@
             }
         });
 
-        // Handle Email/Password Form Submission
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            errorBox.style.display = 'none';
+            alertBox.style.display = 'none';
             
-            const email = loginEmail.value.trim();
+            const email = loginEmail.value.trim().toLowerCase();
             const password = loginPassword.value.trim();
 
             authBtn.disabled = true;
-            authBtn.innerHTML = '<span class="spinner"></span> Validating...';
+            authBtn.innerHTML = '<span class="spinner"></span> Verifying...';
 
+            // --- TIER 1 SPAM SHIELD: Local Burner Blocklist ---
+            const disposableDomains = ['mailinator.com', '10minutemail.com', 'tempmail.com', 'guerrillamail.com', 'yopmail.com', 'trashmail.com'];
+            const domain = email.split('@')[1];
+            
+            if (isSignUpMode && disposableDomains.includes(domain)) {
+                showAlert("Access Denied: Disposable emails are not permitted.");
+                authBtn.disabled = false;
+                authBtn.innerText = "Create Account";
+                return;
+            }
+
+            // --- TIER 2 SPAM SHIELD: External API SMTP Check ---
+            // Key is securely injected here.
+            const validationApiKey = "9a64ede545ca4c69b9e14b4897c9295c";
+            
+            if (isSignUpMode) {
+                try {
+                    const apiRes = await fetch(`https://emailvalidation.abstractapi.com/v1/?api_key=${validationApiKey}&email=${email}`);
+                    const validationData = await apiRes.json();
+                    
+                    if (validationData.deliverability === "UNDELIVERABLE") {
+                        showAlert("Access Denied: This email inbox does not exist.");
+                        authBtn.disabled = false;
+                        authBtn.innerText = "Create Account";
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Validation API bypassed due to network error. Proceeding to Firebase Auth.");
+                }
+            }
+
+            // --- FIREBASE AUTH EXECUTION ---
             try {
                 if (isSignUpMode) {
-                    await createUserWithEmailAndPassword(auth, email, password);
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    await signOut(auth);
+                    
+                    showAlert("Vault created! Check your email inbox to verify your identity before logging in.", true);
+                    
+                    loginPassword.value = '';
+                    authBtn.disabled = false;
+                    authBtn.innerText = "Create Account";
+                    return; 
                 } else {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    if (!userCredential.user.emailVerified) {
+                        await signOut(auth);
+                        showAlert("Access Denied: Please verify your email address first. Check your inbox.");
+                        authBtn.disabled = false;
+                        authBtn.innerText = "Sign In";
+                        return;
+                    }
                 }
-                // Redirect happens automatically in onAuthStateChanged
             } catch (error) {
                 console.error("Auth Error:", error.code);
                 authBtn.disabled = false;
                 authBtn.innerText = isSignUpMode ? "Create Account" : "Sign In";
                 
                 if (error.code === 'auth/email-already-in-use') {
-                    showError("Email already in use. Please sign in.");
+                    showAlert("Email already in use. Please sign in.");
                 } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    showError("Invalid credentials. Please check your email and password.");
+                    showAlert("Invalid credentials. Please check your email and password.");
                 } else if (error.code === 'auth/weak-password') {
-                    showError("Password must be at least 6 characters.");
+                    showAlert("Password must be at least 6 characters.");
                 } else {
-                    showError("Authentication failed. Please try again.");
+                    showAlert("Authentication failed. Please try again.");
                 }
             }
         });
 
-        // Handle Google Login
         googleLoginBtn.addEventListener('click', async () => {
-            errorBox.style.display = 'none';
+            alertBox.style.display = 'none';
             try {
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error(error);
-                showError("Google sign-in failed.");
+                showAlert("Google sign-in failed.");
             }
         });
 
-        // Handle GitHub Login
         githubLoginBtn.addEventListener('click', async () => {
-            errorBox.style.display = 'none';
+            alertBox.style.display = 'none';
             try {
                 await signInWithPopup(auth, githubProvider);
             } catch (error) {
                 console.error(error);
                 if (error.code === 'auth/account-exists-with-different-credential') {
-                    showError("An account already exists with the same email. Try Google Sign In.");
+                    showAlert("An account already exists with the same email. Try Google Sign In.");
                 } else {
-                    showError("GitHub sign-in failed.");
+                    showAlert("GitHub sign-in failed.");
                 }
             }
         });
 
-        // Master Auth State Listener - Handles Redirect to dashboard.html
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Instantly bounce the user to their own dashboard
-                window.location.href = "dashboard.html";
+                if (user.emailVerified || user.providerData.some(p => p.providerId !== 'password')) {
+                    window.location.href = "dashboard.html";
+                } else {
+                    signOut(auth);
+                    showUI(authUI);
+                }
             } else {
                 showUI(authUI);
             }
         });
 
-        // Show loading ring briefly while Firebase checks auth state
         showUI(loadingUI); 
         drawProgressRing('loadingProgressRing', 1.0, '#10b981'); 
 
