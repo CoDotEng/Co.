@@ -18,6 +18,7 @@
             --error-bg: rgba(239, 68, 68, 0.1);
             --error-border: rgba(239, 68, 68, 0.3);
             --error-text: #ef4444;
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,6 +31,8 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            /* Subtly animated gradient background for premium feel */
+            background-image: radial-gradient(at top, #0f0f0f 0%, #050505 50%, #000000 100%);
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
@@ -39,18 +42,24 @@
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid var(--border-color);
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1001;
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; transition: transform 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
         .dot { color: var(--accent); }
         
         .nav-links { display: flex; align-items: center; gap: 2.5rem; }
-        .nav-links a { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .nav-links a { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--accent); transition: width 0.3s ease; }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
         .nav-btn {
             background-color: var(--accent); color: #000 !important;
             padding: 0.7rem 1.5rem; border-radius: 4px; font-weight: 700 !important;
+            transition: all 0.3s ease;
         }
-        .nav-btn:hover { opacity: 0.9; }
+        .nav-btn:hover { background-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
 
         /* --- AUTH CONTAINER --- */
         .main-content {
@@ -63,35 +72,41 @@
             padding: 3rem; border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.03);
             text-align: center;
+            /* Sophisticated depth shadow */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .auth-card h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
-        .auth-card .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+        .auth-card h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; animation: textSlideIn 0.5s ease-out 0.2s both; }
+        .auth-card .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; animation: textSlideIn 0.5s ease-out 0.4s both; }
 
         /* --- FORMS --- */
-        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; animation: formInputSlideIn 0.6s ease-out; }
         .form-group label {
             display: block; margin-bottom: 0.6rem; font-size: 0.7rem; font-weight: 600;
             color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
         }
         .form-control {
             width: 100%; padding: 1rem 1.2rem; background-color: var(--input-bg); color: var(--text-main);
-            border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s;
+            border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 1rem; transition: all 0.3s ease;
         }
-        .form-control:focus { outline: none; border-color: var(--accent); }
+        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
+        .form-control:valid { border-color: var(--success); }
 
         .btn-submit {
             width: 100%; padding: 1rem; background-color: var(--accent); color: #000;
             border: none; border-radius: 6px; font-family: 'Inter', sans-serif; 
-            font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;
+            display: flex; align-items: center; justify-content: center;
         }
-        .btn-submit:hover { opacity: 0.9; }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit:hover { opacity: 1; background-color: #fff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* --- ERROR MESSAGE --- */
         .error-box {
             display: none; background-color: var(--error-bg); border: 1px solid var(--error-border);
             color: var(--error-text); padding: 1rem; border-radius: 6px; font-size: 0.85rem; margin-top: 1.5rem; text-align: center;
+            animation: shakeError 0.4s;
         }
 
         /* --- SOCIAL LOGIN --- */
@@ -106,14 +121,14 @@
             display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; padding: 1rem; background-color: var(--input-bg); color: var(--text-main);
             border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: border-color 0.3s; margin-bottom: 1rem;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 1rem;
         }
-        .social-btn:hover { border-color: #555; }
+        .social-btn:hover { border-color: #555; background-color: #0c0c0c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); }
         .social-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
         .toggle-btn {
             background: transparent; border: none; color: var(--text-muted);
-            width: 100%; padding: 1rem 0 0 0; font-size: 0.85rem; cursor: pointer; transition: color 0.3s;
+            width: 100%; padding: 1rem 0 0 0; font-size: 0.85rem; cursor: pointer; transition: color 0.3s ease;
         }
         .toggle-btn:hover { color: var(--text-main); text-decoration: underline; }
 
@@ -122,12 +137,29 @@
         #auth-ui { display: block; }
         #loading-ui { display: none; }
 
-        .btn-logout { background: transparent; border: 1px solid var(--error-text); color: var(--error-text); margin-top: 2rem; width: auto; padding: 0.8rem 1.5rem; }
+        .btn-logout { background: transparent; border: 1px solid var(--error-text); color: var(--error-text); margin-top: 2rem; width: auto; padding: 0.8rem 1.5rem; transition: all 0.3s ease; }
+        .btn-logout:hover { background-color: var(--error-text); color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
         
+        /* Spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px; }
+
+        /* Refined Fade-Through-Black Smooth Transition */
+        @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
+        .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.3s ease-in-out; }
+
+        /* Micro-interactions */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes textSlideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes formInputSlideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes shakeError { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
         @media (max-width: 768px) { .nav-links { display: none; } .auth-card { padding: 2rem; border: none; } }
     </style>
 </head>
 <body>
+
+    <div id="transitionOverlay"></div>
 
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
@@ -145,8 +177,9 @@
     <main class="main-content">
         
         <div id="loading-ui" class="auth-card">
-            <h2>Loading<span class="dot">.</span></h2>
-            <p class="subtitle">Verifying connection...</p>
+            <canvas id="loadingProgressRing" width="100" height="100" style="display: block; margin: 0 auto 1rem;"></canvas>
+            <h2>Initializing Vault<span class="dot">.</span></h2>
+            <p class="subtitle">Verifying connection with cryptographic protocol...</p>
         </div>
 
         <div id="auth-ui" class="auth-card">
@@ -186,19 +219,30 @@
         </div>
 
         <div id="dashboard-ui" class="auth-card" style="max-width: 600px;">
-            <h2>Dashboard<span class="dot">.</span></h2>
-            <p class="subtitle" id="userEmailDisplay"></p>
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+                <div>
+                    <h2>Dashboard<span class="dot">.</span></h2>
+                    <p class="subtitle" id="userEmailDisplay"></p>
+                </div>
+                <button id="logoutBtn" class="btn-submit btn-logout" style="margin: 0;">Sign Out</button>
+            </div>
             
-            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 8px; margin-top: 2rem;">
-                <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">Active Architecture</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Your project status will update here once our engineers finalize the initial review.</p>
-                <div style="display: inline-block; padding: 0.4rem 1rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-top: 1rem;">Phase 1: Architecture Review</div>
+            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 8px;">
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">Active Architecture Build</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Your live staging environment and build logs are preparing.</p>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 1rem;">
+                    <div style="display: inline-block; padding: 0.4rem 1rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem;">Phase 1: Architecture Review</div>
+                    <canvas id="phaseProgressRing" width="30" height="30" style="background: rgba(0, 229, 255, 0.1); border-radius: 50%;"></canvas>
+                </div>
             </div>
 
-            <button id="logoutBtn" class="btn-submit btn-logout">Sign Out</button>
         </div>
 
     </main>
+
+    <footer>
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -213,6 +257,7 @@
             signOut 
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        // Your Exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -243,6 +288,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const googleLoginBtn = document.getElementById('googleLoginBtn');
         const githubLoginBtn = document.getElementById('githubLoginBtn');
+        const overlay = document.getElementById('transitionOverlay');
         
         const authTitle = document.getElementById('authTitle');
         const authSubtitle = document.getElementById('authSubtitle');
@@ -250,17 +296,76 @@
 
         let isSignUpMode = false;
 
+        // Visual Tutor: Draw Sophisticated Canvas Progress Rings
+        function drawProgressRing(canvasId, percentage, coreColor) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
+            const radius = (Math.min(canvas.width, canvas.height) / 2) - 5;
+            const startAngle = -0.5 * Math.PI;
+            const endAngle = (2 * percentage - 0.5) * Math.PI;
+            
+            // Background ring (track)
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.stroke();
+            
+            // Filled ring (progress)
+            ctx.beginPath();
+            ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = coreColor;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // Initialize Pro-Tier Transitions Engine
+        function handleNavigation(targetPath) {
+            overlay.classList.add('pro-transition-overlay');
+            setTimeout(() => {
+                window.location.href = targetPath;
+            }, 150); // Matches midpoint of animation
+        }
+
+        // Sophisticated UI Switcher
         function showUI(element) {
             loadingUI.style.display = 'none';
             authUI.style.display = 'none';
             dashboardUI.style.display = 'none';
             element.style.display = 'block';
+            if (element === dashboardUI) {
+                // Visualize Phase 1 progress (25% Architecture)
+                drawProgressRing('phaseProgressRing', 0.25, '#00e5ff');
+            }
         }
 
         function showError(msg) {
             errorBox.style.display = 'block';
             errorBox.innerText = msg;
         }
+
+        // Auto-Marker Nav Logic
+        let currentPath = window.location.pathname.split("/").pop();
+        if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+        const navLinks = document.querySelectorAll(".nav-links a");
+        navLinks.forEach(link => {
+            if (link.getAttribute("href") === currentPath) {
+                link.classList.add("active");
+            }
+            // Intercept for smooth transition
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!link.getAttribute("href").startsWith('#')) {
+                   handleNavigation(link.getAttribute("href"));
+                }
+            });
+        });
 
         // Toggle Between Login and Registration
         toggleAuthMode.addEventListener('click', () => {
@@ -290,7 +395,7 @@
             const password = loginPassword.value.trim();
 
             authBtn.disabled = true;
-            authBtn.innerText = 'Authenticating...';
+            authBtn.innerHTML = '<span class="spinner"></span> Validating...';
 
             try {
                 if (isSignUpMode) {
@@ -322,7 +427,7 @@
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error(error);
-                showError("Google sign-in failed or was cancelled.");
+                showError("Google sign-in failed.");
             }
         });
 
@@ -334,9 +439,9 @@
             } catch (error) {
                 console.error(error);
                 if (error.code === 'auth/account-exists-with-different-credential') {
-                    showError("An account already exists with the same email address but different sign-in credentials.");
+                    showError("An account already exists with the same email. Try Google Sign In.");
                 } else {
-                    showError("GitHub sign-in failed or was cancelled.");
+                    showError("GitHub sign-in failed.");
                 }
             }
         });
@@ -352,7 +457,7 @@
         // Master Auth State Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                userEmailDisplay.innerText = "Signed in as: " + user.email;
+                userEmailDisplay.innerText = user.email;
                 showUI(dashboardUI);
                 authBtn.disabled = false;
                 authBtn.innerText = "Sign In";
@@ -360,6 +465,14 @@
                 showUI(authUI);
             }
         });
+
+        // Visual Tutor: Draw sophisticated initialization ring on load
+        showUI(loadingUI); // Show loading temporarily to visualize
+        drawProgressRing('loadingProgressRing', 1.0, '#10b981'); // Full success ring
+        setTimeout(() => {
+             // Let auth listener handle UI state
+        }, 1200);
+
     </script>
 </body>
 </html>
