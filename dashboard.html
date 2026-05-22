@@ -4,202 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard | CODOT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
         :root {
             --bg-color: #050505;
-            --surface-color: #121212;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --card-bg: #111111;
+            --input-bg: #050505;
+            --text-main: #ffffff;
+            --text-muted: #888888;
             --accent: #00e5ff;
-            --accent-glow: rgba(0, 229, 255, 0.4);
-            --border-color: rgba(255, 255, 255, 0.05);
-            --success: #00e676;
-            --warning: #ffea00;
-            --error: #ef4444;
+            --border-color: #222222;
+            --error-text: #ef4444;
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif; background-color: var(--bg-color);
-            color: var(--text-main); line-height: 1.6; overflow-x: hidden;
-            display: flex; flex-direction: column; min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(at top, #0f0f0f 0%, #050505 50%, #000000 100%);
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- UNIVERSAL NAVIGATION --- */
+        /* --- NAVIGATION --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
+            padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid var(--border-color);
             background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            z-index: 1000; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 1001;
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; transition: transform 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
         .dot { color: var(--accent); }
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a:hover { color: var(--accent); }
+        
+        .nav-links { display: flex; align-items: center; gap: 2.5rem; }
+        .nav-links a { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--accent); transition: width 0.3s ease; }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
         .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
-            border: 1px solid var(--accent);
+            background-color: var(--accent); color: #000 !important;
+            padding: 0.7rem 1.5rem; border-radius: 4px; font-weight: 700 !important;
+            transition: all 0.3s ease;
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+        .nav-btn:hover { background-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
 
-        /* --- DASHBOARD HEADER --- */
-        .dash-header {
-            padding: 10rem 5% 4rem 5%;
-            background: radial-gradient(circle at top, #1a1a1a 0%, var(--bg-color) 70%);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 2rem;
+        /* --- DASHBOARD CONTAINER --- */
+        .main-content {
+            flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 4rem 1rem;
         }
 
-        .dash-title h1 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; margin-bottom: 0.5rem; }
-        .dash-title p { color: var(--text-muted); font-size: 1.1rem; }
+        .auth-card {
+            background-color: var(--card-bg);
+            width: 100%; max-width: 650px;
+            padding: 3rem; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* --- HEADER AREA --- */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;
+        }
+        .dashboard-header h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.2rem; letter-spacing: -0.5px; }
+        .dashboard-header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* --- BUTTONS --- */
+        .btn-submit {
+            padding: 0.8rem 1.5rem; background-color: var(--accent); color: #000;
+            border: none; border-radius: 6px; font-family: 'Inter', sans-serif; 
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-submit:hover { background-color: #fff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
         
-        .btn-logout {
-            padding: 0.8rem 1.5rem; background: transparent; color: #ff4757;
-            border: 1px solid rgba(255, 71, 87, 0.3); border-radius: 6px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .btn-logout:hover { background: rgba(255, 71, 87, 0.1); border-color: #ff4757; }
+        .btn-logout { background: transparent; border: 1px solid var(--error-text); color: var(--error-text); margin: 0; }
+        .btn-logout:hover { background-color: var(--error-text); color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
 
-        /* --- DASHBOARD GRID --- */
-        .dashboard-container {
-            padding: 4rem 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
+        /* --- UI STATES --- */
+        #loading-ui, #empty-ui, #active-ui { display: none; }
 
-        .dash-card {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            display: flex;
-            flex-direction: column;
+        /* --- EMPTY STATE (Zero Projects) --- */
+        .empty-state {
+            text-align: center; padding: 4rem 2rem;
+            background: var(--input-bg); border: 1px dashed var(--border-color); border-radius: 8px;
         }
+        .empty-state svg { width: 48px; height: 48px; color: var(--border-color); margin-bottom: 1.5rem; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
 
-        .dash-card:hover { border-color: rgba(0, 229, 255, 0.3); transform: translateY(-5px); }
-
-        .card-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);
+        /* --- ACTIVE STATE (Has Projects) --- */
+        .project-card {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 2rem; border-radius: 8px; position: relative; overflow: hidden;
         }
-        .card-header h2 { font-size: 1.3rem; color: var(--text-main); }
-        .badge {
-            padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-        }
-        .badge.active { background: rgba(0, 229, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); }
-        .badge.pending { background: rgba(255, 234, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
-        .badge.rejected { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid var(--error); }
-
-        /* Project Status Tracker */
-        .status-track { margin-top: 1rem; }
-        .status-step { display: flex; align-items: flex-start; margin-bottom: 1.5rem; position: relative; }
-        .status-step:not(:last-child)::before {
-            content: ''; position: absolute; left: 11px; top: 25px; bottom: -15px; width: 2px; background: var(--border-color);
-        }
-        .status-step.completed:not(:last-child)::before { background: var(--accent); }
+        .project-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
         
-        .step-dot {
-            width: 24px; height: 24px; border-radius: 50%; background: var(--surface-color); border: 2px solid var(--border-color);
-            margin-right: 1.5rem; z-index: 2; flex-shrink: 0;
-        }
-        .status-step.completed .step-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-        .status-step.current .step-dot { border-color: var(--accent); background: var(--bg-color); }
-        
-        .step-text h4 { font-size: 1rem; margin-bottom: 0.2rem; }
-        .step-text p { font-size: 0.85rem; color: var(--text-muted); }
-        .status-step.completed .step-text h4 { color: var(--text-muted); }
-        .status-step.current .step-text h4 { color: var(--accent); }
+        .project-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .ticket-id { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
+        .project-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: #fff; font-weight: 700; }
 
-        /* Rejected State Track Styling */
-        .status-step.rejected .step-dot { background: rgba(239, 68, 68, 0.1); border-color: var(--error); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-        .status-step.rejected .step-text h4 { color: var(--error); }
+        .project-status-container { display: flex; align-items: center; gap: 15px; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        .status-badge { display: inline-block; padding: 0.4rem 1.2rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; }
 
-        /* Data Rows */
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-        .data-label { color: var(--text-muted); font-size: 0.9rem; }
-        .data-value { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+        /* --- TRANSITIONS & ANIMATIONS --- */
+        @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
+        .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Action Buttons */
-        .btn-dash {
-            display: inline-block; width: 100%; text-align: center;
-            background: rgba(255,255,255,0.05); color: var(--text-main);
-            padding: 1rem; border-radius: 6px; font-weight: 600; margin-top: auto;
-            border: 1px solid var(--border-color); transition: all 0.3s ease; cursor: pointer;
-        }
-        .btn-dash:hover { background: var(--accent); color: var(--bg-color); border-color: var(--accent); }
-        
-        .btn-dash.primary { background: var(--accent); color: var(--bg-color); border-color: var(--accent); margin-top: 1rem; }
-        .btn-dash.primary:hover { box-shadow: 0 0 15px var(--accent-glow); }
-
-        /* Loading Overlay for Auth */
-        #authLoader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999; display: flex;
-            justify-content: center; align-items: center; flex-direction: column;
-        }
-        .spinner {
-            width: 50px; height: 50px; border: 3px solid rgba(0, 229, 255, 0.2);
-            border-top-color: var(--accent); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 1rem;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- TOAST NOTIFICATION SYSTEM --- */
-        #toast-container {
-            position: fixed; bottom: 20px; right: 20px; z-index: 10000;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .toast {
-            background: var(--surface-color); color: var(--text-main);
-            border: 1px solid var(--border-color); border-left: 4px solid var(--accent);
-            padding: 1rem 1.5rem; border-radius: 6px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem; font-weight: 600;
-            opacity: 0; transform: translateX(100%);
-            animation: slideIn 0.3s forwards; min-width: 280px;
-        }
-        .toast.success { border-left-color: var(--success); }
-        .toast.error { border-left-color: var(--error); }
-        .toast.info { border-left-color: var(--accent); }
-
-        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideOut { to { opacity: 0; transform: translateX(100%); } }
-
-        /* Footer */
-        footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); border-top: 1px solid var(--border-color); margin-top: auto; }
-
-        /* Reveal Animation */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        @media (max-width: 768px) { .nav-links { display: none; } .auth-card { padding: 2rem; border: none; } .dashboard-header { flex-direction: column; gap: 1rem; } }
     </style>
 </head>
 <body>
 
-    <div id="authLoader">
-        <div class="spinner"></div>
-        <p style="font-family: 'Space Grotesk', sans-serif; color: var(--text-muted);">Authenticating Client...</p>
-    </div>
-
-    <div id="toast-container"></div>
+    <div id="transitionOverlay"></div>
 
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
@@ -209,147 +138,59 @@
             <a href="about.html">About</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="dashboard.html" class="active">Dashboard</a> 
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </nav>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            let currentPath = window.location.pathname.split("/").pop();
-            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
-
-            const navLinks = document.querySelectorAll(".nav-links a");
-            navLinks.forEach(link => {
-                if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)";
-                    if (!link.classList.contains("nav-btn")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                        link.style.paddingBottom = "5px";
-                    }
-                }
-            });
-        });
-
-        // Global Toast Notification Function
-        window.showToast = function(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerText = message;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s forwards';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        };
-    </script>
-
-    <header class="dash-header">
-        <div class="dash-title reveal">
-            <h1>Welcome back, <span id="clientName" style="color: var(--accent);">Client</span><span class="dot">.</span></h1>
-            <p>Here is the current status of your web infrastructure.</p>
-        </div>
-        <button id="logoutBtn" class="btn-logout reveal">Sign Out</button>
-    </header>
-
-    <section class="dashboard-container">
+    <main class="main-content">
         
-        <div class="dash-card reveal" id="buildCard">
-            <div class="card-header">
-                <h2>Active Build</h2>
-                <span id="buildBadge" class="badge pending">Loading...</span>
-            </div>
-            
-            <div class="data-row">
-                <span class="data-label">Project Name</span>
-                <span id="displayProjectName" class="data-value">Fetching...</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Est. Delivery</span>
-                <span id="displayEstDelivery" class="data-value">Fetching...</span>
+        <div class="auth-card">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Vault<span class="dot">.</span></h2>
+                    <p class="subtitle" id="userEmailDisplay">Authenticating...</p>
+                </div>
+                <button id="logoutBtn" class="btn-submit btn-logout" style="display: none;">Secure Exit</button>
             </div>
 
-            <div class="status-track" id="statusTrack">
-                <div class="status-step" id="step1">
-                    <div class="step-dot"></div>
-                    <div class="step-text">
-                        <h4>Planning & Design</h4>
-                        <p>UI/UX wireframes and assets.</p>
+            <div id="loading-ui" style="text-align: center; padding: 3rem 0;">
+                <canvas id="loadingProgressRing" width="80" height="80" style="display: block; margin: 0 auto 1rem;"></canvas>
+                <h3 style="color: var(--accent);">Decrypting Vault...</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Scanning global architecture records.</p>
+            </div>
+
+            <div id="empty-ui" class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <h3>Zero Active Architectures</h3>
+                <p>Your secure vault is currently empty. Our engineers are standing by to review your project parameters.</p>
+                <a href="apply.html" class="btn-submit">
+                    Initialize New Build
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+
+            <div id="active-ui">
+                <div class="project-card">
+                    <div class="project-meta">
+                        <span class="ticket-id" id="displayTicketID">CO-XXXXXX</span>
+                        <span class="project-price" id="displayPrice">₹0</span>
                     </div>
-                </div>
-                <div class="status-step" id="step2">
-                    <div class="step-dot"></div>
-                    <div class="step-text">
-                        <h4>Development</h4>
-                        <p>Hard-coding your custom build.</p>
-                    </div>
-                </div>
-                <div class="status-step" id="step3">
-                    <div class="step-dot"></div>
-                    <div class="step-text">
-                        <h4>Final Testing</h4>
-                        <p>Pending your final approval.</p>
-                    </div>
-                </div>
-                <div class="status-step" id="step4">
-                    <div class="step-dot"></div>
-                    <div class="step-text">
-                        <h4>Live Deployment</h4>
-                        <p>Pushing to global CDN.</p>
+                    
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem; color: #fff;">Primary Architecture Build</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Your staging environment and build logs are being prepared by our engineering team.</p>
+                    
+                    <div class="project-status-container">
+                        <div class="status-badge" id="displayStatus">Architecture Review</div>
+                        <canvas id="phaseProgressRing" width="30" height="30" style="background: rgba(0, 229, 255, 0.1); border-radius: 50%;"></canvas>
                     </div>
                 </div>
             </div>
+
         </div>
-
-        <div class="dash-card reveal" style="transition-delay: 0.1s;">
-            <div class="card-header">
-                <h2>Partnership Status</h2>
-                <span class="badge active">Active</span>
-            </div>
-            
-            <div class="data-row">
-                <span class="data-label">Hosting Plan</span>
-                <span class="data-value">Ad-Supported (Free)</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Server Uptime</span>
-                <span class="data-value" style="color: var(--success);">99.99%</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">SSL Certificate</span>
-                <span class="data-value" style="color: var(--success);">Secured</span>
-            </div>
-
-            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px dashed var(--border-color);">
-                <h4 style="margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Want total ownership?</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                    Remove ads and take full ownership of your source code instantly.
-                </p>
-                <a href="buyout.html" class="btn-dash primary">View Buyout Options</a>
-            </div>
-        </div>
-
-        <div class="dash-card reveal" style="transition-delay: 0.2s;">
-            <div class="card-header">
-                <h2>Quick Actions</h2>
-            </div>
-            
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
-                Need to update your site content or have a question for the development team?
-            </p>
-
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <a href="mailto:support@codotagency.com" class="btn-dash">Email Developer Support</a>
-                <a href="#" class="btn-dash" onclick="event.preventDefault(); window.showToast('Staging link will be available once development is complete.', 'info');">View Staging Environment</a>
-                <a href="#" class="btn-dash" onclick="event.preventDefault(); window.showToast('Asset upload is handled securely in the Track Build panel.', 'info');">Upload Brand Assets (Drive)</a>
-            </div>
-        </div>
-
-    </section>
+    </main>
 
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
@@ -360,6 +201,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // Your Exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -373,134 +215,131 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Check user state immediately on load
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('authLoader').style.display = 'none';
-                
-                let displayName = user.displayName || user.email.split('@')[0];
-                document.getElementById('clientName').innerText = displayName;
+        // UI Elements
+        const loadingUI = document.getElementById('loading-ui');
+        const emptyUI = document.getElementById('empty-ui');
+        const activeUI = document.getElementById('active-ui');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const overlay = document.getElementById('transitionOverlay');
 
-                // Fetch dynamic data from database
-                fetchClientProject(user.email);
-            } else {
-                window.location.replace("login.html");
-            }
+        // Visual Progress Ring Engine
+        function drawProgressRing(canvasId, percentage, coreColor) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
+            const radius = (Math.min(canvas.width, canvas.height) / 2) - 5;
+            const startAngle = -0.5 * Math.PI;
+            const endAngle = (2 * percentage - 0.5) * Math.PI;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = coreColor;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // Pro-Tier Nav Transitions
+        function handleNavigation(targetPath) {
+            overlay.classList.add('pro-transition-overlay');
+            setTimeout(() => { window.location.href = targetPath; }, 150); 
+        }
+
+        const navLinks = document.querySelectorAll(".nav-links a, .empty-state a");
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!link.getAttribute("href").startsWith('#')) {
+                   handleNavigation(link.getAttribute("href"));
+                }
+            });
         });
 
-        async function fetchClientProject(email) {
+        // UI View Switcher
+        function showView(viewElement) {
+            loadingUI.style.display = 'none';
+            emptyUI.style.display = 'none';
+            activeUI.style.display = 'none';
+            viewElement.style.display = 'block';
+        }
+
+        // Fetch User Data from Firestore
+        async function fetchClientArchitecture(email) {
             try {
-                const q = query(collection(db, "applications"), where("clientEmail", "==", email));
-                const snap = await getDocs(q);
-                
-                if (!snap.empty) {
-                    const data = snap.docs[0].data();
-                    const statusRaw = data.status || "1. Application Under Review";
-                    const isRejected = statusRaw === "Rejected";
-                    const cleanStatus = statusRaw.split('. ')[1] || statusRaw;
+                // Query Firestore for any applications matching the logged-in email
+                const q = query(collection(db, "applications"), where("email", "==", email));
+                const querySnapshot = await getDocs(q);
 
-                    document.getElementById('displayProjectName').innerText = data.projectName || "Pending Setup";
-                    document.getElementById('displayEstDelivery').innerText = data.estDelivery || "TBD";
-
-                    const badge = document.getElementById('buildBadge');
-                    const track = document.getElementById('statusTrack');
-
-                    if (isRejected) {
-                        badge.className = "badge rejected";
-                        badge.innerText = "Rejected";
-                        
-                        track.innerHTML = `
-                            <div class="status-step rejected">
-                                <div class="step-dot"></div>
-                                <div class="step-text">
-                                    <h4>Application Rejected</h4>
-                                    <p>Unfortunately, your project application was not approved at this time. Please contact support for more details.</p>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        badge.className = "badge active";
-                        badge.innerText = cleanStatus;
-                        
-                        const phaseNum = parseInt(statusRaw.charAt(0)) || 1;
-                        const step1 = document.getElementById('step1');
-                        const step2 = document.getElementById('step2');
-                        const step3 = document.getElementById('step3');
-                        const step4 = document.getElementById('step4');
-
-                        // Clear current progress
-                        [step1, step2, step3, step4].forEach(s => s.className = "status-step");
-
-                        // Apply new dynamic progress based on the 7 admin phases
-                        if(phaseNum <= 4) { step1.className = "status-step current"; }
-                        else if(phaseNum === 5) { 
-                            step1.className = "status-step completed"; 
-                            step2.className = "status-step current"; 
-                        }
-                        else if(phaseNum === 6) { 
-                            step1.className = "status-step completed"; 
-                            step2.className = "status-step completed"; 
-                            step3.className = "status-step current"; 
-                        }
-                        else if(phaseNum === 7) { 
-                            step1.className = "status-step completed"; 
-                            step2.className = "status-step completed"; 
-                            step3.className = "status-step completed"; 
-                            step4.className = "status-step completed"; 
-                        }
-                    }
+                if (querySnapshot.empty) {
+                    // No projects found -> Show Empty State
+                    showView(emptyUI);
                 } else {
-                    document.getElementById('displayProjectName').innerText = "No Application Found";
-                    document.getElementById('displayEstDelivery').innerText = "--";
-                    document.getElementById('buildBadge').className = "badge pending";
-                    document.getElementById('buildBadge').innerText = "No Data";
+                    // Projects found -> Load the most recent one into the UI
+                    let latestProject = null;
+                    querySnapshot.forEach((doc) => {
+                        latestProject = doc.data(); 
+                        // Note: If you have multiple, this just grabs the last one in the loop. 
+                        // For a student project, this is perfect.
+                    });
+
+                    // Inject data into the UI
+                    document.getElementById('displayTicketID').innerText = latestProject.ticketID || "CO-ACTIVE";
+                    document.getElementById('displayPrice').innerText = latestProject.estimatedPrice || "Pending";
+                    
+                    // Clean up the status text to look premium (e.g., "1. Architecture Under Review" -> "Architecture Review")
+                    let rawStatus = latestProject.status || "Review Pending";
+                    let cleanStatus = rawStatus.replace(/^\d+\.\s*/, ''); 
+                    document.getElementById('displayStatus').innerText = cleanStatus;
+
+                    showView(activeUI);
+                    
+                    // Draw the ring (25% for phase 1)
+                    setTimeout(() => drawProgressRing('phaseProgressRing', 0.25, '#00e5ff'), 100);
                 }
             } catch (error) {
-                console.error("Error fetching project data:", error);
-                window.showToast("Failed to fetch project details.", "error");
+                console.error("Error fetching project data: ", error);
+                // Fallback to empty state if DB fails
+                showView(emptyUI);
             }
         }
 
-        // Logout Button Logic
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+        // Master Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is logged in. Initialize Dashboard.
+                userEmailDisplay.innerText = user.email;
+                logoutBtn.style.display = 'inline-flex';
+                
+                // Show loading ring while querying DB
+                showView(loadingUI);
+                drawProgressRing('loadingProgressRing', 0.7, '#00e5ff');
+                
+                // Fetch their actual data
+                fetchClientArchitecture(user.email);
+            } else {
+                // Not logged in? Bounce back to login.html
+                window.location.href = "login.html";
+            }
+        });
+
+        // Logout Logic
+        logoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
-                window.location.replace("login.html");
-            }).catch((error) => {
-                console.error("Sign Out Error", error);
-                window.showToast("Error signing out.", "error");
-            });
+                handleNavigation("login.html");
+            }).catch(error => console.error("Logout Error:", error));
         });
 
-        // UI Scripts
-        document.addEventListener("DOMContentLoaded", () => {
-            const navLinks = document.querySelectorAll(".nav-links a");
-            navLinks.forEach(link => {
-                if (link.getAttribute("href") === "dashboard.html") {
-                    link.style.color = "var(--accent)";
-                    link.style.borderBottom = "2px solid var(--accent)";
-                    link.style.paddingBottom = "5px";
-                }
-            });
-            const loginLink = Array.from(navLinks).find(a => a.getAttribute('href') === 'login.html');
-            if(loginLink) {
-                loginLink.textContent = "Dashboard";
-                loginLink.setAttribute("href", "dashboard.html");
-            }
-        });
-
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
-        }
-        window.addEventListener("scroll", reveal);
-        setTimeout(reveal, 500); 
     </script>
 </body>
 </html>
