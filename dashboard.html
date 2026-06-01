@@ -119,7 +119,7 @@
         .project-status-container { display: flex; align-items: center; gap: 15px; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
         .status-badge { display: inline-block; padding: 0.4rem 1.2rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; }
 
-        /* --- TRANSITIONS & ANIMATIONS --- */
+        /* --- TRANSITIONS --- */
         @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
         .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -208,7 +208,6 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Your Exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -236,25 +235,13 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const x = canvas.width / 2;
-            const y = canvas.height / 2;
+            const x = canvas.width / 2; const y = canvas.height / 2;
             const radius = (Math.min(canvas.width, canvas.height) / 2) - 5;
-            const startAngle = -0.5 * Math.PI;
-            const endAngle = (2 * percentage - 0.5) * Math.PI;
-            
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.arc(x, y, radius, startAngle, endAngle);
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = coreColor;
-            ctx.lineCap = 'round';
-            ctx.stroke();
+            const startAngle = -0.5 * Math.PI; const endAngle = (2 * percentage - 0.5) * Math.PI;
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.lineWidth = 4; ctx.strokeStyle = coreColor; ctx.lineCap = 'round'; ctx.stroke();
         }
 
         function handleNavigation(targetPath) {
@@ -288,18 +275,12 @@
                     showView(emptyUI);
                 } else {
                     let latestProject = null;
-                    querySnapshot.forEach((doc) => {
-                        latestProject = doc.data(); 
-                    });
-
+                    querySnapshot.forEach((doc) => { latestProject = doc.data(); });
                     currentProjectData = latestProject;
 
                     document.getElementById('displayTicketID').innerText = latestProject.ticketID || "CO-ACTIVE";
                     document.getElementById('displayPrice').innerText = latestProject.estimatedPrice || "Pending";
-                    
-                    if (latestProject.projectName) {
-                        document.getElementById('displayProjectName').innerText = latestProject.projectName;
-                    }
+                    if (latestProject.projectName) document.getElementById('displayProjectName').innerText = latestProject.projectName;
 
                     let rawStatus = latestProject.status || "Review Pending";
                     let cleanStatus = rawStatus.replace(/^\d+\.\s*/, ''); 
@@ -327,13 +308,11 @@
         });
 
         logoutBtn.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                handleNavigation("login.html");
-            }).catch(error => console.error("Logout Error:", error));
+            signOut(auth).then(() => handleNavigation("login.html"));
         });
 
         // =====================================================================
-        // GOD-LEVEL PDF GENERATOR ENGINE (STATEMENT OF WORK)
+        // GOD-LEVEL PDF GENERATOR ENGINE (V2)
         // =====================================================================
         document.getElementById('downloadPdfBtn').addEventListener('click', () => {
             if (!currentProjectData) return;
@@ -342,77 +321,73 @@
             const doc = new jsPDF();
             const p = currentProjectData; 
 
-            // --- HELPER FUNCTIONS ---
+            // --- HELPER FUNCTION ---
             const drawBox = (x, y, w, h, title, value) => {
-                doc.setFillColor(248, 250, 252);
-                doc.setDrawColor(226, 232, 240);
+                doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240);
                 doc.roundedRect(x, y, w, h, 2, 2, 'FD');
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(100, 116, 139);
+                doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
                 doc.text(title, x + 5, y + 8);
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(10);
-                doc.setTextColor(15, 23, 42);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(15, 23, 42);
                 doc.text(value, x + 5, y + 16);
             };
 
-            // --- 1. HEADER (High End Corporate) ---
-            doc.setFillColor(15, 23, 42); // Very dark slate
-            doc.rect(0, 0, 210, 40, 'F');
-            doc.setDrawColor(0, 229, 255); // Cyan accent
+            // --- 1. HEADER ---
+            doc.setFillColor(15, 23, 42); 
+            doc.rect(0, 0, 210, 45, 'F');
+            doc.setDrawColor(0, 229, 255); 
             doc.setLineWidth(1.5);
-            doc.line(0, 40, 210, 40);
+            doc.line(0, 45, 210, 45);
 
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(24);
-            doc.text("CODOT.", 15, 25);
+            doc.setFontSize(28);
+            doc.text("CODOT.", 15, 28);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(148, 163, 184);
-            doc.text("STATEMENT OF WORK & ARCHITECTURE BRIEF", 120, 25);
+            doc.text("STATEMENT OF WORK & ARCHITECTURE BRIEF", 115, 28);
 
-            // --- 2. PROJECT META GRID ---
+            // --- 2. EXECUTIVE SUMMARY & META GRID ---
+            let yPos = 60;
             const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            let yPos = 55;
             
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(15, 23, 42);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
             doc.text(p.projectName || "Custom Architecture Build", 15, yPos);
             
             yPos += 8;
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 85, 105);
+            const summary = "This Statement of Work (SOW) outlines the technical architecture, design parameters, and financial deliverables for the bespoke digital infrastructure commissioned by the client.";
+            doc.text(doc.splitTextToSize(summary, 180), 15, yPos);
+
+            yPos += 18;
             drawBox(15, yPos, 85, 22, "CLIENT IDENTIFIER", p.clientName || p.name || p.email || "Confidential Client");
             drawBox(105, yPos, 40, 22, "TICKET ID", p.ticketID || "CO-ACTIVE");
             drawBox(150, yPos, 45, 22, "DATE ISSUED", date);
 
             // --- 3. SCOPE OF WORK & FEATURES ---
-            yPos += 35;
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(15, 23, 42);
+            yPos += 38;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42);
             doc.text("1.0 ARCHITECTURE SCOPE", 15, yPos);
             
             yPos += 8;
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105);
             doc.text(`Framework Scale: Up to ${p.pagesRequested || 'Standard'} configured environments.`, 15, yPos);
             
             yPos += 10;
-            // Standard Inclusions (To fill space and build value)
+            // Upgraded Standard Inclusions to fill space
             let allFeatures = [
                 "Enterprise-grade SSL Encryption & Security Setup",
                 "Fully Responsive UI/UX (Mobile, Tablet, Desktop)",
-                "Global Content Delivery Network (CDN) Integration"
+                "Global Content Delivery Network (CDN) Integration",
+                "Automated SEO Metadata Architecture",
+                "Pre-deployment Cross-Browser QA Testing"
             ];
             
             if (p.features && p.features.length > 0) {
                 allFeatures = [...allFeatures, ...p.features];
             }
 
-            // Draw feature list with alternating background rows
             allFeatures.forEach((feature, index) => {
                 if (index % 2 === 0) {
                     doc.setFillColor(248, 250, 252);
@@ -425,69 +400,77 @@
                 yPos += 10;
             });
 
-            // --- 4. DYNAMIC PRICING ALGORITHM ---
+            // --- 4. FINANCIAL BREAKDOWN & THE COLLISION FIX ---
             yPos += 15;
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(15, 23, 42);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42);
             doc.text("2.0 FINANCIAL BREAKDOWN", 15, yPos);
 
-            // Extract numeric price to calculate fake line items
-            let priceStr = p.estimatedPrice || "0";
+            let priceStr = p.estimatedPrice || "Pending Assessment";
             let numericPrice = parseInt(priceStr.replace(/[^0-9]/g, '')) || 0;
             
-            let coreCost = "TBD"; let uiCost = "TBD"; let modCost = "TBD"; let totalCost = "Pending Verification";
+            let coreCost = "TBD"; let uiCost = "TBD"; let modCost = "TBD"; let totalCost = priceStr;
             
             if (numericPrice > 0) {
                 coreCost = "₹" + Math.round(numericPrice * 0.55).toLocaleString('en-IN');
                 uiCost = "₹" + Math.round(numericPrice * 0.25).toLocaleString('en-IN');
                 modCost = "₹" + Math.round(numericPrice * 0.20).toLocaleString('en-IN');
                 totalCost = "₹" + numericPrice.toLocaleString('en-IN');
-            } else if (priceStr !== "0") {
-                totalCost = priceStr; // Fallback if they manually typed something weird
             }
 
-            // Draw Pricing Table Header
             yPos += 8;
             doc.setFillColor(15, 23, 42);
             doc.rect(15, yPos, 180, 10, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(9);
             doc.text("DESCRIPTION", 20, yPos + 6.5);
             doc.text("ALLOCATION", 160, yPos + 6.5);
 
-            // Draw Pricing Rows
-            doc.setTextColor(51, 65, 85);
-            doc.setFont("helvetica", "normal");
+            doc.setTextColor(51, 65, 85); doc.setFont("helvetica", "normal");
             
-            yPos += 10;
-            doc.rect(15, yPos, 180, 10, 'S'); doc.text("Core System Architecture & Database Engineering", 20, yPos + 6.5); doc.text(coreCost, 160, yPos + 6.5);
-            
-            yPos += 10;
-            doc.rect(15, yPos, 180, 10, 'S'); doc.text("Custom UI/UX Prototyping & Design", 20, yPos + 6.5); doc.text(uiCost, 160, yPos + 6.5);
-            
-            yPos += 10;
-            doc.rect(15, yPos, 180, 10, 'S'); doc.text("Premium Module Integration & Configuration", 20, yPos + 6.5); doc.text(modCost, 160, yPos + 6.5);
-            
-            yPos += 10;
-            doc.rect(15, yPos, 180, 10, 'S'); doc.text("Hosting Setup & Global CDN Deployment", 20, yPos + 6.5); doc.text("Included", 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Core System Architecture & Database Engineering", 20, yPos + 6.5); doc.text(coreCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Custom UI/UX Prototyping & Design", 20, yPos + 6.5); doc.text(uiCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Premium Module Integration & Configuration", 20, yPos + 6.5); doc.text(modCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Hosting Setup & Global CDN Deployment", 20, yPos + 6.5); doc.text("Included", 160, yPos + 6.5);
 
-            // Draw Total Box
+            // COLLISION FIX: Wider box, dynamic font scaling for long text
             yPos += 15;
             doc.setFillColor(241, 245, 249);
-            doc.roundedRect(120, yPos, 75, 20, 2, 2, 'F');
+            doc.roundedRect(90, yPos, 105, 22, 2, 2, 'F'); // Expanded leftwards significantly
+            
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
-            doc.text("TOTAL ESTIMATE:", 125, yPos + 12);
-            doc.setFontSize(14);
+            doc.setTextColor(100, 116, 139);
+            doc.text("TOTAL ESTIMATE:", 95, yPos + 14); // Shifted label left
+            
+            // Dynamic scaling for long text (e.g. "Pending Assessment")
+            doc.setFontSize(totalCost.length > 10 ? 11 : 16); 
             doc.setTextColor(0, 150, 160);
-            doc.text(totalCost, 190, yPos + 13, { align: 'right' });
+            doc.text(totalCost, 190, yPos + 14, { align: 'right' }); // Right align is now safe
 
-            // --- 5. FOOTER (Professional localization) ---
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(148, 163, 184);
-            doc.text("CODOT Agency | Goa, India | This document is strictly confidential.", 105, 285, { align: 'center' });
+            // --- 5. AUTHORIZATION & SIGN-OFF (Fills the bottom elegantly) ---
+            yPos += 35;
+            doc.setDrawColor(226, 232, 240);
+            doc.line(15, yPos, 195, yPos);
+            
+            yPos += 12;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(15, 23, 42);
+            doc.text("AUTHORIZATION & NEXT STEPS", 15, yPos);
+            
+            yPos += 6;
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 116, 139);
+            const terms = "By proceeding with the initial deployment phase, the client acknowledges and accepts the architectural scope defined above. Any out-of-scope functional requests will require secondary evaluation and separate billing.";
+            doc.text(doc.splitTextToSize(terms, 180), 15, yPos);
+            
+            yPos += 25;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(15, yPos, 85, yPos); 
+            doc.text("Authorized Client Signature", 15, yPos + 5);
+            
+            doc.line(125, yPos, 185, yPos); 
+            doc.text("Date of Approval", 125, yPos + 5);
+
+            // --- 6. FOOTER ---
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
+            doc.text("CODOT Agency | Goa, India | This document is strictly confidential.", 105, 290, { align: 'center' });
 
             doc.save(`CODOT_SOW_${p.ticketID || 'Brief'}.pdf`);
         });
