@@ -33,7 +33,7 @@
             background-image: linear-gradient(to bottom, #0d0d0d 0%, #030303 100%);
         }
 
-        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        h1, h2, h3, h4, h5, .logo { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.2s ease; }
 
         /* --- NAVIGATION --- */
@@ -99,15 +99,14 @@
 
         .module-card {
             background: var(--input-bg); border: 1px solid var(--border-color);
-            border-top: 4px solid transparent; padding: 2.5rem; position: relative;
+            border-top: 4px solid var(--accent); padding: 2.5rem; position: relative;
         }
-        .module-card.active-module { border-top-color: var(--accent); }
         
         .module-header { margin-bottom: 2rem; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
         .module-header h3 { font-size: 1.4rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
         .module-header p { font-size: 0.85rem; color: var(--text-muted); }
 
-        /* --- SPEEDOMETER UI --- */
+        /* --- SPEEDOMETER UI (MODULE 1) --- */
         .speedometer-wrapper {
             position: relative; width: 220px; height: 120px; margin: 0 auto 2rem;
             display: flex; justify-content: center; align-items: flex-end;
@@ -122,9 +121,9 @@
         .score-display-center {
             position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); text-align: center;
         }
-        .score-display-center h4 { font-family: 'Space Grotesk', sans-serif; font-size: 4.5rem; font-weight: 700; line-height: 0.8; color: var(--border-color); transition: color 0.3s ease; }
+        .score-display-center h4 { font-size: 4.5rem; font-weight: 700; line-height: 0.8; color: var(--border-color); transition: color 0.3s ease; }
         
-        .telemetry-verdict { font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; text-align: center; color: var(--text-muted); margin-bottom: 2rem; }
+        .telemetry-verdict { font-weight: 700; letter-spacing: 1px; font-size: 0.85rem; text-align: center; color: var(--text-muted); margin-bottom: 2rem; }
 
         .metrics-grid {
             display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color);
@@ -132,30 +131,24 @@
         .metric-card { padding: 1.2rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .metric-card:nth-child(2n) { border-right: none; }
         .metric-card:nth-last-child(-n+2) { border-bottom: none; }
-        .metric-card h5 { font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
-        .metric-card .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .metric-card h5 { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .metric-card .metric-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
 
-        /* --- DIAGNOSTICS LOG --- */
         #diagList { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
         .diag-item {
             padding: 1rem; background: var(--card-bg); border: 1px solid var(--border-color);
             border-left: 4px solid transparent; margin-bottom: 1rem;
         }
         .diag-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .diag-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; color: #fff; text-transform: uppercase; }
-        .diag-savings { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 700; }
-        .diag-desc { font-size: 0.8rem; color: #888; line-height: 1.4; }
+        .diag-name { font-weight: 700; font-size: 0.85rem; color: #fff; }
+        .diag-savings { font-size: 0.8rem; font-weight: 700; }
+        .diag-desc { font-size: 0.8rem; color: #888; line-height: 1.4; text-transform: none; font-family: 'Inter', sans-serif;}
 
-        /* --- LOCKED STATE UI --- */
-        .locked-module { opacity: 0.5; border-top-color: var(--border-color); filter: grayscale(100%); pointer-events: none; }
-        .locked-badge {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #000; border: 1px solid var(--text-muted); padding: 1rem 2rem;
-            text-align: center; width: 80%; z-index: 10;
-        }
-        .locked-badge h4 { font-family: 'Space Grotesk', sans-serif; color: #fff; letter-spacing: 2px; margin-bottom: 0.5rem; }
-        .locked-badge p { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+        /* --- DRAG RACE UI (MODULE 2) --- */
+        .race-score { font-size: 3.5rem; font-weight: 700; color: #fff; line-height: 1; }
+        .race-sub { font-size: 0.7rem; color: #555; margin-top: 0.5rem; letter-spacing: 1px; }
 
+        /* --- UTILS --- */
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 8px; }
 
@@ -188,7 +181,7 @@
 
         <div class="arsenal-grid">
             
-            <div class="module-card active-module" id="coreEngineCard">
+            <div class="module-card" id="coreEngineCard">
                 <div class="module-header">
                     <h3>Core Engine Telemetry</h3>
                     <p>Lighthouse performance extraction and vital tracking.</p>
@@ -204,7 +197,7 @@
                     </div>
                 </div>
 
-                <div class="telemetry-verdict" id="auditVerdict">Awaiting Target Parameters...</div>
+                <div class="telemetry-verdict" id="auditVerdict">AWAITING TARGET PARAMETERS...</div>
 
                 <div class="metrics-grid">
                     <div class="metric-card">
@@ -225,31 +218,71 @@
                     </div>
                 </div>
 
-                <div id="diagList">
-                    </div>
+                <div id="diagList"></div>
             </div>
 
-            <div class="module-card locked-module">
+            <div class="module-card" id="dragRaceCard">
                 <div class="module-header">
                     <h3>Sector Drag Race</h3>
                     <p>Concurrent latency test vs competitor architecture.</p>
                 </div>
-                <div style="height: 300px; background: repeating-linear-gradient(45deg, #0a0a0a, #0a0a0a 10px, #050505 10px, #050505 20px);"></div>
-                <div class="locked-badge">
-                    <h4>SYSTEM LOCKED</h4>
-                    <p>Module requires level 2 clearance</p>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
+                    <input type="url" id="competitorUrl" placeholder="https://rival-domain.com" style="flex: 1; padding: 1rem; background-color: #000; color: #fff; border: 1px solid var(--border-color); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;">
+                    <button id="runRaceBtn" class="btn-submit" style="padding: 1rem 1.5rem; font-size: 0.85rem;">ENGAGE</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                    <div style="padding: 1.5rem; text-align: center; border-right: 1px solid var(--border-color); background: #050505;">
+                        <h5 style="font-size: 0.75rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 0.5rem;">YOUR DOMAIN</h5>
+                        <div id="raceScoreA" class="race-score">--</div>
+                        <div id="raceLcpA" class="race-sub">LCP: --</div>
+                    </div>
+                    <div style="padding: 1.5rem; text-align: center; background: #050505;">
+                        <h5 style="font-size: 0.75rem; color: var(--error-text); letter-spacing: 2px; margin-bottom: 0.5rem;">RIVAL DOMAIN</h5>
+                        <div id="raceScoreB" class="race-score">--</div>
+                        <div id="raceLcpB" class="race-sub">LCP: --</div>
+                    </div>
+                </div>
+
+                <div id="raceVerdict" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);">
+                    AWAITING RIVAL PARAMETERS
                 </div>
             </div>
 
-            <div class="module-card locked-module">
+            <div class="module-card" id="payloadCard">
                 <div class="module-header">
                     <h3>Payload Weigh-In</h3>
-                    <p>DOM structural depth and DOM chunk parsing.</p>
+                    <p>DOM structural depth and asset bloat evaluation.</p>
                 </div>
-                <div style="height: 300px; background: repeating-linear-gradient(-45deg, #0a0a0a, #0a0a0a 10px, #050505 10px, #050505 20px);"></div>
-                <div class="locked-badge">
-                    <h4>SYSTEM LOCKED</h4>
-                    <p>Module requires level 2 clearance</p>
+
+                <button id="runPayloadBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem;">SCAN PAYLOAD</button>
+                
+                <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">TOTAL MASS</span>
+                        <span id="valMass" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">-- MB</span>
+                    </div>
+                    <div style="height: 8px; background: #111; border: 1px solid #333; margin-bottom: 1.5rem;">
+                        <div id="massBar" style="height: 100%; width: 0%; background: var(--error-text); transition: width 1s ease;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">DOM ELEMENTS</span>
+                        <span id="valDOM" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
+                    </div>
+                    <div style="height: 8px; background: #111; border: 1px solid #333; margin-bottom: 1.5rem;">
+                        <div id="domBar" style="height: 100%; width: 0%; background: var(--warning); transition: width 1s ease;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">JS BOOTUP TIME</span>
+                        <span id="valJS" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">-- s</span>
+                    </div>
+                </div>
+
+                <div id="payloadVerdict" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);">
+                    AWAITING PAYLOAD EXTRACTION
                 </div>
             </div>
 
@@ -261,6 +294,11 @@
     </footer>
 
     <script>
+        const API_KEY = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig";
+
+        // ==========================================
+        // MODULE 1: CORE ENGINE TELEMETRY
+        // ==========================================
         document.getElementById('runTelemetryBtn').addEventListener('click', async () => {
             const urlInput = document.getElementById('targetUrl').value.trim();
             const btn = document.getElementById('runTelemetryBtn');
@@ -276,81 +314,51 @@
             const diagList = document.getElementById('diagList');
 
             if (!urlInput) { alert("ERROR: Missing target URL parameter."); return; }
-
-            const apiKey = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig"; 
             
-            // Loading State
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> INTERROGATING...';
-            
-            scoreDisplay.innerText = "0";
-            scoreDisplay.style.color = "#fff";
-            gaugeFill.style.strokeDashoffset = 125.6; 
-            gaugeFill.style.stroke = "var(--border-color)";
-            
-            verdictDisplay.innerText = "Extracting raw telemetry...";
-            verdictDisplay.style.color = "var(--text-muted)";
-            
-            valLCP.innerText = "---"; valTBT.innerText = "---";
-            valFCP.innerText = "---"; valCLS.innerText = "---";
+            scoreDisplay.innerText = "0"; scoreDisplay.style.color = "#fff";
+            gaugeFill.style.strokeDashoffset = 125.6; gaugeFill.style.stroke = "var(--border-color)";
+            verdictDisplay.innerText = "EXTRACTING RAW TELEMETRY..."; verdictDisplay.style.color = "var(--text-muted)";
+            valLCP.innerText = "---"; valTBT.innerText = "---"; valFCP.innerText = "---"; valCLS.innerText = "---";
             diagList.innerHTML = "";
 
             try {
-                let formattedUrl = urlInput;
-                if (!/^https?:\/\//i.test(formattedUrl)) formattedUrl = 'https://' + formattedUrl;
-
-                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(formattedUrl)}&key=${apiKey}&strategy=mobile`;
+                let formattedUrl = /^https?:\/\//i.test(urlInput) ? urlInput : 'https://' + urlInput;
+                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(formattedUrl)}&key=${API_KEY}&strategy=mobile`;
+                
                 const response = await fetch(endpoint);
                 const data = await response.json();
-
                 if (data.error) throw new Error(data.error.message);
 
-                // 1. Calculate Score & Speedometer
                 const rawScore = data.lighthouseResult.categories.performance.score;
                 const finalScore = Math.round(rawScore * 100);
                 
                 scoreDisplay.innerText = finalScore;
-                
-                const gaugeOffset = 125.6 - (rawScore * 125.6);
-                gaugeFill.style.strokeDashoffset = gaugeOffset;
+                gaugeFill.style.strokeDashoffset = 125.6 - (rawScore * 125.6);
 
-                // 2. Extract Vitals
                 const audits = data.lighthouseResult.audits;
                 valLCP.innerText = audits['largest-contentful-paint'].displayValue;
                 valTBT.innerText = audits['total-blocking-time'].displayValue;
                 valFCP.innerText = audits['first-contentful-paint'].displayValue;
                 valCLS.innerText = audits['cumulative-layout-shift'].displayValue;
 
-                // 3. Brutalist Color Evaluation
-                let themeColor = "";
-
-                if (finalScore >= 90) {
-                    themeColor = "var(--success)";
-                    verdictDisplay.innerText = "SYSTEM OPTIMAL: ARCHITECTURE PASS";
-                } else if (finalScore >= 50) {
-                    themeColor = "var(--warning)";
-                    verdictDisplay.innerText = "SUBOPTIMAL: THREAD BLOCKING DETECTED";
-                } else {
-                    themeColor = "var(--error-text)";
-                    verdictDisplay.innerText = "CRITICAL FAIL: IMMEDIATE REBUILD REQUIRED";
-                }
-
+                let themeColor = finalScore >= 90 ? "var(--success)" : (finalScore >= 50 ? "var(--warning)" : "var(--error-text)");
                 gaugeFill.style.stroke = themeColor;
                 scoreDisplay.style.color = themeColor;
                 verdictDisplay.style.color = themeColor;
+                
+                if (finalScore >= 90) verdictDisplay.innerText = "SYSTEM OPTIMAL: ARCHITECTURE PASS";
+                else if (finalScore >= 50) verdictDisplay.innerText = "SUBOPTIMAL: THREAD BLOCKING DETECTED";
+                else verdictDisplay.innerText = "CRITICAL FAIL: IMMEDIATE REBUILD REQUIRED";
 
-                // 4. Actionable Diagnostics Generator
                 let issueFound = false;
-
                 for (const key in audits) {
                     const audit = audits[key];
                     if (audit.score !== null && audit.score < 0.9 && audit.details && audit.details.type === 'opportunity') {
                         issueFound = true;
-                        
                         const isSevere = audit.score < 0.5;
                         const borderCol = isSevere ? 'var(--error-text)' : 'var(--warning)';
-                        const textCol = isSevere ? 'var(--error-text)' : 'var(--warning)';
-                        
                         const cleanDesc = audit.description.split('.')[0] + "."; 
                         const savingsStr = audit.displayValue || "ACTION REQ";
 
@@ -358,30 +366,149 @@
                             <div class="diag-item" style="border-left-color: ${borderCol};">
                                 <div class="diag-item-top">
                                     <span class="diag-name">${audit.title}</span>
-                                    <span class="diag-savings" style="color: ${textCol};">${savingsStr}</span>
+                                    <span class="diag-savings" style="color: ${borderCol};">${savingsStr}</span>
                                 </div>
                                 <div class="diag-desc">${cleanDesc}</div>
                             </div>
                         `;
                     }
                 }
+                if (!issueFound) diagList.innerHTML = `<div style="padding: 1.5rem; color: var(--success); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--success); background: #000; text-align: center;">NO CRITICAL FAULTS. SYSTEM CLEAR.</div>`;
 
-                if (!issueFound) {
-                    diagList.innerHTML = `<div style="padding: 1.5rem; color: var(--success); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--success); background: #000; text-align: center;">NO CRITICAL FAULTS. SYSTEM CLEAR.</div>`;
+            } catch (error) {
+                console.error("Telemetry Error:", error);
+                scoreDisplay.innerText = "ERR"; gaugeFill.style.stroke = "var(--error-text)";
+                verdictDisplay.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdictDisplay.style.color = "var(--error-text)";
+            } finally {
+                btn.disabled = false; btn.innerText = "Initiate Sequence";
+            }
+        });
+
+        // ==========================================
+        // MODULE 2: SECTOR DRAG RACE
+        // ==========================================
+        document.getElementById('runRaceBtn').addEventListener('click', async () => {
+            const baseInput = document.getElementById('targetUrl').value.trim();
+            const rivalInput = document.getElementById('competitorUrl').value.trim();
+            const btn = document.getElementById('runRaceBtn');
+            const scoreA = document.getElementById('raceScoreA'); const scoreB = document.getElementById('raceScoreB');
+            const lcpA = document.getElementById('raceLcpA'); const lcpB = document.getElementById('raceLcpB');
+            const verdict = document.getElementById('raceVerdict');
+
+            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+            if (!rivalInput) { alert("ERROR: Missing rival target."); return; }
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> RACING...';
+            scoreA.innerText = "0"; scoreA.style.color = "#fff"; scoreB.innerText = "0"; scoreB.style.color = "#fff";
+            lcpA.innerText = "LCP: SCANNING"; lcpB.innerText = "LCP: SCANNING";
+            verdict.innerText = "CONCURRENT TELEMETRY ENGAGED..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+
+            try {
+                let urlA = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
+                let urlB = /^https?:\/\//i.test(rivalInput) ? rivalInput : 'https://' + rivalInput;
+
+                const endA = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(urlA)}&key=${API_KEY}&strategy=mobile`;
+                const endB = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(urlB)}&key=${API_KEY}&strategy=mobile`;
+
+                const [resA, resB] = await Promise.all([fetch(endA), fetch(endB)]);
+                const dataA = await resA.json(); const dataB = await resB.json();
+
+                if (dataA.error || dataB.error) throw new Error("API Execution Failed");
+
+                const finalA = Math.round(dataA.lighthouseResult.categories.performance.score * 100);
+                const finalB = Math.round(dataB.lighthouseResult.categories.performance.score * 100);
+                
+                scoreA.innerText = finalA; scoreB.innerText = finalB;
+                lcpA.innerText = "LCP: " + dataA.lighthouseResult.audits['largest-contentful-paint'].displayValue;
+                lcpB.innerText = "LCP: " + dataB.lighthouseResult.audits['largest-contentful-paint'].displayValue;
+
+                if (finalA > finalB) {
+                    scoreA.style.color = "var(--success)"; scoreB.style.color = "var(--error-text)";
+                    verdict.innerText = `VICTORY: OUTPERFORMING RIVAL BY ${finalA - finalB} POINTS.`;
+                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
+                } else if (finalA < finalB) {
+                    scoreA.style.color = "var(--error-text)"; scoreB.style.color = "var(--success)";
+                    verdict.innerText = `CRITICAL: RIVAL OUTPERFORMING ARCHITECTURE BY ${finalB - finalA} POINTS.`;
+                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
+                } else {
+                    scoreA.style.color = "var(--warning)"; scoreB.style.color = "var(--warning)";
+                    verdict.innerText = "DEAD HEAT: ARCHITECTURES DEADLOCKED.";
+                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
                 }
 
             } catch (error) {
-                console.error("Audit Error:", error);
-                scoreDisplay.innerText = "ERR";
-                gaugeFill.style.stroke = "var(--error-text)";
-                verdictDisplay.innerText = "TELEMETRY FAILED: CHECK TARGET URL.";
-                verdictDisplay.style.color = "var(--error-text)";
-                
-                valLCP.innerText = "---"; valTBT.innerText = "---";
-                valFCP.innerText = "---"; valCLS.innerText = "---";
+                console.error("Race Error:", error);
+                scoreA.innerText = "ERR"; scoreB.innerText = "ERR";
+                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URLs."; verdict.style.color = "var(--error-text)";
             } finally {
-                btn.disabled = false;
-                btn.innerText = "Initiate Sequence";
+                btn.disabled = false; btn.innerText = "ENGAGE";
+            }
+        });
+
+        // ==========================================
+        // MODULE 3: PAYLOAD WEIGH-IN
+        // ==========================================
+        document.getElementById('runPayloadBtn').addEventListener('click', async () => {
+            const baseInput = document.getElementById('targetUrl').value.trim();
+            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+
+            const btn = document.getElementById('runPayloadBtn');
+            const valMass = document.getElementById('valMass');
+            const valDOM = document.getElementById('valDOM');
+            const valJS = document.getElementById('valJS');
+            const massBar = document.getElementById('massBar');
+            const domBar = document.getElementById('domBar');
+            const verdict = document.getElementById('payloadVerdict');
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> WEIGHING...';
+            valMass.innerText = "--"; valDOM.innerText = "--"; valJS.innerText = "--";
+            massBar.style.width = "0%"; domBar.style.width = "0%";
+            verdict.innerText = "EXTRACTING ASSET CHUNKS..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+
+            try {
+                let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
+                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&strategy=mobile`;
+                
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                if (data.error) throw new Error("API Failed");
+
+                const audits = data.lighthouseResult.audits;
+                
+                // Mass
+                const massBytes = audits['total-byte-weight'].numericValue;
+                const massMB = (massBytes / (1024 * 1024)).toFixed(2);
+                valMass.innerText = massMB + " MB";
+                massBar.style.width = Math.min((massMB / 5) * 100, 100) + "%";
+                massBar.style.background = massMB > 3 ? "var(--error-text)" : (massMB > 1.5 ? "var(--warning)" : "var(--success)");
+
+                // DOM Size
+                const domCount = audits['dom-size'].numericValue;
+                valDOM.innerText = domCount;
+                domBar.style.width = Math.min((domCount / 1500) * 100, 100) + "%";
+                domBar.style.background = domCount > 1000 ? "var(--error-text)" : (domCount > 600 ? "var(--warning)" : "var(--success)");
+
+                // JS Bootup
+                const jsTime = (audits['bootup-time'].numericValue / 1000).toFixed(2);
+                valJS.innerText = jsTime + " s";
+
+                // Verdict
+                if (massMB > 3 || domCount > 1000) {
+                    verdict.innerText = "CRITICAL: MASSIVE BLOAT DETECTED. CHASSIS OVERLOADED.";
+                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
+                } else if (massMB > 1.5 || domCount > 600) {
+                    verdict.innerText = "WARNING: UNOPTIMIZED ASSETS. REDUCE PAYLOAD.";
+                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
+                } else {
+                    verdict.innerText = "OPTIMAL: PAYLOAD WITHIN ACCEPTABLE PARAMETERS.";
+                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
+                }
+
+            } catch (error) {
+                console.error("Payload Error:", error);
+                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
+            } finally {
+                btn.disabled = false; btn.innerText = "SCAN PAYLOAD";
             }
         });
     </script>
