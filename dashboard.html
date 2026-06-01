@@ -104,7 +104,6 @@
         /* --- UI STATES --- */
         #loading-ui, #empty-ui, #active-ui { display: none; }
 
-        /* --- EMPTY STATE --- */
         .empty-state {
             text-align: center; padding: 4rem 2rem;
             background: var(--input-bg); border: 1px dashed var(--border-color); border-radius: 8px;
@@ -113,7 +112,6 @@
         .empty-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
         .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
 
-        /* --- CARDS --- */
         .project-card {
             background: var(--input-bg); border: 1px solid var(--border-color);
             padding: 2rem; border-radius: 8px; position: relative; overflow: hidden;
@@ -124,16 +122,44 @@
         .project-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .ticket-id { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
         .project-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: #fff; font-weight: 700; }
-
         .project-status-container { display: flex; align-items: center; gap: 15px; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
         .status-badge { display: inline-block; padding: 0.4rem 1.2rem; background: rgba(0, 229, 255, 0.1); color: var(--accent); border-radius: 50px; font-weight: 600; font-size: 0.85rem; }
+
+        /* --- SPEEDOMETER & METRICS UI --- */
+        .speedometer-wrapper {
+            position: relative; width: 200px; height: 110px; margin: 0 auto 1rem;
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        .speedometer-svg { width: 100%; height: 100%; overflow: visible; }
+        .speed-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; stroke-linecap: round; }
+        .speed-fill { 
+            fill: none; stroke: var(--accent); stroke-width: 12; stroke-linecap: round;
+            stroke-dasharray: 125.6; /* Pi * radius (40) */
+            stroke-dashoffset: 125.6; /* Starts empty */
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+        }
+        .score-display-center {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            text-align: center;
+        }
+        .score-display-center h4 { font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700; line-height: 0.9; color: #fff; transition: color 0.5s ease; }
+        .score-display-center span { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+
+        .metrics-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.5rem;
+        }
+        .metric-card {
+            background: #0a0a0a; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px;
+            padding: 1rem; text-align: left;
+        }
+        .metric-card h5 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        .metric-card .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .metric-card .metric-desc { font-size: 0.75rem; color: #666; margin-top: 0.2rem; }
 
         /* --- TRANSITIONS --- */
         @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
         .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Spinner */
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px; }
 
@@ -205,24 +231,52 @@
                 </div>
 
                 <div class="project-card" style="border-color: #333;">
-                    <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: #fff;">Legacy Infrastructure Audit</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Run a live Google Lighthouse scan on your current/competitor website to identify critical bottlenecks.</p>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: #fff;">Live Infrastructure Audit</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Run a live diagnostic on your current/competitor website to identify specific engine bottlenecks.</p>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
                         <input type="url" id="auditUrl" class="form-control" placeholder="https://your-current-site.com" style="flex: 1;">
-                        <button id="runAuditBtn" class="btn-submit" style="width: auto;">Run Scan</button>
+                        <button id="runAuditBtn" class="btn-submit" style="width: auto;">Scan Servers</button>
                     </div>
 
-                    <div id="auditResults" style="display: none; background: #0a0a0a; border: 1px dashed var(--border-color); padding: 1.5rem; border-radius: 8px; text-align: center;">
-                        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 0.9rem;">Google Performance Score</h4>
+                    <div id="auditResults" style="display: none; background: #050505; border: 1px solid var(--border-color); padding: 2rem 1.5rem; border-radius: 8px; text-align: center;">
                         
-                        <div style="font-size: 3.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--accent); line-height: 1;" id="finalScore">--</div>
-                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Out of 100</p>
-
-                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: left;">
-                            <p id="auditVerdict" style="color: var(--error-text); font-weight: 600; font-size: 0.9rem;">⚠️ Analysis Pending</p>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Our proposed CODOT Architecture replaces legacy codebases to guarantee elite performance, improving SEO indexing and user conversion rates.</p>
+                        <div class="speedometer-wrapper">
+                            <svg viewBox="0 0 100 50" class="speedometer-svg">
+                                <path class="speed-track" d="M 10 45 A 40 40 0 0 1 90 45" />
+                                <path class="speed-fill" id="speedGaugeFill" d="M 10 45 A 40 40 0 0 1 90 45" />
+                            </svg>
+                            <div class="score-display-center">
+                                <h4 id="finalScore">--</h4>
+                                <span>Total Score</span>
+                            </div>
                         </div>
+
+                        <p id="auditVerdict" style="color: var(--text-muted); font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem;">⚠️ Waiting for target URL...</p>
+
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <h5>LCP (Load Time)</h5>
+                                <div class="metric-val" id="valLCP">--</div>
+                                <div class="metric-desc">Largest asset rendering speed.</div>
+                            </div>
+                            <div class="metric-card">
+                                <h5>TBT (Interactivity)</h5>
+                                <div class="metric-val" id="valTBT">--</div>
+                                <div class="metric-desc">Total main-thread blocking time.</div>
+                            </div>
+                            <div class="metric-card">
+                                <h5>FCP (First Paint)</h5>
+                                <div class="metric-val" id="valFCP">--</div>
+                                <div class="metric-desc">When first UI element appears.</div>
+                            </div>
+                            <div class="metric-card">
+                                <h5>CLS (Visual Stability)</h5>
+                                <div class="metric-val" id="valCLS">--</div>
+                                <div class="metric-desc">Layout shift during rendering.</div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -246,7 +300,6 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -269,7 +322,6 @@
         
         let currentProjectData = null; 
 
-        // Canvas Ring Utility
         function drawProgressRing(canvasId, percentage, coreColor) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
@@ -285,7 +337,6 @@
             ctx.lineWidth = 4; ctx.strokeStyle = coreColor; ctx.lineCap = 'round'; ctx.stroke();
         }
 
-        // Navigation Engine
         function handleNavigation(targetPath) {
             overlay.classList.add('pro-transition-overlay');
             setTimeout(() => { window.location.href = targetPath; }, 150); 
@@ -306,7 +357,6 @@
             viewElement.style.display = 'block';
         }
 
-        // Fetch User Data from Firestore
         async function fetchClientArchitecture(email) {
             try {
                 const q = query(collection(db, "applications"), where("email", "==", email));
@@ -331,12 +381,11 @@
                     setTimeout(() => drawProgressRing('phaseProgressRing', 0.25, '#00e5ff'), 100);
                 }
             } catch (error) {
-                console.error("Error fetching project data: ", error);
+                console.error("Error fetching data: ", error);
                 showView(emptyUI);
             }
         }
 
-        // Firebase Auth Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userEmailDisplay.innerText = user.email;
@@ -354,180 +403,146 @@
         });
 
         // =====================================================================
-        // LIVE WEB PERFORMANCE AUDIT ENGINE
+        // UPGRADED SPEEDOMETER AUDIT ENGINE
         // =====================================================================
         document.getElementById('runAuditBtn').addEventListener('click', async () => {
             const urlInput = document.getElementById('auditUrl').value.trim();
             const btn = document.getElementById('runAuditBtn');
             const resultsDiv = document.getElementById('auditResults');
+            
+            // UI Elements
             const scoreDisplay = document.getElementById('finalScore');
             const verdictDisplay = document.getElementById('auditVerdict');
+            const gaugeFill = document.getElementById('speedGaugeFill');
+            
+            // Metric Elements
+            const valLCP = document.getElementById('valLCP');
+            const valTBT = document.getElementById('valTBT');
+            const valFCP = document.getElementById('valFCP');
+            const valCLS = document.getElementById('valCLS');
 
-            if (!urlInput) {
-                alert("Please enter a valid website URL to scan.");
-                return;
-            }
+            if (!urlInput) { alert("Enter a valid URL."); return; }
 
-            // Secure Google API Key
             const apiKey = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig"; 
             
-            // UI Loading State
+            // Loading State (Resetting Gauge)
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Scanning...';
+            btn.innerHTML = '<span class="spinner"></span> Scanning servers...';
             resultsDiv.style.display = "block";
-            scoreDisplay.innerText = "⏳";
-            scoreDisplay.style.color = "var(--text-muted)";
-            verdictDisplay.innerText = "Fetching real-time Lighthouse data...";
+            
+            scoreDisplay.innerText = "0";
+            scoreDisplay.style.color = "#fff";
+            gaugeFill.style.strokeDashoffset = 125.6; // Empty gauge
+            gaugeFill.style.stroke = "var(--text-muted)";
+            
+            verdictDisplay.innerText = "Running Lighthouse diagnostic...";
             verdictDisplay.style.color = "var(--text-muted)";
+            
+            valLCP.innerText = "⏳"; valTBT.innerText = "⏳";
+            valFCP.innerText = "⏳"; valCLS.innerText = "⏳";
 
             try {
-                // Ensure protocol exists
                 let formattedUrl = urlInput;
-                if (!/^https?:\/\//i.test(formattedUrl)) {
-                    formattedUrl = 'https://' + formattedUrl;
-                }
+                if (!/^https?:\/\//i.test(formattedUrl)) formattedUrl = 'https://' + formattedUrl;
 
-                // Direct Frontend API Call to Google Lighthouse
                 const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(formattedUrl)}&key=${apiKey}&strategy=mobile`;
                 const response = await fetch(endpoint);
                 const data = await response.json();
 
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+                if (data.error) throw new Error(data.error.message);
 
-                // Extract the score (Google returns it as a decimal 0.0 to 1.0)
+                // 1. Calculate and Animate Main Score
                 const rawScore = data.lighthouseResult.categories.performance.score;
                 const finalScore = Math.round(rawScore * 100);
-
-                // Update UI with the Score
+                
                 scoreDisplay.innerText = finalScore;
+                
+                // SVG Dash Array logic (Circumference of half circle is ~125.6)
+                // 0 score = offset 125.6. 100 score = offset 0.
+                const gaugeOffset = 125.6 - (rawScore * 125.6);
+                gaugeFill.style.strokeDashoffset = gaugeOffset;
 
-                // Sales logic based on the score
+                // 2. Extract Specific Vitals (The Dyno Sheet)
+                const audits = data.lighthouseResult.audits;
+                valLCP.innerText = audits['largest-contentful-paint'].displayValue;
+                valTBT.innerText = audits['total-blocking-time'].displayValue;
+                valFCP.innerText = audits['first-contentful-paint'].displayValue;
+                valCLS.innerText = audits['cumulative-layout-shift'].displayValue;
+
+                // 3. Color Coding Logic
                 if (finalScore >= 90) {
+                    gaugeFill.style.stroke = "var(--success)";
                     scoreDisplay.style.color = "var(--success)";
                     verdictDisplay.style.color = "var(--success)";
-                    verdictDisplay.innerText = "✅ Excellent Mobile Performance";
+                    verdictDisplay.innerText = "✅ Excellent Performance. Codebase is fully optimized.";
                 } else if (finalScore >= 50) {
+                    gaugeFill.style.stroke = "var(--warning)";
                     scoreDisplay.style.color = "var(--warning)";
                     verdictDisplay.style.color = "var(--warning)";
-                    verdictDisplay.innerText = "⚠️ Average Performance Detected";
+                    verdictDisplay.innerText = "⚠️ Average Performance. Potential bottlenecks found in UI thread.";
                 } else {
+                    gaugeFill.style.stroke = "var(--error-text)";
                     scoreDisplay.style.color = "var(--error-text)";
                     verdictDisplay.style.color = "var(--error-text)";
-                    verdictDisplay.innerText = "🚨 Critical Code Bottlenecks Detected";
+                    verdictDisplay.innerText = "🚨 Critical Code Bottlenecks. Immediate infrastructure rebuild required.";
                 }
 
             } catch (error) {
                 console.error("Audit Error:", error);
                 scoreDisplay.innerText = "ERR";
-                scoreDisplay.style.color = "var(--error-text)";
+                gaugeFill.style.stroke = "var(--error-text)";
                 verdictDisplay.innerText = "Failed to scan. Check the URL and ensure the site is public.";
                 verdictDisplay.style.color = "var(--error-text)";
+                
+                valLCP.innerText = "--"; valTBT.innerText = "--";
+                valFCP.innerText = "--"; valCLS.innerText = "--";
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Run Scan";
+                btn.innerText = "Scan Servers";
             }
         });
 
         // =====================================================================
-        // GOD-LEVEL PDF GENERATOR ENGINE (STATEMENT OF WORK)
+        // PDF GENERATOR (UNTOUCHED)
         // =====================================================================
         document.getElementById('downloadPdfBtn').addEventListener('click', () => {
             if (!currentProjectData) return;
+            const { jsPDF } = window.jspdf; const doc = new jsPDF(); const p = currentProjectData; 
             
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const p = currentProjectData; 
-
-            // --- HELPER FUNCTION ---
             const drawBox = (x, y, w, h, title, value) => {
-                doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240);
-                doc.roundedRect(x, y, w, h, 2, 2, 'FD');
-                doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
-                doc.text(title, x + 5, y + 8);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(15, 23, 42);
-                doc.text(value, x + 5, y + 16);
+                doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240); doc.roundedRect(x, y, w, h, 2, 2, 'FD');
+                doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(100, 116, 139); doc.text(title, x + 5, y + 8);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(15, 23, 42); doc.text(value, x + 5, y + 16);
             };
 
-            // --- 1. HEADER ---
-            doc.setFillColor(15, 23, 42); 
-            doc.rect(0, 0, 210, 45, 'F');
-            doc.setDrawColor(0, 229, 255); 
-            doc.setLineWidth(1.5);
-            doc.line(0, 45, 210, 45);
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F');
+            doc.setDrawColor(0, 229, 255); doc.setLineWidth(1.5); doc.line(0, 45, 210, 45);
+            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(28); doc.text("CODOT.", 15, 28);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(148, 163, 184); doc.text("STATEMENT OF WORK & ARCHITECTURE BRIEF", 115, 28);
 
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(28);
-            doc.text("CODOT.", 15, 28);
-            
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(148, 163, 184);
-            doc.text("STATEMENT OF WORK & ARCHITECTURE BRIEF", 115, 28);
+            let yPos = 60; const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42); doc.text(p.projectName || "Custom Architecture Build", 15, yPos);
+            yPos += 8; doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 85, 105);
+            doc.text(doc.splitTextToSize("This Statement of Work (SOW) outlines the technical architecture, design parameters, and financial deliverables for the bespoke digital infrastructure commissioned by the client.", 180), 15, yPos);
 
-            // --- 2. EXECUTIVE SUMMARY & META GRID ---
-            let yPos = 60;
-            const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            
-            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
-            doc.text(p.projectName || "Custom Architecture Build", 15, yPos);
-            
-            yPos += 8;
-            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 85, 105);
-            const summary = "This Statement of Work (SOW) outlines the technical architecture, design parameters, and financial deliverables for the bespoke digital infrastructure commissioned by the client.";
-            doc.text(doc.splitTextToSize(summary, 180), 15, yPos);
+            yPos += 18; drawBox(15, yPos, 85, 22, "CLIENT IDENTIFIER", p.clientName || p.name || p.email || "Confidential Client");
+            drawBox(105, yPos, 40, 22, "TICKET ID", p.ticketID || "CO-ACTIVE"); drawBox(150, yPos, 45, 22, "DATE ISSUED", date);
 
-            yPos += 18;
-            drawBox(15, yPos, 85, 22, "CLIENT IDENTIFIER", p.clientName || p.name || p.email || "Confidential Client");
-            drawBox(105, yPos, 40, 22, "TICKET ID", p.ticketID || "CO-ACTIVE");
-            drawBox(150, yPos, 45, 22, "DATE ISSUED", date);
-
-            // --- 3. SCOPE OF WORK & FEATURES ---
-            yPos += 38;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42);
-            doc.text("1.0 ARCHITECTURE SCOPE", 15, yPos);
-            
-            yPos += 8;
-            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105);
-            doc.text(`Framework Scale: Up to ${p.pagesRequested || 'Standard'} configured environments.`, 15, yPos);
+            yPos += 38; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42); doc.text("1.0 ARCHITECTURE SCOPE", 15, yPos);
+            yPos += 8; doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105); doc.text(`Framework Scale: Up to ${p.pagesRequested || 'Standard'} configured environments.`, 15, yPos);
             
             yPos += 10;
-            let allFeatures = [
-                "Enterprise-grade SSL Encryption & Security Setup",
-                "Fully Responsive UI/UX (Mobile, Tablet, Desktop)",
-                "Global Content Delivery Network (CDN) Integration",
-                "Automated SEO Metadata Architecture",
-                "Pre-deployment Cross-Browser QA Testing"
-            ];
-            
-            if (p.features && p.features.length > 0) {
-                allFeatures = [...allFeatures, ...p.features];
-            }
+            let allFeatures = ["Enterprise-grade SSL Encryption & Security Setup", "Fully Responsive UI/UX (Mobile, Tablet, Desktop)", "Global Content Delivery Network (CDN) Integration", "Automated SEO Metadata Architecture", "Pre-deployment Cross-Browser QA Testing"];
+            if (p.features && p.features.length > 0) allFeatures = [...allFeatures, ...p.features];
 
             allFeatures.forEach((feature, index) => {
-                if (index % 2 === 0) {
-                    doc.setFillColor(248, 250, 252);
-                    doc.rect(15, yPos - 5, 180, 10, 'F');
-                }
-                doc.setTextColor(0, 200, 220);
-                doc.text("■", 18, yPos);
-                doc.setTextColor(51, 65, 85);
-                doc.text(feature, 25, yPos);
-                yPos += 10;
+                if (index % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, yPos - 5, 180, 10, 'F'); }
+                doc.setTextColor(0, 200, 220); doc.text("■", 18, yPos); doc.setTextColor(51, 65, 85); doc.text(feature, 25, yPos); yPos += 10;
             });
 
-            // --- 4. FINANCIAL BREAKDOWN ---
-            yPos += 15;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42);
-            doc.text("2.0 FINANCIAL BREAKDOWN", 15, yPos);
-
-            let priceStr = p.estimatedPrice || "Pending Assessment";
-            let numericPrice = parseInt(priceStr.replace(/[^0-9]/g, '')) || 0;
-            
-            let coreCost = "TBD"; let uiCost = "TBD"; let modCost = "TBD"; let totalCost = priceStr;
-            
+            yPos += 15; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42); doc.text("2.0 FINANCIAL BREAKDOWN", 15, yPos);
+            let numericPrice = parseInt((p.estimatedPrice || "").replace(/[^0-9]/g, '')) || 0;
+            let coreCost = "TBD", uiCost = "TBD", modCost = "TBD", totalCost = p.estimatedPrice || "Pending Assessment";
             if (numericPrice > 0) {
                 coreCost = "₹" + Math.round(numericPrice * 0.55).toLocaleString('en-IN');
                 uiCost = "₹" + Math.round(numericPrice * 0.25).toLocaleString('en-IN');
@@ -535,13 +550,8 @@
                 totalCost = "₹" + numericPrice.toLocaleString('en-IN');
             }
 
-            yPos += 8;
-            doc.setFillColor(15, 23, 42);
-            doc.rect(15, yPos, 180, 10, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(9);
-            doc.text("DESCRIPTION", 20, yPos + 6.5);
-            doc.text("ALLOCATION", 160, yPos + 6.5);
-
+            yPos += 8; doc.setFillColor(15, 23, 42); doc.rect(15, yPos, 180, 10, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("DESCRIPTION", 20, yPos + 6.5); doc.text("ALLOCATION", 160, yPos + 6.5);
             doc.setTextColor(51, 65, 85); doc.setFont("helvetica", "normal");
             
             yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Core System Architecture & Database Engineering", 20, yPos + 6.5); doc.text(coreCost, 160, yPos + 6.5);
@@ -549,42 +559,17 @@
             yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Premium Module Integration & Configuration", 20, yPos + 6.5); doc.text(modCost, 160, yPos + 6.5);
             yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Hosting Setup & Global CDN Deployment", 20, yPos + 6.5); doc.text("Included", 160, yPos + 6.5);
 
-            yPos += 15;
-            doc.setFillColor(241, 245, 249);
-            doc.roundedRect(90, yPos, 105, 22, 2, 2, 'F'); 
-            
-            doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 116, 139);
-            doc.text("TOTAL ESTIMATE:", 95, yPos + 14); 
-            
-            doc.setFontSize(totalCost.length > 10 ? 11 : 16); 
-            doc.setTextColor(0, 150, 160);
-            doc.text(totalCost, 190, yPos + 14, { align: 'right' }); 
+            yPos += 15; doc.setFillColor(241, 245, 249); doc.roundedRect(90, yPos, 105, 22, 2, 2, 'F'); 
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.text("TOTAL ESTIMATE:", 95, yPos + 14); 
+            doc.setFontSize(totalCost.length > 10 ? 11 : 16); doc.setTextColor(0, 150, 160); doc.text(totalCost, 190, yPos + 14, { align: 'right' }); 
 
-            // --- 5. AUTHORIZATION & SIGN-OFF ---
-            yPos += 35;
-            doc.setDrawColor(226, 232, 240);
-            doc.line(15, yPos, 195, yPos);
-            
-            yPos += 12;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(15, 23, 42);
-            doc.text("AUTHORIZATION & NEXT STEPS", 15, yPos);
-            
-            yPos += 6;
-            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 116, 139);
-            const terms = "By proceeding with the initial deployment phase, the client acknowledges and accepts the architectural scope defined above. Any out-of-scope functional requests will require secondary evaluation and separate billing.";
-            doc.text(doc.splitTextToSize(terms, 180), 15, yPos);
-            
-            yPos += 25;
-            doc.setDrawColor(200, 200, 200);
-            doc.line(15, yPos, 85, yPos); 
-            doc.text("Authorized Client Signature", 15, yPos + 5);
-            
-            doc.line(125, yPos, 185, yPos); 
-            doc.text("Date of Approval", 125, yPos + 5);
-
-            // --- 6. FOOTER ---
-            doc.setFontSize(8); doc.setTextColor(148, 163, 184);
-            doc.text("CODOT Agency | Goa, India | This document is strictly confidential.", 105, 290, { align: 'center' });
+            yPos += 35; doc.setDrawColor(226, 232, 240); doc.line(15, yPos, 195, yPos);
+            yPos += 12; doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(15, 23, 42); doc.text("AUTHORIZATION & NEXT STEPS", 15, yPos);
+            yPos += 6; doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 116, 139);
+            doc.text(doc.splitTextToSize("By proceeding with the initial deployment phase, the client acknowledges and accepts the architectural scope defined above.", 180), 15, yPos);
+            yPos += 25; doc.setDrawColor(200, 200, 200); doc.line(15, yPos, 85, yPos); doc.text("Authorized Client Signature", 15, yPos + 5);
+            doc.line(125, yPos, 185, yPos); doc.text("Date of Approval", 125, yPos + 5);
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184); doc.text("CODOT Agency | Goa, India | This document is strictly confidential.", 105, 290, { align: 'center' });
 
             doc.save(`CODOT_SOW_${p.ticketID || 'Brief'}.pdf`);
         });
