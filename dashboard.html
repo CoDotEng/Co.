@@ -127,39 +127,53 @@
 
         /* --- SPEEDOMETER & METRICS UI --- */
         .speedometer-wrapper {
-            position: relative; width: 200px; height: 110px; margin: 0 auto 1rem;
+            position: relative; width: 220px; height: 120px; margin: 0 auto 1.5rem;
             display: flex; justify-content: center; align-items: flex-end;
         }
         .speedometer-svg { width: 100%; height: 100%; overflow: visible; }
         .speed-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; stroke-linecap: round; }
         .speed-fill { 
             fill: none; stroke: var(--accent); stroke-width: 12; stroke-linecap: round;
-            stroke-dasharray: 125.6; /* Pi * radius (40) */
-            stroke-dashoffset: 125.6; /* Starts empty */
+            stroke-dasharray: 125.6;
+            stroke-dashoffset: 125.6;
             transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+            filter: drop-shadow(0 0 8px rgba(0,229,255,0.4));
         }
         .score-display-center {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
             text-align: center;
         }
-        .score-display-center h4 { font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700; line-height: 0.9; color: #fff; transition: color 0.5s ease; }
+        .score-display-center h4 { font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700; line-height: 0.9; color: #fff; transition: color 0.5s ease; }
         .score-display-center span { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
 
         .metrics-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.5rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;
         }
         .metric-card {
-            background: #0a0a0a; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px;
-            padding: 1rem; text-align: left;
+            background: #080808; border: 1px solid rgba(255,255,255,0.03); border-radius: 8px;
+            padding: 1.2rem; text-align: left;
         }
-        .metric-card h5 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
-        .metric-card .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
-        .metric-card .metric-desc { font-size: 0.75rem; color: #666; margin-top: 0.2rem; }
+        .metric-card h5 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        .metric-card .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .metric-card .metric-desc { font-size: 0.75rem; color: #555; margin-top: 0.4rem; }
+
+        /* --- DIAGNOSTICS UI --- */
+        #detailedDiagnostics { display: none; margin-top: 2rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: left; }
+        .diagnostic-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .diagnostic-title { color: #fff; font-size: 1.1rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+        
+        .diag-item {
+            padding: 1rem; border-radius: 6px; margin-bottom: 0.8rem;
+            display: flex; flex-direction: column; gap: 0.4rem;
+        }
+        .diag-item-top { display: flex; justify-content: space-between; align-items: center; }
+        .diag-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
+        .diag-savings { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 700; }
+        .diag-desc { font-size: 0.8rem; color: rgba(255,255,255,0.6); line-height: 1.4; }
 
         /* --- TRANSITIONS --- */
         @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
         .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px; }
 
@@ -232,7 +246,7 @@
 
                 <div class="project-card" style="border-color: #333;">
                     <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: #fff;">Live Infrastructure Audit</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Run a live diagnostic on your current/competitor website to identify specific engine bottlenecks.</p>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Run a live diagnostic on your current/competitor website to identify engine bottlenecks.</p>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
                         <input type="url" id="auditUrl" class="form-control" placeholder="https://your-current-site.com" style="flex: 1;">
@@ -275,6 +289,14 @@
                                 <div class="metric-val" id="valCLS">--</div>
                                 <div class="metric-desc">Layout shift during rendering.</div>
                             </div>
+                        </div>
+
+                        <div id="detailedDiagnostics">
+                            <div class="diagnostic-header">
+                                <span class="diagnostic-title">Diagnostic Breakdown</span>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Action Items</span>
+                            </div>
+                            <div id="diagList"></div>
                         </div>
 
                     </div>
@@ -403,39 +425,42 @@
         });
 
         // =====================================================================
-        // UPGRADED SPEEDOMETER AUDIT ENGINE
+        // SPEEDOMETER + DETAILED DIAGNOSTICS ENGINE
         // =====================================================================
         document.getElementById('runAuditBtn').addEventListener('click', async () => {
             const urlInput = document.getElementById('auditUrl').value.trim();
             const btn = document.getElementById('runAuditBtn');
             const resultsDiv = document.getElementById('auditResults');
             
-            // UI Elements
             const scoreDisplay = document.getElementById('finalScore');
             const verdictDisplay = document.getElementById('auditVerdict');
             const gaugeFill = document.getElementById('speedGaugeFill');
             
-            // Metric Elements
             const valLCP = document.getElementById('valLCP');
             const valTBT = document.getElementById('valTBT');
             const valFCP = document.getElementById('valFCP');
             const valCLS = document.getElementById('valCLS');
 
+            const diagSection = document.getElementById('detailedDiagnostics');
+            const diagList = document.getElementById('diagList');
+
             if (!urlInput) { alert("Enter a valid URL."); return; }
 
             const apiKey = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig"; 
             
-            // Loading State (Resetting Gauge)
+            // Loading State
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Scanning servers...';
+            btn.innerHTML = '<span class="spinner"></span> Scanning code...';
             resultsDiv.style.display = "block";
+            diagSection.style.display = "none";
             
             scoreDisplay.innerText = "0";
             scoreDisplay.style.color = "#fff";
-            gaugeFill.style.strokeDashoffset = 125.6; // Empty gauge
+            gaugeFill.style.strokeDashoffset = 125.6; 
             gaugeFill.style.stroke = "var(--text-muted)";
+            gaugeFill.style.filter = "none";
             
-            verdictDisplay.innerText = "Running Lighthouse diagnostic...";
+            verdictDisplay.innerText = "Extracting Lighthouse data...";
             verdictDisplay.style.color = "var(--text-muted)";
             
             valLCP.innerText = "⏳"; valTBT.innerText = "⏳";
@@ -451,47 +476,86 @@
 
                 if (data.error) throw new Error(data.error.message);
 
-                // 1. Calculate and Animate Main Score
+                // 1. Calculate Score & Speedometer animation
                 const rawScore = data.lighthouseResult.categories.performance.score;
                 const finalScore = Math.round(rawScore * 100);
                 
                 scoreDisplay.innerText = finalScore;
                 
-                // SVG Dash Array logic (Circumference of half circle is ~125.6)
-                // 0 score = offset 125.6. 100 score = offset 0.
                 const gaugeOffset = 125.6 - (rawScore * 125.6);
                 gaugeFill.style.strokeDashoffset = gaugeOffset;
 
-                // 2. Extract Specific Vitals (The Dyno Sheet)
+                // 2. Metrics Setup
                 const audits = data.lighthouseResult.audits;
                 valLCP.innerText = audits['largest-contentful-paint'].displayValue;
                 valTBT.innerText = audits['total-blocking-time'].displayValue;
                 valFCP.innerText = audits['first-contentful-paint'].displayValue;
                 valCLS.innerText = audits['cumulative-layout-shift'].displayValue;
 
-                // 3. Color Coding Logic
+                // 3. Color Logic
+                let themeColor = "";
+                let glowColor = "";
+
                 if (finalScore >= 90) {
-                    gaugeFill.style.stroke = "var(--success)";
-                    scoreDisplay.style.color = "var(--success)";
-                    verdictDisplay.style.color = "var(--success)";
-                    verdictDisplay.innerText = "✅ Excellent Performance. Codebase is fully optimized.";
+                    themeColor = "var(--success)";
+                    glowColor = "rgba(16,185,129,0.4)";
+                    verdictDisplay.innerText = "✅ Excellent Performance. Clean architecture.";
                 } else if (finalScore >= 50) {
-                    gaugeFill.style.stroke = "var(--warning)";
-                    scoreDisplay.style.color = "var(--warning)";
-                    verdictDisplay.style.color = "var(--warning)";
-                    verdictDisplay.innerText = "⚠️ Average Performance. Potential bottlenecks found in UI thread.";
+                    themeColor = "var(--warning)";
+                    glowColor = "rgba(245,158,11,0.4)";
+                    verdictDisplay.innerText = "⚠️ Suboptimal layout. Thread blocking detected.";
                 } else {
-                    gaugeFill.style.stroke = "var(--error-text)";
-                    scoreDisplay.style.color = "var(--error-text)";
-                    verdictDisplay.style.color = "var(--error-text)";
-                    verdictDisplay.innerText = "🚨 Critical Code Bottlenecks. Immediate infrastructure rebuild required.";
+                    themeColor = "var(--error-text)";
+                    glowColor = "rgba(239,68,68,0.4)";
+                    verdictDisplay.innerText = "🚨 Critical Code Bottlenecks. Needs immediate rebuild.";
                 }
+
+                gaugeFill.style.stroke = themeColor;
+                gaugeFill.style.filter = `drop-shadow(0 0 8px ${glowColor})`;
+                scoreDisplay.style.color = themeColor;
+                verdictDisplay.style.color = themeColor;
+
+                // 4. ACTIONABLE DIAGNOSTICS GENERATOR
+                diagList.innerHTML = "";
+                let issueFound = false;
+
+                for (const key in audits) {
+                    const audit = audits[key];
+                    // Pull specific performance loss opportunities (Time savings)
+                    if (audit.score !== null && audit.score < 0.9 && audit.details && audit.details.type === 'opportunity') {
+                        issueFound = true;
+                        
+                        const isSevere = audit.score < 0.5;
+                        const bgColor = isSevere ? 'rgba(239, 68, 68, 0.05)' : 'rgba(245, 158, 11, 0.05)';
+                        const borderCol = isSevere ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)';
+                        const textCol = isSevere ? 'var(--error-text)' : 'var(--warning)';
+                        
+                        const cleanDesc = audit.description.split('.')[0] + "."; 
+                        const savingsStr = audit.displayValue || "Requires Action";
+
+                        diagList.innerHTML += `
+                            <div class="diag-item" style="background: ${bgColor}; border: 1px solid ${borderCol};">
+                                <div class="diag-item-top">
+                                    <span class="diag-name">${audit.title}</span>
+                                    <span class="diag-savings" style="color: ${textCol};">${savingsStr}</span>
+                                </div>
+                                <div class="diag-desc">${cleanDesc}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (!issueFound) {
+                    diagList.innerHTML = `<div style="padding: 1rem; color: var(--success); font-size: 0.9rem; border: 1px solid rgba(16,185,129,0.2); background: rgba(16,185,129,0.05); border-radius: 6px;">No major action items. Site is firing on all cylinders.</div>`;
+                }
+                
+                diagSection.style.display = "block";
 
             } catch (error) {
                 console.error("Audit Error:", error);
                 scoreDisplay.innerText = "ERR";
                 gaugeFill.style.stroke = "var(--error-text)";
-                verdictDisplay.innerText = "Failed to scan. Check the URL and ensure the site is public.";
+                verdictDisplay.innerText = "Failed to scan. Check the URL.";
                 verdictDisplay.style.color = "var(--error-text)";
                 
                 valLCP.innerText = "--"; valTBT.innerText = "--";
