@@ -73,9 +73,7 @@
         .hero-command h1 { font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 0.5rem; }
         .hero-command p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2.5rem; letter-spacing: 1px; text-transform: uppercase; }
         
-        .target-input-group {
-            display: flex; gap: 10px; max-width: 700px; margin: 0 auto;
-        }
+        .target-input-group { display: flex; gap: 10px; max-width: 700px; margin: 0 auto; }
         .target-input-group input {
             flex: 1; padding: 1.2rem 1.5rem; background-color: var(--input-bg); color: var(--text-main);
             border: 1px solid var(--border-color); border-radius: 0;
@@ -93,41 +91,33 @@
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* --- ARSENAL GRID --- */
-        .arsenal-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 2rem;
-        }
-
+        .arsenal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
         .module-card {
             background: var(--input-bg); border: 1px solid var(--border-color);
             border-top: 4px solid var(--accent); padding: 2.5rem; position: relative;
         }
-        
         .module-header { margin-bottom: 2rem; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
         .module-header h3 { font-size: 1.4rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
         .module-header p { font-size: 0.85rem; color: var(--text-muted); }
+        .verdict-box {
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
+            font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);
+        }
 
         /* --- SPEEDOMETER UI (MODULE 1) --- */
         .speedometer-wrapper {
-            position: relative; width: 220px; height: 120px; margin: 0 auto 2rem;
-            display: flex; justify-content: center; align-items: flex-end;
+            position: relative; width: 220px; height: 120px; margin: 0 auto 2rem; display: flex; justify-content: center; align-items: flex-end;
         }
         .speedometer-svg { width: 100%; height: 100%; overflow: visible; }
         .speed-track { fill: none; stroke: var(--border-color); stroke-width: 8; stroke-linecap: square; }
         .speed-fill { 
             fill: none; stroke: var(--border-color); stroke-width: 8; stroke-linecap: square;
-            stroke-dasharray: 125.6; stroke-dashoffset: 125.6;
-            transition: stroke-dashoffset 1.5s cubic-bezier(0.1, 0, 0.1, 1), stroke 0.3s ease;
+            stroke-dasharray: 125.6; stroke-dashoffset: 125.6; transition: stroke-dashoffset 1.5s cubic-bezier(0.1, 0, 0.1, 1), stroke 0.3s ease;
         }
-        .score-display-center {
-            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); text-align: center;
-        }
+        .score-display-center { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); text-align: center; }
         .score-display-center h4 { font-size: 4.5rem; font-weight: 700; line-height: 0.8; color: var(--border-color); transition: color 0.3s ease; }
         
-        .telemetry-verdict { font-weight: 700; letter-spacing: 1px; font-size: 0.85rem; text-align: center; color: var(--text-muted); margin-bottom: 2rem; }
-
-        .metrics-grid {
-            display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color);
-        }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
         .metric-card { padding: 1.2rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .metric-card:nth-child(2n) { border-right: none; }
         .metric-card:nth-last-child(-n+2) { border-bottom: none; }
@@ -135,10 +125,7 @@
         .metric-card .metric-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
 
         #diagList { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
-        .diag-item {
-            padding: 1rem; background: var(--card-bg); border: 1px solid var(--border-color);
-            border-left: 4px solid transparent; margin-bottom: 1rem;
-        }
+        .diag-item { padding: 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid transparent; margin-bottom: 1rem; }
         .diag-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
         .diag-name { font-weight: 700; font-size: 0.85rem; color: #fff; }
         .diag-savings { font-size: 0.8rem; font-weight: 700; }
@@ -197,8 +184,6 @@
                     </div>
                 </div>
 
-                <div class="telemetry-verdict" id="auditVerdict">AWAITING TARGET PARAMETERS...</div>
-
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <h5>LCP / Render Time</h5>
@@ -218,6 +203,7 @@
                     </div>
                 </div>
 
+                <div class="verdict-box" id="auditVerdict">AWAITING TARGET PARAMETERS</div>
                 <div id="diagList"></div>
             </div>
 
@@ -245,9 +231,7 @@
                     </div>
                 </div>
 
-                <div id="raceVerdict" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);">
-                    AWAITING RIVAL PARAMETERS
-                </div>
+                <div class="verdict-box" id="raceVerdict">AWAITING RIVAL PARAMETERS</div>
             </div>
 
             <div class="module-card" id="payloadCard">
@@ -281,9 +265,35 @@
                     </div>
                 </div>
 
-                <div id="payloadVerdict" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);">
-                    AWAITING PAYLOAD EXTRACTION
+                <div class="verdict-box" id="payloadVerdict">AWAITING PAYLOAD EXTRACTION</div>
+            </div>
+
+            <div class="module-card" id="threatCard">
+                <div class="module-header">
+                    <h3>Threat Matrix</h3>
+                    <p>Security protocol and vulnerability payload analysis.</p>
                 </div>
+
+                <button id="runSecurityBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem; background-color: var(--error-text); color: #fff;">SCAN VULNERABILITIES</button>
+                
+                <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111; padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">SSL / HTTPS</span>
+                        <span id="secHttps" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111; padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">CVE LIBRARIES</span>
+                        <span id="secLibs" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">XSS PROTECTION (CSP)</span>
+                        <span id="secCsp" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
+                    </div>
+                </div>
+
+                <div class="verdict-box" id="securityVerdict">AWAITING SECURITY SWEEP</div>
             </div>
 
         </div>
@@ -315,8 +325,7 @@
 
             if (!urlInput) { alert("ERROR: Missing target URL parameter."); return; }
             
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> INTERROGATING...';
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> INTERROGATING...';
             scoreDisplay.innerText = "0"; scoreDisplay.style.color = "#fff";
             gaugeFill.style.strokeDashoffset = 125.6; gaugeFill.style.stroke = "var(--border-color)";
             verdictDisplay.innerText = "EXTRACTING RAW TELEMETRY..."; verdictDisplay.style.color = "var(--text-muted)";
@@ -344,9 +353,7 @@
                 valCLS.innerText = audits['cumulative-layout-shift'].displayValue;
 
                 let themeColor = finalScore >= 90 ? "var(--success)" : (finalScore >= 50 ? "var(--warning)" : "var(--error-text)");
-                gaugeFill.style.stroke = themeColor;
-                scoreDisplay.style.color = themeColor;
-                verdictDisplay.style.color = themeColor;
+                gaugeFill.style.stroke = themeColor; scoreDisplay.style.color = themeColor; verdictDisplay.style.color = themeColor;
                 
                 if (finalScore >= 90) verdictDisplay.innerText = "SYSTEM OPTIMAL: ARCHITECTURE PASS";
                 else if (finalScore >= 50) verdictDisplay.innerText = "SUBOPTIMAL: THREAD BLOCKING DETECTED";
@@ -492,7 +499,6 @@
                 const jsTime = (audits['bootup-time'].numericValue / 1000).toFixed(2);
                 valJS.innerText = jsTime + " s";
 
-                // Verdict
                 if (massMB > 3 || domCount > 1000) {
                     verdict.innerText = "CRITICAL: MASSIVE BLOAT DETECTED. CHASSIS OVERLOADED.";
                     verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
@@ -509,6 +515,68 @@
                 verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
             } finally {
                 btn.disabled = false; btn.innerText = "SCAN PAYLOAD";
+            }
+        });
+
+        // ==========================================
+        // MODULE 4: THREAT MATRIX (SECURITY)
+        // ==========================================
+        document.getElementById('runSecurityBtn').addEventListener('click', async () => {
+            const baseInput = document.getElementById('targetUrl').value.trim();
+            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+
+            const btn = document.getElementById('runSecurityBtn');
+            const secHttps = document.getElementById('secHttps');
+            const secLibs = document.getElementById('secLibs');
+            const secCsp = document.getElementById('secCsp');
+            const verdict = document.getElementById('securityVerdict');
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color: #fff; border-top-color: transparent;"></span> SWEEPING...';
+            secHttps.innerText = "SCANNING"; secHttps.style.color = "var(--text-muted)";
+            secLibs.innerText = "SCANNING"; secLibs.style.color = "var(--text-muted)";
+            secCsp.innerText = "SCANNING"; secCsp.style.color = "var(--text-muted)";
+            verdict.innerText = "RUNNING VULNERABILITY SWEEP..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+
+            try {
+                let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
+                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&category=best-practices`;
+                
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                if (data.error) throw new Error("API Failed");
+
+                const audits = data.lighthouseResult.audits;
+                
+                const hasHttps = audits['is-on-https'].score === 1;
+                secHttps.innerText = hasHttps ? "SECURE" : "UNENCRYPTED";
+                secHttps.style.color = hasHttps ? "var(--success)" : "var(--error-text)";
+
+                const vulnLibs = audits['no-vulnerable-libraries'];
+                const hasVulnLibs = vulnLibs.score !== 1;
+                secLibs.innerText = hasVulnLibs ? "THREAT DETECTED" : "CLEAN";
+                secLibs.style.color = hasVulnLibs ? "var(--error-text)" : "var(--success)";
+
+                const cspAudit = audits['csp-xss'];
+                const hasCsp = cspAudit && cspAudit.score === 1;
+                secCsp.innerText = hasCsp ? "ACTIVE" : "EXPOSED";
+                secCsp.style.color = hasCsp ? "var(--success)" : "var(--error-text)";
+
+                if (!hasHttps || hasVulnLibs) {
+                    verdict.innerText = "CRITICAL: ARCHITECTURE COMPROMISED. HIGH LIABILITY RISK.";
+                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
+                } else if (!hasCsp) {
+                    verdict.innerText = "WARNING: NO XSS PROTECTION. VULNERABLE TO INJECTION.";
+                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
+                } else {
+                    verdict.innerText = "SECURE: INFRASTRUCTURE LOCKED DOWN.";
+                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
+                }
+
+            } catch (error) {
+                console.error("Security Error:", error);
+                verdict.innerText = "SWEEP FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
+            } finally {
+                btn.disabled = false; btn.innerHTML = "SCAN VULNERABILITIES";
             }
         });
     </script>
