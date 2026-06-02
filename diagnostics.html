@@ -14,6 +14,7 @@
             --text-main: #ffffff;
             --text-muted: #777777;
             --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
             --border-color: #222222;
             --error-text: #ef4444;
             --warning: #f59e0b;
@@ -31,37 +32,104 @@
             display: flex;
             flex-direction: column;
             background-image: linear-gradient(to bottom, #0d0d0d 0%, #030303 100%);
+            overflow-x: hidden;
         }
 
         h1, h2, h3, h4, h5, .logo { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.2s ease; }
 
-        /* --- NAVIGATION --- */
+        /* =========================================
+           UNIVERSAL NAVIGATION SYSTEM
+           ========================================= */
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid var(--border-color);
             background: rgba(3, 3, 3, 0.9); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 1001;
+            position: fixed; top: 0; z-index: 2000;
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; transition: transform 0.2s ease; }
+        
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; transition: transform 0.2s ease; z-index: 2001; }
         .logo:hover { transform: scale(1.02); }
         .dot { color: var(--accent); }
         
-        .nav-links { display: flex; align-items: center; gap: 2.5rem; }
-        .nav-links a { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; position: relative; }
-        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--accent); transition: width 0.2s ease; }
-        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-        .nav-btn {
-            background-color: var(--accent); color: #000 !important;
-            padding: 0.7rem 1.5rem; font-weight: 700 !important; border-radius: 0;
-            transition: all 0.2s ease;
+        /* --- DESKTOP NAV --- */
+        .desktop-nav { display: flex; align-items: center; gap: 2rem; }
+        .desktop-nav a { 
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase; 
+            letter-spacing: 1px; color: #fff; position: relative; padding-bottom: 4px;
         }
-        .nav-btn:hover { background-color: #fff; transform: translateY(-2px); box-shadow: 4px 4px 0px rgba(0, 229, 255, 0.3); }
+        
+        /* The Highlighter Effect */
+        .desktop-nav a::after { 
+            content: ''; position: absolute; width: 0; height: 2px; 
+            bottom: 0; left: 0; background-color: var(--accent); 
+            transition: width 0.3s cubic-bezier(0.1, 0, 0.1, 1); 
+        }
+        .desktop-nav a:hover::after, .desktop-nav a.active::after { width: 100%; }
+        .desktop-nav a:hover, .desktop-nav a.active { color: var(--accent); }
+        
+        /* Desktop CTA Button */
+        .desktop-nav .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.6rem 1.2rem; font-weight: 700 !important; border-radius: 4px;
+            transition: all 0.2s ease; border: 1px solid var(--accent);
+        }
+        .desktop-nav .nav-btn::after { display: none; }
+        .desktop-nav .nav-btn:hover { 
+            box-shadow: 0 0 15px var(--accent-glow);
+            background-color: #fff; transform: translateY(-2px);
+        }
+
+        /* --- MOBILE TOGGLE BUTTON --- */
+        .mobile-toggle {
+            display: none; flex-direction: column; gap: 6px;
+            background: transparent; border: none; cursor: pointer; z-index: 2001;
+        }
+        .mobile-toggle span {
+            width: 30px; height: 2px; background-color: #fff;
+            transition: all 0.3s ease;
+        }
+        /* Toggle Active Animation */
+        .mobile-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); background-color: var(--accent); }
+        .mobile-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); background-color: var(--accent); }
+
+        /* --- MOBILE OVERLAY MENU --- */
+        .mobile-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #050505; z-index: 1500;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .mobile-nav-links {
+            display: flex; flex-direction: column; align-items: center; gap: 2rem;
+            transform: translateY(20px); transition: transform 0.4s ease;
+        }
+        .mobile-overlay.active .mobile-nav-links { transform: translateY(0); }
+        
+        .mobile-nav-links a {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; color: #fff;
+        }
+        .mobile-nav-links a.active, .mobile-nav-links a:hover { color: var(--accent); }
+        
+        .mobile-nav-links .nav-btn {
+            margin-top: 1rem; background-color: var(--accent); color: #000 !important;
+            padding: 1rem 3rem; border: 1px solid var(--accent); border-radius: 4px;
+        }
+
+        /* --- RESPONSIVE BREAKPOINT --- */
+        @media (max-width: 992px) {
+            .desktop-nav { display: none; }
+            .mobile-toggle { display: flex; }
+        }
 
         /* --- LAYOUT --- */
         .main-content {
-            flex: 1; padding: 4rem 5%; max-width: 1400px; margin: 0 auto; width: 100%;
+            flex: 1; padding: 12rem 5% 4rem 5%; max-width: 1400px; margin: 0 auto; width: 100%;
         }
 
         /* --- HERO COMMAND --- */
@@ -139,21 +207,77 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 8px; }
 
-        @media (max-width: 768px) { .target-input-group { flex-direction: column; } .hero-command { padding: 2rem 1rem; } .nav-links { display: none; } }
+        @media (max-width: 768px) { .target-input-group { flex-direction: column; } .hero-command { padding: 2rem 1rem; } }
     </style>
 </head>
 <body>
 
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-        <div class="nav-links">
+        
+        <div class="desktop-nav">
+            <a href="index.html">Home</a>
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
-            <a href="diagnostics.html" class="active">The Lab</a>
+            <a href="about.html">About</a>
+            <a href="diagnostics.html">The Lab</a>
+            <a href="estimate.html">Instant Quote</a>
+            <a href="buyout.html">The Buyout</a>
             <a href="dashboard.html">Dashboard</a> 
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="diagnostics.html">The Lab</a>
+            <a href="estimate.html">Instant Quote</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="dashboard.html">Dashboard</a> 
+            <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- DYNAMIC HIGHLIGHTER ENGINE ---
+            let currentPath = window.location.pathname.split("/").pop();
+            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+
+            const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
+            
+            allNavLinks.forEach(link => {
+                link.classList.remove("active"); 
+                if (link.getAttribute("href") === currentPath) {
+                    link.classList.add("active"); 
+                }
+            });
+
+            // --- MOBILE TOGGLE ENGINE ---
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const body = document.body;
+
+            mobileToggle.addEventListener('click', () => {
+                mobileToggle.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                
+                if (mobileOverlay.classList.contains('active')) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
 
     <main class="main-content">
         
@@ -299,8 +423,8 @@
         </div>
     </main>
 
-    <footer>
-        <p style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">&copy; 2026 CODOT Agency. Built differently.</p>
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+        <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
     <script>
@@ -452,7 +576,7 @@
             }
         });
 
-       // ==========================================
+        // ==========================================
         // MODULE 3: PAYLOAD WEIGH-IN (BULLETPROOF)
         // ==========================================
         document.getElementById('runPayloadBtn').addEventListener('click', async () => {
@@ -482,20 +606,17 @@
 
                 const audits = data.lighthouseResult.audits;
                 
-                // Bulletproof Mass Extraction
                 const massBytes = audits['total-byte-weight']?.numericValue || 0;
                 const massMB = (massBytes / (1024 * 1024)).toFixed(2);
                 valMass.innerText = massMB + " MB";
                 massBar.style.width = Math.min((massMB / 5) * 100, 100) + "%";
                 massBar.style.background = massMB > 3 ? "var(--error-text)" : (massMB > 1.5 ? "var(--warning)" : "var(--success)");
 
-                // Bulletproof DOM Size Extraction
                 const domCount = audits['dom-size']?.numericValue || 0;
                 valDOM.innerText = domCount;
                 domBar.style.width = Math.min((domCount / 1500) * 100, 100) + "%";
                 domBar.style.background = domCount > 1000 ? "var(--error-text)" : (domCount > 600 ? "var(--warning)" : "var(--success)");
 
-                // Bulletproof JS Bootup Extraction
                 const rawJsTime = audits['bootup-time']?.numericValue || 0;
                 const jsTime = (rawJsTime / 1000).toFixed(2);
                 valJS.innerText = jsTime + " s";
@@ -548,19 +669,15 @@
 
                 const audits = data.lighthouseResult.audits;
                 
-                // Bulletproof HTTPS Check
                 const hasHttps = audits['is-on-https']?.score === 1;
                 secHttps.innerText = hasHttps ? "SECURE" : "UNENCRYPTED";
                 secHttps.style.color = hasHttps ? "var(--success)" : "var(--error-text)";
 
-                // Bulletproof Vulnerability Check
                 const vulnScore = audits['no-vulnerable-libraries']?.score;
-                // If the score is missing or 1, it's clean. If it's 0, it has threats.
                 const hasVulnLibs = vulnScore !== undefined && vulnScore !== null && vulnScore !== 1;
                 secLibs.innerText = hasVulnLibs ? "THREAT DETECTED" : "CLEAN";
                 secLibs.style.color = hasVulnLibs ? "var(--error-text)" : "var(--success)";
 
-                // Bulletproof CSP Check
                 const hasCsp = audits['csp-xss']?.score === 1;
                 secCsp.innerText = hasCsp ? "ACTIVE" : "EXPOSED";
                 secCsp.style.color = hasCsp ? "var(--success)" : "var(--error-text)";
