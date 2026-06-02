@@ -594,14 +594,36 @@
                     await typeWriter("ROUTING TO TELEMETRY LAB... Please navigate to 'The Lab' tab in the main interface to run target acquisition.", responseDiv);
                 }
                 else {
+                    // LLM RENDER BACKEND HOOKUP
                     terminalInput.disabled = true;
-                    await typeWriter("Processing query through CODOT neural net...", responseDiv);
+                    await typeWriter("Transmitting payload to CODOT neural net...", responseDiv, 10);
                     
-                    setTimeout(async () => {
-                        await typeWriter("I am the CODOT Central Intelligence. My LLM backend is currently being wired up by Aditya and Lokesh. Once connected, I will audit your infrastructure and calculate your revenue bleed in real-time.", responseDiv);
+                    try {
+                                             const renderURL = 'https://co-cca6.onrender.com/api/chat';
+                        
+                        const response = await fetch(renderURL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                message: rawInput, 
+                                email: auth.currentUser ? auth.currentUser.email : 'Guest'
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (!response.ok) throw new Error(data.error || 'Server connection failed.');
+
+                        await typeWriter(data.reply, responseDiv, 15);
+                        
+                    } catch (error) {
+                        console.error("Terminal Error:", error);
+                        responseDiv.className = 'error-msg';
+                        await typeWriter(`ERR: ${error.message} (Is the Render server asleep?)`, responseDiv, 10);
+                    } finally {
                         terminalInput.disabled = false;
                         terminalInput.focus();
-                    }, 1000);
+                    }
                 }
             }
         });
