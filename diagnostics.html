@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Lab | CODOT Telemetry</title>
+    <title>Client Dashboard | CODOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* --- CORE CSS (BRUTALIST) --- */
+        /* --- CORE CSS --- */
         :root {
             --bg-color: #030303;
             --card-bg: #0a0a0a;
@@ -35,7 +36,7 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, .logo { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.2s ease; }
 
         /* =========================================
@@ -44,7 +45,7 @@
         nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid var(--border-color);
-            background: rgba(3, 3, 3, 0.9); backdrop-filter: blur(10px);
+            background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(10px);
             position: fixed; top: 0; z-index: 2000;
         }
         
@@ -76,8 +77,7 @@
         }
         .desktop-nav .nav-btn::after { display: none; }
         .desktop-nav .nav-btn:hover { 
-            box-shadow: 0 0 15px var(--accent-glow);
-            background-color: #fff; transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--accent-glow); background-color: #fff; transform: translateY(-2px);
         }
 
         /* --- MOBILE TOGGLE BUTTON --- */
@@ -117,8 +117,8 @@
         .mobile-nav-links a.active, .mobile-nav-links a:hover { color: var(--accent); }
         
         .mobile-nav-links .nav-btn {
-            margin-top: 1rem; background-color: var(--accent); color: #000 !important;
-            padding: 1rem 3rem; border: 1px solid var(--accent); border-radius: 4px;
+            margin-top: 1rem; background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 1rem 3rem; border: 1px solid var(--accent); border-radius: 4px; font-weight: 700;
         }
 
         /* --- RESPONSIVE BREAKPOINT --- */
@@ -127,90 +127,151 @@
             .mobile-toggle { display: flex; }
         }
 
-        /* --- LAYOUT --- */
+        /* --- DASHBOARD CONTAINER --- */
         .main-content {
-            flex: 1; padding: 12rem 5% 4rem 5%; max-width: 1400px; margin: 0 auto; width: 100%;
+            flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 8rem 1rem 4rem 1rem;
         }
 
-        /* --- HERO COMMAND --- */
-        .hero-command {
-            text-align: center; margin-bottom: 4rem; padding: 4rem 2rem;
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.8);
+        .auth-card {
+            background-color: var(--card-bg);
+            width: 100%; max-width: 650px;
+            padding: 3rem; 
+            border-radius: 0; /* SHARP */
+            border: 1px solid var(--border-color);
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.8); /* HARD SHADOW */
+            animation: fadeIn 0.4s ease-out;
         }
-        .hero-command h1 { font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 0.5rem; }
-        .hero-command p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2.5rem; letter-spacing: 1px; text-transform: uppercase; }
-        
-        .target-input-group { display: flex; gap: 10px; max-width: 700px; margin: 0 auto; }
-        .target-input-group input {
-            flex: 1; padding: 1.2rem 1.5rem; background-color: var(--input-bg); color: var(--text-main);
-            border: 1px solid var(--border-color); border-radius: 0;
-            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; transition: border-color 0.2s;
+
+        /* --- HEADER AREA --- */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;
         }
-        .target-input-group input:focus { outline: none; border-color: var(--accent); }
-        
+        .dashboard-header h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.2rem; letter-spacing: -1px; text-transform: uppercase; }
+        .dashboard-header .subtitle { color: var(--text-muted); font-size: 0.95rem; letter-spacing: 0.5px; }
+
+        /* --- BUTTONS & FORMS --- */
         .btn-submit {
-            padding: 1.2rem 2.5rem; background-color: var(--accent); color: #000;
-            border: none; border-radius: 0; font-family: 'Space Grotesk', sans-serif; 
-            font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.8rem 1.5rem; background-color: var(--accent); color: #000;
+            border: none; border-radius: 0; /* SHARP */
+            font-family: 'Space Grotesk', sans-serif; 
+            font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-submit:hover { background-color: #fff; transform: translate(-2px, -2px); box-shadow: 4px 4px 0px rgba(0, 229, 255, 0.4); }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* --- ARSENAL GRID --- */
-        .arsenal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-        .module-card {
-            background: var(--input-bg); border: 1px solid var(--border-color);
-            border-top: 4px solid var(--accent); padding: 2.5rem; position: relative;
-        }
-        .module-header { margin-bottom: 2rem; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
-        .module-header h3 { font-size: 1.4rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
-        .module-header p { font-size: 0.85rem; color: var(--text-muted); }
-        .verdict-box {
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
-            font-size: 0.85rem; text-align: center; padding: 1.2rem; background: #000; border: 1px solid var(--border-color); color: var(--text-muted);
-        }
-
-        /* --- SPEEDOMETER UI (MODULE 1) --- */
-        .speedometer-wrapper {
-            position: relative; width: 220px; height: 120px; margin: 0 auto 2rem; display: flex; justify-content: center; align-items: flex-end;
-        }
-        .speedometer-svg { width: 100%; height: 100%; overflow: visible; }
-        .speed-track { fill: none; stroke: var(--border-color); stroke-width: 8; stroke-linecap: square; }
-        .speed-fill { 
-            fill: none; stroke: var(--border-color); stroke-width: 8; stroke-linecap: square;
-            stroke-dasharray: 125.6; stroke-dashoffset: 125.6; transition: stroke-dashoffset 1.5s cubic-bezier(0.1, 0, 0.1, 1), stroke 0.3s ease;
-        }
-        .score-display-center { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); text-align: center; }
-        .score-display-center h4 { font-size: 4.5rem; font-weight: 700; line-height: 0.8; color: var(--border-color); transition: color 0.3s ease; }
         
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-        .metric-card { padding: 1.2rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
-        .metric-card:nth-child(2n) { border-right: none; }
-        .metric-card:nth-last-child(-n+2) { border-bottom: none; }
-        .metric-card h5 { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.5rem; }
-        .metric-card .metric-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .btn-logout { background: transparent; border: 1px solid var(--error-text); color: var(--error-text); margin: 0; }
+        .btn-logout:hover { background-color: var(--error-text); color: #000; box-shadow: 4px 4px 0px rgba(239, 68, 68, 0.4); }
 
-        #diagList { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
-        .diag-item { padding: 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid transparent; margin-bottom: 1rem; }
-        .diag-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .diag-name { font-weight: 700; font-size: 0.85rem; color: #fff; }
-        .diag-savings { font-size: 0.8rem; font-weight: 700; }
-        .diag-desc { font-size: 0.8rem; color: #888; line-height: 1.4; text-transform: none; font-family: 'Inter', sans-serif;}
+        /* --- UI STATES --- */
+        #loading-ui, #empty-ui, #active-ui { display: none; }
 
-        /* --- DRAG RACE UI (MODULE 2) --- */
-        .race-score { font-size: 3.5rem; font-weight: 700; color: #fff; line-height: 1; }
-        .race-sub { font-size: 0.7rem; color: #555; margin-top: 0.5rem; letter-spacing: 1px; }
+        .empty-state {
+            text-align: center; padding: 4rem 2rem;
+            background: var(--input-bg); border: 1px dashed var(--border-color); border-radius: 0; /* SHARP */
+        }
+        .empty-state svg { width: 48px; height: 48px; color: var(--border-color); margin-bottom: 1.5rem; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; text-transform: uppercase; }
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
 
-        /* --- UTILS --- */
+        .project-card {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 2rem; border-radius: 0; /* SHARP */
+            position: relative; overflow: hidden;
+        }
+        .card-accent-line { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        
+        .project-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .ticket-id { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+        .project-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: #fff; font-weight: 700; }
+        .project-status-container { display: flex; align-items: center; gap: 15px; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        
+        .status-badge { 
+            display: inline-block; padding: 0.4rem 1.2rem; 
+            background: transparent; color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 0; /* SHARP */
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* --- FLOATING TERMINAL TRIGGER --- */
+        .floating-terminal-btn {
+            display: none; /* Hidden until authenticated */
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 1999;
+            padding: 1rem 1.5rem; background: #000; border: 1px solid var(--accent); color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(0, 229, 255, 0.2);
+            transition: all 0.3s ease; font-family: 'Space Grotesk', monospace;
+            align-items: center; gap: 10px; cursor: pointer;
+            font-size: 0.9rem; font-weight: 700; letter-spacing: 1px;
+        }
+        .floating-terminal-btn:hover {
+            transform: translateY(-5px);
+            background: var(--accent); color: #000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9), 0 0 25px rgba(0, 229, 255, 0.5);
+        }
+
+        /* --- TERMINAL OVERLAY CSS --- */
+        .terminal-overlay {
+            position: fixed; top: -100vh; left: 0; width: 100vw; height: 70vh;
+            background-color: rgba(3, 3, 3, 0.98); backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--accent); z-index: 3000;
+            display: flex; flex-direction: column;
+            font-family: 'Space Grotesk', monospace;
+            transition: top 0.4s cubic-bezier(0.1, 0, 0.1, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .terminal-overlay.active { top: 0; }
+
+        .terminal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 2rem; background: #000; border-bottom: 1px solid #222;
+            color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px;
+        }
+        .terminal-close {
+            background: transparent; color: var(--error-text); border: none;
+            font-family: 'Space Grotesk', monospace; font-size: 1.2rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.2s ease;
+        }
+        .terminal-close:hover { transform: scale(1.2); }
+
+        .terminal-output {
+            flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .terminal-output::-webkit-scrollbar { width: 6px; }
+        .terminal-output::-webkit-scrollbar-thumb { background: #333; }
+
+        .sys-msg { color: var(--text-main); font-size: 0.9rem; line-height: 1.5; }
+        .user-msg { color: var(--text-muted); font-size: 0.9rem; }
+        .ai-msg { color: var(--accent); font-size: 0.9rem; text-shadow: 0 0 8px rgba(0, 229, 255, 0.3); }
+
+        .terminal-input-line {
+            display: flex; align-items: center; padding: 1.5rem 2rem;
+            background: #000; border-top: 1px solid #222;
+        }
+        .prompt-user { color: var(--success); font-size: 1rem; margin-right: 1rem; font-weight: 700; }
+        .terminal-input {
+            flex: 1; background: transparent; border: none; color: var(--text-main);
+            font-family: 'Space Grotesk', monospace; font-size: 1rem; outline: none;
+        }
+
+        /* --- TRANSITIONS --- */
+        @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
+        .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 8px; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #000; border-radius: 0; border-top-color: transparent; animation: spin 0.8s linear infinite; margin-right: 8px; }
 
-        @media (max-width: 768px) { .target-input-group { flex-direction: column; } .hero-command { padding: 2rem 1rem; } }
+        @media (max-width: 768px) { 
+            .auth-card { padding: 2rem; border: none; box-shadow: none; } 
+            .dashboard-header { flex-direction: column; gap: 1rem; } 
+            .floating-terminal-btn { bottom: 1.5rem; right: 1.5rem; padding: 0.8rem 1.2rem; font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="transitionOverlay"></div>
 
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
@@ -223,7 +284,7 @@
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> 
+            <a href="dashboard.html" class="active">Dashboard</a> 
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
 
@@ -241,27 +302,46 @@
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> 
+            <a href="dashboard.html" class="active">Dashboard</a> 
             <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </div>
+
+    <button id="floatingTerminalBtn" class="floating-terminal-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        [>_ SYSTEM TERMINAL]
+    </button>
+
+    <div id="aiTerminalOverlay" class="terminal-overlay">
+        <div class="terminal-header">
+            <span>CODOT CENTRAL INTELLIGENCE // SECURE CONNECTION</span>
+            <button id="closeTerminalBtn" class="terminal-close">X</button>
+        </div>
+        <div class="terminal-output" id="terminalOutput">
+            <div class="sys-msg">Initializing CODOT engine...</div>
+            <div class="sys-msg">Connection established.</div>
+            <div class="sys-msg" style="color: var(--accent); margin-bottom: 1rem;">Type /help for available commands or ask a question.</div>
+        </div>
+        <div class="terminal-input-line">
+            <span class="prompt-user">client@codot:~$</span>
+            <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false">
         </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // --- DYNAMIC HIGHLIGHTER ENGINE ---
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
             const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
             
             allNavLinks.forEach(link => {
-                link.classList.remove("active"); 
-                if (link.getAttribute("href") === currentPath) {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === currentPath || (currentPath === "login.html" && link.getAttribute("href") === "dashboard.html")) {
                     link.classList.add("active"); 
                 }
             });
 
-            // --- MOBILE TOGGLE ENGINE ---
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileOverlay = document.getElementById('mobileOverlay');
             const body = document.body;
@@ -269,7 +349,6 @@
             mobileToggle.addEventListener('click', () => {
                 mobileToggle.classList.toggle('active');
                 mobileOverlay.classList.toggle('active');
-                
                 if (mobileOverlay.classList.contains('active')) {
                     body.style.overflow = 'hidden';
                 } else {
@@ -281,424 +360,322 @@
 
     <main class="main-content">
         
-        <div class="hero-command">
-            <h1>Target Acquisition</h1>
-            <p>Enter target infrastructure URL to initiate telemetry.</p>
-            <div class="target-input-group">
-                <input type="url" id="targetUrl" placeholder="https://target-domain.com" required>
-                <button id="runTelemetryBtn" class="btn-submit">Initiate Sequence</button>
-            </div>
-        </div>
-
-        <div class="arsenal-grid">
-            
-            <div class="module-card" id="coreEngineCard">
-                <div class="module-header">
-                    <h3>Core Engine Telemetry</h3>
-                    <p>Lighthouse performance extraction and vital tracking.</p>
+        <div class="auth-card">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Vault<span class="dot">.</span></h2>
+                    <p class="subtitle" id="userEmailDisplay">Authenticating...</p>
                 </div>
-                
-                <div class="speedometer-wrapper">
-                    <svg viewBox="0 0 100 50" class="speedometer-svg">
-                        <path class="speed-track" d="M 10 45 A 40 40 0 0 1 90 45" />
-                        <path class="speed-fill" id="speedGaugeFill" d="M 10 45 A 40 40 0 0 1 90 45" />
-                    </svg>
-                    <div class="score-display-center">
-                        <h4 id="finalScore">--</h4>
-                    </div>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <h5>LCP / Render Time</h5>
-                        <div class="metric-val" id="valLCP">--</div>
-                    </div>
-                    <div class="metric-card">
-                        <h5>TBT / Thread Block</h5>
-                        <div class="metric-val" id="valTBT">--</div>
-                    </div>
-                    <div class="metric-card">
-                        <h5>FCP / First Paint</h5>
-                        <div class="metric-val" id="valFCP">--</div>
-                    </div>
-                    <div class="metric-card">
-                        <h5>CLS / Layout Shift</h5>
-                        <div class="metric-val" id="valCLS">--</div>
-                    </div>
-                </div>
-
-                <div class="verdict-box" id="auditVerdict">AWAITING TARGET PARAMETERS</div>
-                <div id="diagList"></div>
+                <button id="logoutBtn" class="btn-submit btn-logout" style="display: none;">Secure Exit</button>
             </div>
 
-            <div class="module-card" id="dragRaceCard">
-                <div class="module-header">
-                    <h3>Sector Drag Race</h3>
-                    <p>Concurrent latency test vs competitor architecture.</p>
-                </div>
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
-                    <input type="url" id="competitorUrl" placeholder="https://rival-domain.com" style="flex: 1; padding: 1rem; background-color: #000; color: #fff; border: 1px solid var(--border-color); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;">
-                    <button id="runRaceBtn" class="btn-submit" style="padding: 1rem 1.5rem; font-size: 0.85rem;">ENGAGE</button>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-                    <div style="padding: 1.5rem; text-align: center; border-right: 1px solid var(--border-color); background: #050505;">
-                        <h5 style="font-size: 0.75rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 0.5rem;">YOUR DOMAIN</h5>
-                        <div id="raceScoreA" class="race-score">--</div>
-                        <div id="raceLcpA" class="race-sub">LCP: --</div>
-                    </div>
-                    <div style="padding: 1.5rem; text-align: center; background: #050505;">
-                        <h5 style="font-size: 0.75rem; color: var(--error-text); letter-spacing: 2px; margin-bottom: 0.5rem;">RIVAL DOMAIN</h5>
-                        <div id="raceScoreB" class="race-score">--</div>
-                        <div id="raceLcpB" class="race-sub">LCP: --</div>
-                    </div>
-                </div>
-
-                <div class="verdict-box" id="raceVerdict">AWAITING RIVAL PARAMETERS</div>
+            <div id="loading-ui" style="text-align: center; padding: 3rem 0;">
+                <canvas id="loadingProgressRing" width="80" height="80" style="display: block; margin: 0 auto 1.5rem;"></canvas>
+                <h3 style="color: var(--accent); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; font-size: 1rem; letter-spacing: 2px;">Decrypting Vault</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Scanning global architecture records</p>
             </div>
 
-            <div class="module-card" id="payloadCard">
-                <div class="module-header">
-                    <h3>Payload Weigh-In</h3>
-                    <p>DOM structural depth and asset bloat evaluation.</p>
-                </div>
+            <div id="empty-ui" class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
+                    <rect x="3" y="3" width="18" height="18"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <h3>Zero Active Architectures</h3>
+                <p>Your secure vault is currently empty. Our engineers are standing by to review your project parameters.</p>
+                <a href="apply.html" class="btn-submit">
+                    Initialize New Build
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" style="margin-bottom:0; width:16px; height:16px; margin-left:8px; color:#000;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
 
-                <button id="runPayloadBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem;">SCAN PAYLOAD</button>
+            <div id="active-ui">
                 
-                <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">TOTAL MASS</span>
-                        <span id="valMass" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">-- MB</span>
-                    </div>
-                    <div style="height: 8px; background: #111; border: 1px solid #333; margin-bottom: 1.5rem;">
-                        <div id="massBar" style="height: 100%; width: 0%; background: var(--error-text); transition: width 1s ease;"></div>
+                <div class="project-card">
+                    <div class="card-accent-line"></div>
+                    <div class="project-meta">
+                        <span class="ticket-id" id="displayTicketID">CO-XXXXXX</span>
+                        <span class="project-price" id="displayPrice">₹0</span>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">DOM ELEMENTS</span>
-                        <span id="valDOM" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
-                    </div>
-                    <div style="height: 8px; background: #111; border: 1px solid #333; margin-bottom: 1.5rem;">
-                        <div id="domBar" style="height: 100%; width: 0%; background: var(--warning); transition: width 1s ease;"></div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">JS BOOTUP TIME</span>
-                        <span id="valJS" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">-- s</span>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 1px;" id="displayProjectName">Primary Architecture</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Staging environment and build logs actively compiling.</p>
+                    
+                    <div class="project-status-container">
+                        <div class="status-badge" id="displayStatus">Architecture Review</div>
+                        <canvas id="phaseProgressRing" width="30" height="30"></canvas>
                     </div>
                 </div>
 
-                <div class="verdict-box" id="payloadVerdict">AWAITING PAYLOAD EXTRACTION</div>
-            </div>
-
-            <div class="module-card" id="threatCard">
-                <div class="module-header">
-                    <h3>Threat Matrix</h3>
-                    <p>Security protocol and vulnerability payload analysis.</p>
+                <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                    <button id="downloadPdfBtn" class="btn-submit" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); width: 100%;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Master Statement of Work (PDF)
+                    </button>
                 </div>
-
-                <button id="runSecurityBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem; background-color: var(--error-text); color: #fff;">SCAN VULNERABILITIES</button>
-                
-                <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111; padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">SSL / HTTPS</span>
-                        <span id="secHttps" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111; padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">CVE LIBRARIES</span>
-                        <span id="secLibs" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">XSS PROTECTION (CSP)</span>
-                        <span id="secCsp" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">--</span>
-                    </div>
-                </div>
-
-                <div class="verdict-box" id="securityVerdict">AWAITING SECURITY SWEEP</div>
             </div>
 
         </div>
     </main>
 
-    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+    <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <script>
-        const API_KEY = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // ==========================================
-        // MODULE 1: CORE ENGINE TELEMETRY
-        // ==========================================
-        document.getElementById('runTelemetryBtn').addEventListener('click', async () => {
-            const urlInput = document.getElementById('targetUrl').value.trim();
-            const btn = document.getElementById('runTelemetryBtn');
-            
-            const scoreDisplay = document.getElementById('finalScore');
-            const verdictDisplay = document.getElementById('auditVerdict');
-            const gaugeFill = document.getElementById('speedGaugeFill');
-            
-            const valLCP = document.getElementById('valLCP');
-            const valTBT = document.getElementById('valTBT');
-            const valFCP = document.getElementById('valFCP');
-            const valCLS = document.getElementById('valCLS');
-            const diagList = document.getElementById('diagList');
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
+            authDomain: "codot-agency.firebaseapp.com",
+            projectId: "codot-agency",
+            storageBucket: "codot-agency.firebasestorage.app",
+            messagingSenderId: "22678307444",
+            appId: "1:22678307444:web:59c72496bad5db86b3c721"
+        };
 
-            if (!urlInput) { alert("ERROR: Missing target URL parameter."); return; }
-            
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> INTERROGATING...';
-            scoreDisplay.innerText = "0"; scoreDisplay.style.color = "#fff";
-            gaugeFill.style.strokeDashoffset = 125.6; gaugeFill.style.stroke = "var(--border-color)";
-            verdictDisplay.innerText = "EXTRACTING RAW TELEMETRY..."; verdictDisplay.style.color = "var(--text-muted)";
-            valLCP.innerText = "---"; valTBT.innerText = "---"; valFCP.innerText = "---"; valCLS.innerText = "---";
-            diagList.innerHTML = "";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
+        const loadingUI = document.getElementById('loading-ui');
+        const emptyUI = document.getElementById('empty-ui');
+        const activeUI = document.getElementById('active-ui');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const overlay = document.getElementById('transitionOverlay');
+        const floatingTerminalBtn = document.getElementById('floatingTerminalBtn');
+        
+        let currentProjectData = null; 
+
+        // Canvas Ring Utility (SHARPENED)
+        function drawProgressRing(canvasId, percentage, coreColor) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const x = canvas.width / 2; const y = canvas.height / 2;
+            const radius = (Math.min(canvas.width, canvas.height) / 2) - 4;
+            const startAngle = -0.5 * Math.PI; const endAngle = (2 * percentage - 0.5) * Math.PI;
+            
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.stroke();
+            
+            ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.lineWidth = 4; ctx.strokeStyle = coreColor; ctx.lineCap = 'butt'; /* SHARP */ ctx.stroke();
+        }
+
+        // Navigation Engine
+        function handleNavigation(targetPath) {
+            overlay.classList.add('pro-transition-overlay');
+            setTimeout(() => { window.location.href = targetPath; }, 150); 
+        }
+
+        const navLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a, .empty-state a");
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!link.getAttribute("href").startsWith('#')) handleNavigation(link.getAttribute("href"));
+            });
+        });
+
+        function showView(viewElement) {
+            loadingUI.style.display = 'none';
+            emptyUI.style.display = 'none';
+            activeUI.style.display = 'none';
+            viewElement.style.display = 'block';
+        }
+
+        // Fetch User Data from Firestore
+        async function fetchClientArchitecture(email) {
             try {
-                let formattedUrl = /^https?:\/\//i.test(urlInput) ? urlInput : 'https://' + urlInput;
-                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(formattedUrl)}&key=${API_KEY}&strategy=mobile`;
-                
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                const q = query(collection(db, "applications"), where("email", "==", email));
+                const querySnapshot = await getDocs(q);
 
-                const rawScore = data.lighthouseResult.categories.performance.score;
-                const finalScore = Math.round(rawScore * 100);
-                
-                scoreDisplay.innerText = finalScore;
-                gaugeFill.style.strokeDashoffset = 125.6 - (rawScore * 125.6);
+                if (querySnapshot.empty) {
+                    showView(emptyUI);
+                } else {
+                    let latestProject = null;
+                    querySnapshot.forEach((doc) => { latestProject = doc.data(); });
+                    currentProjectData = latestProject;
 
-                const audits = data.lighthouseResult.audits;
-                valLCP.innerText = audits['largest-contentful-paint'].displayValue;
-                valTBT.innerText = audits['total-blocking-time'].displayValue;
-                valFCP.innerText = audits['first-contentful-paint'].displayValue;
-                valCLS.innerText = audits['cumulative-layout-shift'].displayValue;
+                    document.getElementById('displayTicketID').innerText = latestProject.ticketID || "CO-ACTIVE";
+                    document.getElementById('displayPrice').innerText = latestProject.estimatedPrice || "Pending";
+                    if (latestProject.projectName) document.getElementById('displayProjectName').innerText = latestProject.projectName;
 
-                let themeColor = finalScore >= 90 ? "var(--success)" : (finalScore >= 50 ? "var(--warning)" : "var(--error-text)");
-                gaugeFill.style.stroke = themeColor; scoreDisplay.style.color = themeColor; verdictDisplay.style.color = themeColor;
-                
-                if (finalScore >= 90) verdictDisplay.innerText = "SYSTEM OPTIMAL: ARCHITECTURE PASS";
-                else if (finalScore >= 50) verdictDisplay.innerText = "SUBOPTIMAL: THREAD BLOCKING DETECTED";
-                else verdictDisplay.innerText = "CRITICAL FAIL: IMMEDIATE REBUILD REQUIRED";
+                    let rawStatus = latestProject.status || "Review Pending";
+                    let cleanStatus = rawStatus.replace(/^\d+\.\s*/, ''); 
+                    document.getElementById('displayStatus').innerText = cleanStatus;
 
-                let issueFound = false;
-                for (const key in audits) {
-                    const audit = audits[key];
-                    if (audit.score !== null && audit.score < 0.9 && audit.details && audit.details.type === 'opportunity') {
-                        issueFound = true;
-                        const isSevere = audit.score < 0.5;
-                        const borderCol = isSevere ? 'var(--error-text)' : 'var(--warning)';
-                        const cleanDesc = audit.description.split('.')[0] + "."; 
-                        const savingsStr = audit.displayValue || "ACTION REQ";
-
-                        diagList.innerHTML += `
-                            <div class="diag-item" style="border-left-color: ${borderCol};">
-                                <div class="diag-item-top">
-                                    <span class="diag-name">${audit.title}</span>
-                                    <span class="diag-savings" style="color: ${borderCol};">${savingsStr}</span>
-                                </div>
-                                <div class="diag-desc">${cleanDesc}</div>
-                            </div>
-                        `;
-                    }
+                    showView(activeUI);
+                    setTimeout(() => drawProgressRing('phaseProgressRing', 0.25, '#00e5ff'), 100);
                 }
-                if (!issueFound) diagList.innerHTML = `<div style="padding: 1.5rem; color: var(--success); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--success); background: #000; text-align: center;">NO CRITICAL FAULTS. SYSTEM CLEAR.</div>`;
-
             } catch (error) {
-                console.error("Telemetry Error:", error);
-                scoreDisplay.innerText = "ERR"; gaugeFill.style.stroke = "var(--error-text)";
-                verdictDisplay.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdictDisplay.style.color = "var(--error-text)";
-            } finally {
-                btn.disabled = false; btn.innerText = "Initiate Sequence";
+                console.error("Error fetching project data: ", error);
+                showView(emptyUI);
+            }
+        }
+
+        // Firebase Auth Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userEmailDisplay.innerText = user.email;
+                logoutBtn.style.display = 'inline-flex';
+                // REVEAL TERMINAL ONLY IF LOGGED IN
+                floatingTerminalBtn.style.display = 'flex';
+                
+                showView(loadingUI);
+                drawProgressRing('loadingProgressRing', 0.7, '#00e5ff');
+                fetchClientArchitecture(user.email);
+            } else {
+                floatingTerminalBtn.style.display = 'none';
+                window.location.href = "login.html";
             }
         });
 
-        // ==========================================
-        // MODULE 2: SECTOR DRAG RACE
-        // ==========================================
-        document.getElementById('runRaceBtn').addEventListener('click', async () => {
-            const baseInput = document.getElementById('targetUrl').value.trim();
-            const rivalInput = document.getElementById('competitorUrl').value.trim();
-            const btn = document.getElementById('runRaceBtn');
-            const scoreA = document.getElementById('raceScoreA'); const scoreB = document.getElementById('raceScoreB');
-            const lcpA = document.getElementById('raceLcpA'); const lcpB = document.getElementById('raceLcpB');
-            const verdict = document.getElementById('raceVerdict');
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => handleNavigation("login.html"));
+        });
 
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
-            if (!rivalInput) { alert("ERROR: Missing rival target."); return; }
+        // =====================================================================
+        // THE GOD-MODE AI TERMINAL ENGINE
+        // =====================================================================
+        const terminalOverlay = document.getElementById('aiTerminalOverlay');
+        const closeTerminalBtn = document.getElementById('closeTerminalBtn');
+        const terminalInput = document.getElementById('terminalInput');
+        const terminalOutput = document.getElementById('terminalOutput');
 
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> RACING...';
-            scoreA.innerText = "0"; scoreA.style.color = "#fff"; scoreB.innerText = "0"; scoreB.style.color = "#fff";
-            lcpA.innerText = "LCP: SCANNING"; lcpB.innerText = "LCP: SCANNING";
-            verdict.innerText = "CONCURRENT TELEMETRY ENGAGED..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+        floatingTerminalBtn.addEventListener('click', () => {
+            terminalOverlay.classList.add('active');
+            setTimeout(() => terminalInput.focus(), 400);
+        });
 
-            try {
-                let urlA = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
-                let urlB = /^https?:\/\//i.test(rivalInput) ? rivalInput : 'https://' + rivalInput;
+        closeTerminalBtn.addEventListener('click', () => {
+            terminalOverlay.classList.remove('active');
+        });
 
-                const endA = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(urlA)}&key=${API_KEY}&strategy=mobile`;
-                const endB = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(urlB)}&key=${API_KEY}&strategy=mobile`;
+        // Typewriter Effect
+        async function typeWriter(text, element, speed = 15) {
+            element.innerHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                element.innerHTML += text.charAt(i);
+                await new Promise(r => setTimeout(r, speed));
+            }
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
 
-                const [resA, resB] = await Promise.all([fetch(endA), fetch(endB)]);
-                const dataA = await resA.json(); const dataB = await resB.json();
+        // Command Parser
+        terminalInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const rawInput = terminalInput.value.trim();
+                if (!rawInput) return;
 
-                if (dataA.error || dataB.error) throw new Error("API Execution Failed");
+                terminalInput.value = '';
+                terminalOutput.innerHTML += `<div class="user-msg">client@codot:~$ ${rawInput}</div>`;
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-                const finalA = Math.round(dataA.lighthouseResult.categories.performance.score * 100);
-                const finalB = Math.round(dataB.lighthouseResult.categories.performance.score * 100);
-                
-                scoreA.innerText = finalA; scoreB.innerText = finalB;
-                lcpA.innerText = "LCP: " + dataA.lighthouseResult.audits['largest-contentful-paint'].displayValue;
-                lcpB.innerText = "LCP: " + dataB.lighthouseResult.audits['largest-contentful-paint'].displayValue;
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'ai-msg';
+                terminalOutput.appendChild(responseDiv);
 
-                if (finalA > finalB) {
-                    scoreA.style.color = "var(--success)"; scoreB.style.color = "var(--error-text)";
-                    verdict.innerText = `VICTORY: OUTPERFORMING RIVAL BY ${finalA - finalB} POINTS.`;
-                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
-                } else if (finalA < finalB) {
-                    scoreA.style.color = "var(--error-text)"; scoreB.style.color = "var(--success)";
-                    verdict.innerText = `CRITICAL: RIVAL OUTPERFORMING ARCHITECTURE BY ${finalB - finalA} POINTS.`;
-                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
-                } else {
-                    scoreA.style.color = "var(--warning)"; scoreB.style.color = "var(--warning)";
-                    verdict.innerText = "DEAD HEAT: ARCHITECTURES DEADLOCKED.";
-                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
+                const command = rawInput.toLowerCase();
+
+                if (command === '/clear') {
+                    terminalOutput.innerHTML = '';
+                } 
+                else if (command === '/help') {
+                    await typeWriter("SYSTEM COMMANDS:\n/audit  - Run Lighthouse telemetry on domain\n/quote  - Calculate architecture build cost\n/clear  - Wipe terminal log\nOr simply type a question to speak with the CODOT Intelligence.", responseDiv);
                 }
-
-            } catch (error) {
-                console.error("Race Error:", error);
-                scoreA.innerText = "ERR"; scoreB.innerText = "ERR";
-                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URLs."; verdict.style.color = "var(--error-text)";
-            } finally {
-                btn.disabled = false; btn.innerText = "ENGAGE";
+                else if (command === '/quote') {
+                    await typeWriter("ROUTING TO QUOTE ENGINE... Please navigate to the 'Instant Quote' tab in the main interface.", responseDiv);
+                }
+                else if (command === '/audit') {
+                    await typeWriter("ROUTING TO TELEMETRY LAB... Please navigate to 'The Lab' tab in the main interface to run target acquisition.", responseDiv);
+                }
+                else {
+                    terminalInput.disabled = true;
+                    await typeWriter("Processing query through CODOT neural net...", responseDiv);
+                    
+                    setTimeout(async () => {
+                        await typeWriter("I am the CODOT Central Intelligence. My LLM backend is currently being wired up by Aditya and Lokesh. Once connected, I will audit your infrastructure and calculate your revenue bleed in real-time.", responseDiv);
+                        terminalInput.disabled = false;
+                        terminalInput.focus();
+                    }, 1000);
+                }
             }
         });
 
-        // ==========================================
-        // MODULE 3: PAYLOAD WEIGH-IN (BULLETPROOF)
-        // ==========================================
-        document.getElementById('runPayloadBtn').addEventListener('click', async () => {
-            const baseInput = document.getElementById('targetUrl').value.trim();
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+        // =====================================================================
+        // PDF GENERATOR
+        // =====================================================================
+        document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+            if (!currentProjectData) return;
+            const { jsPDF } = window.jspdf; const doc = new jsPDF(); const p = currentProjectData; 
+            
+            const drawBox = (x, y, w, h, title, value) => {
+                doc.setFillColor(248, 250, 252); doc.setDrawColor(226, 232, 240); doc.rect(x, y, w, h, 'FD'); 
+                doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(100, 116, 139); doc.text(title, x + 5, y + 8);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(15, 23, 42); doc.text(value, x + 5, y + 16);
+            };
 
-            const btn = document.getElementById('runPayloadBtn');
-            const valMass = document.getElementById('valMass');
-            const valDOM = document.getElementById('valDOM');
-            const valJS = document.getElementById('valJS');
-            const massBar = document.getElementById('massBar');
-            const domBar = document.getElementById('domBar');
-            const verdict = document.getElementById('payloadVerdict');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F');
+            doc.setDrawColor(0, 229, 255); doc.setLineWidth(1.5); doc.line(0, 45, 210, 45);
+            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(28); doc.text("CODOT.", 15, 28);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(148, 163, 184); doc.text("STATEMENT OF WORK & ARCHITECTURE BRIEF", 115, 28);
 
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> WEIGHING...';
-            valMass.innerText = "--"; valDOM.innerText = "--"; valJS.innerText = "--";
-            massBar.style.width = "0%"; domBar.style.width = "0%";
-            verdict.innerText = "EXTRACTING ASSET CHUNKS..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+            let yPos = 60; const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42); doc.text(p.projectName || "Custom Architecture Build", 15, yPos);
+            yPos += 8; doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 85, 105);
+            doc.text(doc.splitTextToSize("This Statement of Work (SOW) outlines the technical architecture, design parameters, and financial deliverables for the bespoke digital infrastructure commissioned by the client.", 180), 15, yPos);
 
-            try {
-                let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
-                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&strategy=mobile`;
-                
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                if (data.error) throw new Error("API Failed");
+            yPos += 18; drawBox(15, yPos, 85, 22, "CLIENT IDENTIFIER", p.clientName || p.name || p.email || "Confidential Client");
+            drawBox(105, yPos, 40, 22, "TICKET ID", p.ticketID || "CO-ACTIVE"); drawBox(150, yPos, 45, 22, "DATE ISSUED", date);
 
-                const audits = data.lighthouseResult.audits;
-                
-                const massBytes = audits['total-byte-weight']?.numericValue || 0;
-                const massMB = (massBytes / (1024 * 1024)).toFixed(2);
-                valMass.innerText = massMB + " MB";
-                massBar.style.width = Math.min((massMB / 5) * 100, 100) + "%";
-                massBar.style.background = massMB > 3 ? "var(--error-text)" : (massMB > 1.5 ? "var(--warning)" : "var(--success)");
+            yPos += 38; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42); doc.text("1.0 ARCHITECTURE SCOPE", 15, yPos);
+            yPos += 8; doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105); doc.text(`Framework Scale: Up to ${p.pagesRequested || 'Standard'} configured environments.`, 15, yPos);
+            
+            yPos += 10;
+            let allFeatures = ["Enterprise-grade SSL Encryption & Security Setup", "Fully Responsive UI/UX (Mobile, Tablet, Desktop)", "Global Content Delivery Network (CDN) Integration", "Automated SEO Metadata Architecture", "Pre-deployment Cross-Browser QA Testing"];
+            if (p.features && p.features.length > 0) allFeatures = [...allFeatures, ...p.features];
 
-                const domCount = audits['dom-size']?.numericValue || 0;
-                valDOM.innerText = domCount;
-                domBar.style.width = Math.min((domCount / 1500) * 100, 100) + "%";
-                domBar.style.background = domCount > 1000 ? "var(--error-text)" : (domCount > 600 ? "var(--warning)" : "var(--success)");
+            allFeatures.forEach((feature, index) => {
+                if (index % 2 === 0) { doc.setFillColor(248, 250, 252); doc.rect(15, yPos - 5, 180, 10, 'F'); }
+                doc.setTextColor(0, 200, 220); doc.text("■", 18, yPos); doc.setTextColor(51, 65, 85); doc.text(feature, 25, yPos); yPos += 10;
+            });
 
-                const rawJsTime = audits['bootup-time']?.numericValue || 0;
-                const jsTime = (rawJsTime / 1000).toFixed(2);
-                valJS.innerText = jsTime + " s";
-
-                if (massMB > 3 || domCount > 1000) {
-                    verdict.innerText = "CRITICAL: MASSIVE BLOAT DETECTED. CHASSIS OVERLOADED.";
-                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
-                } else if (massMB > 1.5 || domCount > 600) {
-                    verdict.innerText = "WARNING: UNOPTIMIZED ASSETS. REDUCE PAYLOAD.";
-                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
-                } else {
-                    verdict.innerText = "OPTIMAL: PAYLOAD WITHIN ACCEPTABLE PARAMETERS.";
-                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
-                }
-
-            } catch (error) {
-                console.error("Payload Error:", error);
-                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
-            } finally {
-                btn.disabled = false; btn.innerText = "SCAN PAYLOAD";
+            yPos += 15; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(15, 23, 42); doc.text("2.0 FINANCIAL BREAKDOWN", 15, yPos);
+            let numericPrice = parseInt((p.estimatedPrice || "").replace(/[^0-9]/g, '')) || 0;
+            let coreCost = "TBD", uiCost = "TBD", modCost = "TBD", totalCost = p.estimatedPrice || "Pending Assessment";
+            if (numericPrice > 0) {
+                coreCost = "₹" + Math.round(numericPrice * 0.55).toLocaleString('en-IN');
+                uiCost = "₹" + Math.round(numericPrice * 0.25).toLocaleString('en-IN');
+                modCost = "₹" + Math.round(numericPrice * 0.20).toLocaleString('en-IN');
+                totalCost = "₹" + numericPrice.toLocaleString('en-IN');
             }
-        });
 
-        // ==========================================
-        // MODULE 4: THREAT MATRIX (BULLETPROOF)
-        // ==========================================
-        document.getElementById('runSecurityBtn').addEventListener('click', async () => {
-            const baseInput = document.getElementById('targetUrl').value.trim();
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+            yPos += 8; doc.setFillColor(15, 23, 42); doc.rect(15, yPos, 180, 10, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("DESCRIPTION", 20, yPos + 6.5); doc.text("ALLOCATION", 160, yPos + 6.5);
+            doc.setTextColor(51, 65, 85); doc.setFont("helvetica", "normal");
+            
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Core System Architecture & Database Engineering", 20, yPos + 6.5); doc.text(coreCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Custom UI/UX Prototyping & Design", 20, yPos + 6.5); doc.text(uiCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Premium Module Integration & Configuration", 20, yPos + 6.5); doc.text(modCost, 160, yPos + 6.5);
+            yPos += 10; doc.rect(15, yPos, 180, 10, 'S'); doc.text("Hosting Setup & Global CDN Deployment", 20, yPos + 6.5); doc.text("Included", 160, yPos + 6.5);
 
-            const btn = document.getElementById('runSecurityBtn');
-            const secHttps = document.getElementById('secHttps');
-            const secLibs = document.getElementById('secLibs');
-            const secCsp = document.getElementById('secCsp');
-            const verdict = document.getElementById('securityVerdict');
+            yPos += 15; doc.setFillColor(241, 245, 249); doc.rect(90, yPos, 105, 22, 'F'); 
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.text("TOTAL ESTIMATE:", 95, yPos + 14); 
+            doc.setFontSize(totalCost.length > 10 ? 11 : 16); doc.setTextColor(0, 150, 160); doc.text(totalCost, 190, yPos + 14, { align: 'right' }); 
 
-            btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color: #fff; border-top-color: transparent;"></span> SWEEPING...';
-            secHttps.innerText = "SCANNING"; secHttps.style.color = "var(--text-muted)";
-            secLibs.innerText = "SCANNING"; secLibs.style.color = "var(--text-muted)";
-            secCsp.innerText = "SCANNING"; secCsp.style.color = "var(--text-muted)";
-            verdict.innerText = "RUNNING VULNERABILITY SWEEP..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+            yPos += 35; doc.setDrawColor(226, 232, 240); doc.line(15, yPos, 195, yPos);
+            yPos += 12; doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(15, 23, 42); doc.text("AUTHORIZATION & NEXT STEPS", 15, yPos);
+            yPos += 6; doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 116, 139);
+            doc.text(doc.splitTextToSize("By proceeding with the initial deployment phase, the client acknowledges and accepts the architectural scope defined above.", 180), 15, yPos);
+            yPos += 25; doc.setDrawColor(200, 200, 200); doc.line(15, yPos, 85, yPos); doc.text("Authorized Client Signature", 15, yPos + 5);
+            doc.line(125, yPos, 185, yPos); doc.text("Date of Approval", 125, yPos + 5);
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184); doc.text("CODOT Agency | Goa, India | This document is strictly confidential.", 105, 290, { align: 'center' });
 
-            try {
-                let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
-                const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&category=best-practices`;
-                
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                if (data.error) throw new Error("API Failed");
-
-                const audits = data.lighthouseResult.audits;
-                
-                const hasHttps = audits['is-on-https']?.score === 1;
-                secHttps.innerText = hasHttps ? "SECURE" : "UNENCRYPTED";
-                secHttps.style.color = hasHttps ? "var(--success)" : "var(--error-text)";
-
-                const vulnScore = audits['no-vulnerable-libraries']?.score;
-                const hasVulnLibs = vulnScore !== undefined && vulnScore !== null && vulnScore !== 1;
-                secLibs.innerText = hasVulnLibs ? "THREAT DETECTED" : "CLEAN";
-                secLibs.style.color = hasVulnLibs ? "var(--error-text)" : "var(--success)";
-
-                const hasCsp = audits['csp-xss']?.score === 1;
-                secCsp.innerText = hasCsp ? "ACTIVE" : "EXPOSED";
-                secCsp.style.color = hasCsp ? "var(--success)" : "var(--error-text)";
-
-                if (!hasHttps || hasVulnLibs) {
-                    verdict.innerText = "CRITICAL: ARCHITECTURE COMPROMISED. HIGH LIABILITY RISK.";
-                    verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
-                } else if (!hasCsp) {
-                    verdict.innerText = "WARNING: NO XSS PROTECTION. VULNERABLE TO INJECTION.";
-                    verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
-                } else {
-                    verdict.innerText = "SECURE: INFRASTRUCTURE LOCKED DOWN.";
-                    verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
-                }
-
-            } catch (error) {
-                console.error("Security Error:", error);
-                verdict.innerText = "SWEEP FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
-            } finally {
-                btn.disabled = false; btn.innerHTML = "SCAN VULNERABILITIES";
-            }
+            doc.save(`CODOT_SOW_${p.ticketID || 'Brief'}.pdf`);
         });
     </script>
 </body>
