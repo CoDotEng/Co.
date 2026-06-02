@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard | CODOT</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* --- CORE CSS --- */
@@ -202,6 +204,51 @@
             font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
         }
 
+        /* --- TERMINAL CSS --- */
+        .terminal-overlay {
+            position: fixed; top: -100vh; left: 0; width: 100vw; height: 70vh;
+            background-color: rgba(3, 3, 3, 0.98); backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--accent); z-index: 3000;
+            display: flex; flex-direction: column;
+            font-family: 'Space Grotesk', monospace;
+            transition: top 0.4s cubic-bezier(0.1, 0, 0.1, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .terminal-overlay.active { top: 0; }
+
+        .terminal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 2rem; background: #000; border-bottom: 1px solid #222;
+            color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px;
+        }
+        .terminal-close {
+            background: transparent; color: var(--error-text); border: none;
+            font-family: 'Space Grotesk', monospace; font-size: 1.2rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.2s ease;
+        }
+        .terminal-close:hover { transform: scale(1.2); }
+
+        .terminal-output {
+            flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .terminal-output::-webkit-scrollbar { width: 6px; }
+        .terminal-output::-webkit-scrollbar-thumb { background: #333; }
+
+        .sys-msg { color: var(--text-main); font-size: 0.9rem; line-height: 1.5; }
+        .user-msg { color: var(--text-muted); font-size: 0.9rem; }
+        .ai-msg { color: var(--accent); font-size: 0.9rem; text-shadow: 0 0 8px rgba(0, 229, 255, 0.3); }
+        .error-msg { color: var(--error-text); font-size: 0.9rem; }
+
+        .terminal-input-line {
+            display: flex; align-items: center; padding: 1.5rem 2rem;
+            background: #000; border-top: 1px solid #222;
+        }
+        .prompt-user { color: var(--success); font-size: 1rem; margin-right: 1rem; font-weight: 700; }
+        .terminal-input {
+            flex: 1; background: transparent; border: none; color: var(--text-main);
+            font-family: 'Space Grotesk', monospace; font-size: 1rem; outline: none;
+        }
+
         /* --- TRANSITIONS --- */
         @keyframes fadeThroughBlack { 0% { opacity: 0; background: black; } 50% { opacity: 1; background: black; } 100% { opacity: 0; background: transparent; } }
         .pro-transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10000; animation: fadeThroughBlack 0.2s ease-in-out; }
@@ -216,9 +263,11 @@
 
     <div id="transitionOverlay"></div>
 
+    <!-- UNIVERSAL NAVIGATION -->
     <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
         
+        <!-- PC Links -->
         <div class="desktop-nav">
             <a href="index.html">Home</a>
             <a href="model.html">How It Works</a>
@@ -227,15 +276,18 @@
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> 
+            <a href="dashboard.html" class="active">Dashboard</a> 
+            <a href="#" id="desktopTerminalBtn" style="color: var(--accent); font-family: 'Space Grotesk', monospace; letter-spacing: 0;">[>_ TERMINAL]</a>
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
 
+        <!-- Mobile Hamburger -->
         <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
             <span></span><span></span><span></span>
         </button>
     </nav>
 
+    <!-- MOBILE FULLSCREEN OVERLAY -->
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="mobile-nav-links">
             <a href="index.html">Home</a>
@@ -245,11 +297,30 @@
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> 
+            <a href="dashboard.html" class="active">Dashboard</a> 
+            <a href="#" id="mobileTerminalBtn" style="color: var(--accent); font-family: 'Space Grotesk', monospace;">[>_ TERMINAL]</a>
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </div>
 
+    <!-- THE AI TERMINAL OVERLAY -->
+    <div id="aiTerminalOverlay" class="terminal-overlay">
+        <div class="terminal-header">
+            <span>CODOT CENTRAL INTELLIGENCE // SECURE CONNECTION</span>
+            <button id="closeTerminalBtn" class="terminal-close">X</button>
+        </div>
+        <div class="terminal-output" id="terminalOutput">
+            <div class="sys-msg">Initializing CODOT engine...</div>
+            <div class="sys-msg">Connection established.</div>
+            <div class="sys-msg" style="color: var(--accent); margin-bottom: 1rem;">Type /help for available commands or ask a question.</div>
+        </div>
+        <div class="terminal-input-line">
+            <span class="prompt-user">client@codot:~$</span>
+            <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false" autofocus>
+        </div>
+    </div>
+
+    <!-- NAVIGATION & TERMINAL ENGINE LOGIC -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // --- DYNAMIC HIGHLIGHTER ENGINE ---
@@ -257,7 +328,7 @@
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
             // Grab all navigation links in both desktop and mobile menus
-            const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
+            const allNavLinks = document.querySelectorAll(".desktop-nav a:not(#desktopTerminalBtn), .mobile-nav-links a:not(#mobileTerminalBtn)");
             
             allNavLinks.forEach(link => {
                 link.classList.remove("active"); // Strip defaults
@@ -282,6 +353,91 @@
                     body.style.overflow = 'auto';
                 }
             });
+
+            // ==========================================
+            // THE GOD-MODE AI TERMINAL ENGINE
+            // ==========================================
+            const terminalOverlay = document.getElementById('aiTerminalOverlay');
+            const desktopTerminalBtn = document.getElementById('desktopTerminalBtn');
+            const mobileTerminalBtn = document.getElementById('mobileTerminalBtn');
+            const closeTerminalBtn = document.getElementById('closeTerminalBtn');
+            const terminalInput = document.getElementById('terminalInput');
+            const terminalOutput = document.getElementById('terminalOutput');
+
+            // Toggle Logic
+            function toggleTerminal(e) {
+                e.preventDefault();
+                terminalOverlay.classList.toggle('active');
+                if (terminalOverlay.classList.contains('active')) {
+                    setTimeout(() => terminalInput.focus(), 400);
+                }
+            }
+
+            if(desktopTerminalBtn) desktopTerminalBtn.addEventListener('click', toggleTerminal);
+            if(mobileTerminalBtn) mobileTerminalBtn.addEventListener('click', (e) => {
+                // Close mobile menu first, then open terminal
+                document.getElementById('mobileToggle').click(); 
+                toggleTerminal(e);
+            });
+            if(closeTerminalBtn) closeTerminalBtn.addEventListener('click', () => terminalOverlay.classList.remove('active'));
+
+            // Typewriter Effect Function
+            async function typeWriter(text, element, speed = 15) {
+                element.innerHTML = '';
+                for (let i = 0; i < text.length; i++) {
+                    element.innerHTML += text.charAt(i);
+                    await new Promise(r => setTimeout(r, speed));
+                }
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+
+            // Command Parser
+            if(terminalInput) {
+                terminalInput.addEventListener('keydown', async (e) => {
+                    if (e.key === 'Enter') {
+                        const rawInput = terminalInput.value.trim();
+                        if (!rawInput) return;
+
+                        // Print User Message
+                        terminalInput.value = '';
+                        terminalOutput.innerHTML += `<div class="user-msg">client@codot:~$ ${rawInput}</div>`;
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+                        // Create AI Response Container
+                        const responseDiv = document.createElement('div');
+                        responseDiv.className = 'ai-msg';
+                        terminalOutput.appendChild(responseDiv);
+
+                        const command = rawInput.toLowerCase();
+
+                        // 1. Hardcoded Terminal Commands
+                        if (command === '/clear') {
+                            terminalOutput.innerHTML = '';
+                        } 
+                        else if (command === '/help') {
+                            await typeWriter("SYSTEM COMMANDS:\n/audit  - Run Lighthouse telemetry on domain\n/quote  - Calculate architecture build cost\n/clear  - Wipe terminal log\nOr simply type a question to speak with the CODOT Intelligence.", responseDiv);
+                        }
+                        else if (command === '/quote') {
+                            await typeWriter("ROUTING TO QUOTE ENGINE... Please navigate to the 'Instant Quote' tab in the main interface.", responseDiv);
+                        }
+                        else if (command === '/audit') {
+                            await typeWriter("ROUTING TO TELEMETRY LAB... Please navigate to 'The Lab' tab in the main interface to run target acquisition.", responseDiv);
+                        }
+                        // 2. The AI NLP Fallback
+                        else {
+                            // Disable input while "thinking"
+                            terminalInput.disabled = true;
+                            await typeWriter("Processing query through CODOT neural net...", responseDiv);
+                            
+                            setTimeout(async () => {
+                                await typeWriter("I am the CODOT Central Intelligence. My LLM backend is currently being wired up by Aditya and Lokesh. Once connected, I will audit your infrastructure and calculate your revenue bleed in real-time.", responseDiv);
+                                terminalInput.disabled = false;
+                                terminalInput.focus();
+                            }, 1000);
+                        }
+                    }
+                });
+            }
         });
     </script>
 
@@ -296,12 +452,14 @@
                 <button id="logoutBtn" class="btn-submit btn-logout" style="display: none;">Secure Exit</button>
             </div>
 
+            <!-- Loading State -->
             <div id="loading-ui" style="text-align: center; padding: 3rem 0;">
                 <canvas id="loadingProgressRing" width="80" height="80" style="display: block; margin: 0 auto 1.5rem;"></canvas>
                 <h3 style="color: var(--accent); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; font-size: 1rem; letter-spacing: 2px;">Decrypting Vault</h3>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">Scanning global architecture records</p>
             </div>
 
+            <!-- Empty State -->
             <div id="empty-ui" class="empty-state">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter">
                     <rect x="3" y="3" width="18" height="18"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line>
@@ -314,8 +472,10 @@
                 </a>
             </div>
 
+            <!-- Active Project State -->
             <div id="active-ui">
                 
+                <!-- Project Status Card -->
                 <div class="project-card">
                     <div class="card-accent-line"></div>
                     <div class="project-meta">
@@ -332,6 +492,7 @@
                     </div>
                 </div>
 
+                <!-- Download SOW Button -->
                 <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                     <button id="downloadPdfBtn" class="btn-submit" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); width: 100%;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -347,6 +508,7 @@
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
+    <!-- LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -399,7 +561,7 @@
         }
 
         // Add smooth transitions to links that aren't purely UI toggles
-        const navLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a, .empty-state a");
+        const navLinks = document.querySelectorAll(".desktop-nav a:not(#desktopTerminalBtn), .mobile-nav-links a:not(#mobileTerminalBtn), .empty-state a");
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
