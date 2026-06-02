@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | CODOT</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS (Matching previous pages) --- */
@@ -30,23 +29,93 @@
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
-        /* --- NAVIGATION --- */
+        /* =========================================
+           UNIVERSAL NAVIGATION SYSTEM
+           ========================================= */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 5%; position: fixed; width: 100%; top: 0;
-            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem 5%; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(10px);
+            position: fixed; top: 0; z-index: 2000;
         }
-        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+        
+        .logo { font-size: 2rem; font-weight: 700; letter-spacing: -1px; transition: transform 0.2s ease; z-index: 2001; }
+        .logo:hover { transform: scale(1.02); }
         .dot { color: var(--accent); }
         
-        .nav-links a { margin-left: 2rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-        .nav-btn {
-            background-color: var(--accent); color: var(--bg-color) !important;
-            padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700 !important;
+        /* --- DESKTOP NAV --- */
+        .desktop-nav { display: flex; align-items: center; gap: 2rem; }
+        .desktop-nav a { 
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase; 
+            letter-spacing: 1px; color: #fff; position: relative; padding-bottom: 4px;
         }
-        .nav-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+        
+        /* The Highlighter Effect */
+        .desktop-nav a::after { 
+            content: ''; position: absolute; width: 0; height: 2px; 
+            bottom: 0; left: 0; background-color: var(--accent); 
+            transition: width 0.3s cubic-bezier(0.1, 0, 0.1, 1); 
+        }
+        .desktop-nav a:hover::after, .desktop-nav a.active::after { width: 100%; }
+        .desktop-nav a:hover, .desktop-nav a.active { color: var(--accent); }
+        
+        /* Desktop CTA Button */
+        .desktop-nav .nav-btn {
+            background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 0.6rem 1.2rem; font-weight: 700 !important; border-radius: 4px;
+            transition: all 0.2s ease; border: 1px solid var(--accent);
+        }
+        .desktop-nav .nav-btn::after { display: none; }
+        .desktop-nav .nav-btn:hover { 
+            box-shadow: 0 0 15px var(--accent-glow); background-color: transparent; color: var(--accent) !important; transform: translateY(-2px);
+        }
+
+        /* --- MOBILE TOGGLE BUTTON --- */
+        .mobile-toggle {
+            display: none; flex-direction: column; gap: 6px;
+            background: transparent; border: none; cursor: pointer; z-index: 2001;
+        }
+        .mobile-toggle span {
+            width: 30px; height: 2px; background-color: #fff;
+            transition: all 0.3s ease;
+        }
+        /* Toggle Active Animation */
+        .mobile-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); background-color: var(--accent); }
+        .mobile-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); background-color: var(--accent); }
+
+        /* --- MOBILE OVERLAY MENU --- */
+        .mobile-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #050505; z-index: 1500;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .mobile-nav-links {
+            display: flex; flex-direction: column; align-items: center; gap: 2rem;
+            transform: translateY(20px); transition: transform 0.4s ease;
+        }
+        .mobile-overlay.active .mobile-nav-links { transform: translateY(0); }
+        
+        .mobile-nav-links a {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; color: #fff;
+        }
+        .mobile-nav-links a.active, .mobile-nav-links a:hover { color: var(--accent); }
+        
+        .mobile-nav-links .nav-btn {
+            margin-top: 1rem; background-color: var(--accent); color: var(--bg-color) !important;
+            padding: 1rem 3rem; border: 1px solid var(--accent); border-radius: 4px;
+        }
+
+        /* --- RESPONSIVE BREAKPOINT --- */
+        @media (max-width: 992px) {
+            .desktop-nav { display: none; }
+            .mobile-toggle { display: flex; }
+        }
 
         /* --- PAGE HEADER --- */
         .page-header {
@@ -147,6 +216,7 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700;
             cursor: pointer; transition: all 0.3s ease; border-radius: 4px; display: inline-block;
             margin-top: 2rem;
+            border: none;
         }
         .btn:hover { box-shadow: 0 0 20px var(--accent-glow); }
 
@@ -159,58 +229,85 @@
 
         @media (max-width: 900px) {
             .story-container { grid-template-columns: 1fr; gap: 2rem; }
-            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION -->
-    <!-- NAVIGATION -->
-<nav>
+    <nav>
         <a href="index.html" class="logo">Co<span class="dot">.</span></a>
-        <div class="nav-links">
+        
+        <div class="desktop-nav">
+            <a href="index.html">Home</a>
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
+            <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
-            <a href="dashboard.html">Dashboard</a> <a href="apply.html" class="nav-btn">Apply Now</a>
+            <a href="dashboard.html">Dashboard</a> 
+            <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="model.html">How It Works</a>
+            <a href="work.html">Work</a>
+            <a href="about.html">About</a>
+            <a href="diagnostics.html">The Lab</a>
+            <a href="estimate.html">Instant Quote</a>
+            <a href="buyout.html">The Buyout</a>
+            <a href="dashboard.html">Dashboard</a> 
+            <a href="apply.html" class="nav-btn">Apply Now</a>
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Get the current file name from the URL
+            // --- DYNAMIC HIGHLIGHTER ENGINE ---
             let currentPath = window.location.pathname.split("/").pop();
-            // Default to index.html if on the root path
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Find all the links in the navigation
-            const navLinks = document.querySelectorAll(".nav-links a");
+            // Grab all navigation links in both desktop and mobile menus
+            const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
             
-            navLinks.forEach(link => {
-                // If the link matches the current page, highlight it!
+            allNavLinks.forEach(link => {
+                link.classList.remove("active"); // Strip defaults
                 if (link.getAttribute("href") === currentPath) {
-                    link.style.color = "var(--accent)"; // Make text cyan
-                    
-                    // Add a bottom border to everything except the Apply button
-                    if (!link.classList.contains("nav-btn")) {
-                        link.style.borderBottom = "2px solid var(--accent)";
-                        link.style.paddingBottom = "5px";
-                    }
+                    link.classList.add("active"); // Inject active class for current page
+                }
+            });
+
+            // --- MOBILE TOGGLE ENGINE ---
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const body = document.body;
+
+            mobileToggle.addEventListener('click', () => {
+                mobileToggle.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                
+                // Prevent background scrolling when menu is open
+                if (mobileOverlay.classList.contains('active')) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = 'auto';
                 }
             });
         });
     </script>
 
-    <!-- HEADER -->
     <header class="page-header">
         <h1 class="reveal">The Industry is Broken<span class="dot">.</span></h1>
         <p class="reveal">We built CODOT to fix it. We believe premium web design shouldn't require a small business to take on massive financial risk.</p>
     </header>
 
-    <!-- THE STORY -->
     <section class="section">
         <div class="story-container">
             <div class="story-text reveal">
@@ -224,7 +321,6 @@
             </div>
         </div>
 
-        <!-- CORE VALUES -->
         <h2 class="values-title reveal">Our Core Directives</h2>
         <div class="grid-3">
             <div class="value-card reveal">
@@ -247,19 +343,16 @@
         </div>
     </section>
 
-    <!-- CTA -->
     <section class="cta-section">
         <h2 class="reveal">Let's build something incredible.</h2>
         <p class="reveal" style="color: var(--text-muted); margin-top: 1rem;">Stop paying upfront for websites that underperform.</p>
         <a href="apply.html" class="btn reveal">Start Your Free Build</a>
     </section>
 
-    <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <!-- SCROLL REVEAL SCRIPT -->
     <script>
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
