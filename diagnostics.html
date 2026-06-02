@@ -452,8 +452,8 @@
             }
         });
 
-        // ==========================================
-        // MODULE 3: PAYLOAD WEIGH-IN
+       // ==========================================
+        // MODULE 3: PAYLOAD WEIGH-IN (BULLETPROOF)
         // ==========================================
         document.getElementById('runPayloadBtn').addEventListener('click', async () => {
             const baseInput = document.getElementById('targetUrl').value.trim();
@@ -482,21 +482,22 @@
 
                 const audits = data.lighthouseResult.audits;
                 
-                // Mass
-                const massBytes = audits['total-byte-weight'].numericValue;
+                // Bulletproof Mass Extraction
+                const massBytes = audits['total-byte-weight']?.numericValue || 0;
                 const massMB = (massBytes / (1024 * 1024)).toFixed(2);
                 valMass.innerText = massMB + " MB";
                 massBar.style.width = Math.min((massMB / 5) * 100, 100) + "%";
                 massBar.style.background = massMB > 3 ? "var(--error-text)" : (massMB > 1.5 ? "var(--warning)" : "var(--success)");
 
-                // DOM Size
-                const domCount = audits['dom-size'].numericValue;
+                // Bulletproof DOM Size Extraction
+                const domCount = audits['dom-size']?.numericValue || 0;
                 valDOM.innerText = domCount;
                 domBar.style.width = Math.min((domCount / 1500) * 100, 100) + "%";
                 domBar.style.background = domCount > 1000 ? "var(--error-text)" : (domCount > 600 ? "var(--warning)" : "var(--success)");
 
-                // JS Bootup
-                const jsTime = (audits['bootup-time'].numericValue / 1000).toFixed(2);
+                // Bulletproof JS Bootup Extraction
+                const rawJsTime = audits['bootup-time']?.numericValue || 0;
+                const jsTime = (rawJsTime / 1000).toFixed(2);
                 valJS.innerText = jsTime + " s";
 
                 if (massMB > 3 || domCount > 1000) {
