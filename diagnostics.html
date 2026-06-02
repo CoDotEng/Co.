@@ -520,7 +520,7 @@
         });
 
         // ==========================================
-        // MODULE 4: THREAT MATRIX (SECURITY)
+        // MODULE 4: THREAT MATRIX (BULLETPROOF)
         // ==========================================
         document.getElementById('runSecurityBtn').addEventListener('click', async () => {
             const baseInput = document.getElementById('targetUrl').value.trim();
@@ -548,17 +548,20 @@
 
                 const audits = data.lighthouseResult.audits;
                 
-                const hasHttps = audits['is-on-https'].score === 1;
+                // Bulletproof HTTPS Check
+                const hasHttps = audits['is-on-https']?.score === 1;
                 secHttps.innerText = hasHttps ? "SECURE" : "UNENCRYPTED";
                 secHttps.style.color = hasHttps ? "var(--success)" : "var(--error-text)";
 
-                const vulnLibs = audits['no-vulnerable-libraries'];
-                const hasVulnLibs = vulnLibs.score !== 1;
+                // Bulletproof Vulnerability Check
+                const vulnScore = audits['no-vulnerable-libraries']?.score;
+                // If the score is missing or 1, it's clean. If it's 0, it has threats.
+                const hasVulnLibs = vulnScore !== undefined && vulnScore !== null && vulnScore !== 1;
                 secLibs.innerText = hasVulnLibs ? "THREAT DETECTED" : "CLEAN";
                 secLibs.style.color = hasVulnLibs ? "var(--error-text)" : "var(--success)";
 
-                const cspAudit = audits['csp-xss'];
-                const hasCsp = cspAudit && cspAudit.score === 1;
+                // Bulletproof CSP Check
+                const hasCsp = audits['csp-xss']?.score === 1;
                 secCsp.innerText = hasCsp ? "ACTIVE" : "EXPOSED";
                 secCsp.style.color = hasCsp ? "var(--success)" : "var(--error-text)";
 
