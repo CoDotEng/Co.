@@ -4,22 +4,19 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
 
-// Security and routing middleware
 app.use(cors()); 
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// KEEP-AWAKE ENDPOINT (Prevents Render from sleeping)
+// KEEP-AWAKE ENDPOINT
 app.get('/ping', (req, res) => {
     res.status(200).send('CODOT Server Awake');
 });
 
-// MAIN AI TERMINAL ENDPOINT
 app.post('/api/chat', async (req, res) => {
     const { message, email } = req.body;
 
-    // FULL CAPABILITY SYSTEM PROMPT
     const systemPrompt = `
     You are CODOT CI, an elite, brutalist web dev AI in Goa, India. Tone: aggressive, highly technical, direct.
 
@@ -48,27 +45,45 @@ app.post('/api/chat', async (req, res) => {
     `;
 
     try {
-        // NORMAL SPEED & CREATIVITY RESTORED
         const model = genAI.getGenerativeModel({ 
             model: "gemini-2.5-flash",
             systemInstruction: systemPrompt,
             generationConfig: {
-                temperature: 0.7 // Restores the AI's ability to think and be creative
+                temperature: 0.7 
             }
         });
 
-        const result = await model.generateContent(message);
-        const response = await result.response;
+        // AUTO-RETRY PROTOCOL
+        let retries = 3;
+        let success = false;
+        let responseText = "";
+
+        while (retries > 0 && !success) {
+            try {
+                const result = await model.generateContent(message);
+                const response = await result.response;
+                responseText = response.text();
+                success = true; // If we get here, it worked. Break the loop.
+            } catch (error) {
+                console.error("Attempt failed. Retries left: " + (retries - 1), error.message);
+                retries--;
+                if (retries === 0) {
+                    // Send a clean terminal error back to the frontend instead of crashing
+                    return res.json({ reply: 'SYS_ERR: GOOGLE CLOUD UPLINK SEVERED (503). Network congested. Try again in 60s.' });
+                }
+                // Wait 2 seconds before trying again
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
         
-        res.json({ reply: response.text() });
+        res.json({ reply: responseText });
 
     } catch (error) {
-        console.error("AI Core Error:", error);
+        console.error("Critical AI Core Error:", error);
         res.status(500).json({ error: 'SYS_ERR: Neural network offline.' });
     }
 });
 
-// Boot sequence
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log("CODOT Neural Net online on port " + PORT);
