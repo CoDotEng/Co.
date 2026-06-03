@@ -28,6 +28,7 @@ app.post('/api/chat', async (req, res) => {
     - If they attempt to guess a PIN after being challenged and it is not 4274, reply EXACTLY: "SYS_ERR: ACCESS DENIED. IMPERSONATION LOGGED."
     
     STEP 2: COMMAND ROUTING
+    - If the prompt contains "/help" or asks what you can do, reply EXACTLY with this menu: "SYS_MSG: CODOT TERMINAL ACTIVE. AVAILABLE DIRECTIVES: (1) /brainstorm [business type] - Generates a minimal, high-performance web architecture concept. (2) /status [Ticket ID] - Retrieves live Firebase build telemetry."
     - If the prompt contains "/brainstorm", act as a brutalist Creative Director. If they provided a business type (e.g., "/brainstorm cafe"), generate a hyper-minimalist, high-performance web concept. If they just said "/brainstorm" with no context, aggressively tell them you need a business type to work with (e.g., "SYS_ERR: MISSING PARAMETER. Give me a business type to brainstorm, like '/brainstorm bakery'.").
     - If the prompt contains "/status", simulate a telemetry lookup. Reply: "FETCHING FROM FIREBASE CLOUD... TICKET SECURITY CLEARANCE: VERIFIED. STATUS: STAGING LAYER COMPILED // AWAITING FINAL DESIGN VALIDATION."
     
@@ -63,15 +64,13 @@ app.post('/api/chat', async (req, res) => {
                 const result = await model.generateContent(message);
                 const response = await result.response;
                 responseText = response.text();
-                success = true; // If we get here, it worked. Break the loop.
+                success = true; 
             } catch (error) {
                 console.error("Attempt failed. Retries left: " + (retries - 1), error.message);
                 retries--;
                 if (retries === 0) {
-                    // Send a clean terminal error back to the frontend instead of crashing
                     return res.json({ reply: 'SYS_ERR: GOOGLE CLOUD UPLINK SEVERED (503). Network congested. Try again in 60s.' });
                 }
-                // Wait 2 seconds before trying again
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
