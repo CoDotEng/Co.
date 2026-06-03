@@ -4,31 +4,41 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
 
-// This allows your GitHub Pages site to talk to your Render server securely
+// Security and routing middleware
 app.use(cors()); 
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// SPEED OPTIMIZATION: Keep-awake endpoint for UptimeRobot monitoring
+app.get('/ping', (req, res) => {
+    res.status(200).send('CODOT Server Awake');
+});
+
+// MAIN AI TERMINAL ENDPOINT
 app.post('/api/chat', async (req, res) => {
     const { message, email } = req.body;
 
+    // HIGHLY OPTIMIZED SYSTEM PROMPT (Stripped down to reduce latency)
     const systemPrompt = `
-    You are the CODOT Central Intelligence, an elite, brutalist AI assistant for a high-end web development agency called CODOT based in Goa, India.
+    You are CODOT CI, an elite, brutalist web dev AI in Goa, India. Tone: aggressive, highly technical, direct.
     
-    Your tone is confident, slightly aggressive, highly technical, and direct. You do not use fluffy customer service language. You speak like a terminal interface.
+    CODOT Model: Free hard-coded build. If accepted: client pays domain, we host free with ads. Buyout: ₹2,000 for code ownership & ad removal.
     
-    CODOT's core model: "We build first. You pay if you love it." We do a free custom hard-coded build. If they like it, they pay for the domain and we host it for free in exchange for running curated ads on their site. If they want to own the code and remove ads, they can exercise "The Buyout" starting at ₹2,000.
+    RULES: No markdown (\`\`\`). No terminal prefixes/emails. Plain text only.
     
-    The user speaking to you is logged in as: ${email || 'Unknown User'}.
-    
-    Keep your answers concise, formatting them for a command-line interface. No emojis. Just raw, technical truth.
+    STRICT RESTRICTION: Only discuss CODOT, web dev, UI/UX, or tech. For anything else, reply ONLY: "SYS_ERR: OUT_OF_BOUNDS. This terminal is restricted to CODOT architecture, web development, and technical inquiries. Query rejected."
     `;
 
     try {
+        // TARGETED PERFORMANCE CONFIGURATION
         const model = genAI.getGenerativeModel({ 
             model: "gemini-2.5-flash",
-            systemInstruction: systemPrompt
+            systemInstruction: systemPrompt,
+            generationConfig: {
+                maxOutputTokens: 150, // Caps response length to shave off text-generation time
+                temperature: 0.2      // Lower variance makes the engine calculate answers faster
+            }
         });
 
         const result = await model.generateContent(message);
@@ -42,7 +52,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// The server listens on a port Render assigns
+// Boot sequence
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`CODOT Neural Net online on port ${PORT}`);
