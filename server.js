@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const app = express();
 
 // Security and routing middleware
-app.use(cors());  
+app.use(cors()); 
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -50,7 +50,7 @@ app.post('/api/chat', async (req, res) => {
             systemInstruction: systemPrompt,
             generationConfig: {
                 maxOutputTokens: 150, 
-                temperature: 0.1 // Dropped to 0.1 for even stricter logical adherence
+                temperature: 0.1
             }
         });
 
@@ -68,5 +68,5 @@ app.post('/api/chat', async (req, res) => {
 // Boot sequence
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(\`CODOT Neural Net online on port \${PORT}\`);
+    console.log(`CODOT Neural Net online on port ${PORT}`);
 });
