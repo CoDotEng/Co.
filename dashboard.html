@@ -241,9 +241,10 @@
         .terminal-output::-webkit-scrollbar { width: 6px; }
         .terminal-output::-webkit-scrollbar-thumb { background: #333; }
 
-        .sys-msg { color: var(--text-main); font-size: 0.9rem; line-height: 1.5; }
-        .user-msg { color: var(--text-muted); font-size: 0.9rem; }
-        .ai-msg { color: var(--accent); font-size: 0.9rem; text-shadow: 0 0 8px rgba(0, 229, 255, 0.3); }
+        /* ADDED white-space: pre-wrap TO FIX LINE BREAKS */
+        .sys-msg { color: var(--text-main); font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+        .user-msg { color: var(--text-muted); font-size: 0.9rem; white-space: pre-wrap; word-wrap: break-word; }
+        .ai-msg { color: var(--accent); font-size: 0.9rem; text-shadow: 0 0 8px rgba(0, 229, 255, 0.3); white-space: pre-wrap; word-wrap: break-word; }
 
         .terminal-input-line {
             display: flex; align-items: center; padding: 1.5rem 2rem;
@@ -449,7 +450,7 @@
         
         let currentProjectData = null; 
 
-        // Canvas Ring Utility (SHARPENED)
+        // Canvas Ring Utility
         function drawProgressRing(canvasId, percentage, coreColor) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
@@ -463,7 +464,7 @@
             ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; ctx.stroke();
             
             ctx.beginPath(); ctx.arc(x, y, radius, startAngle, endAngle);
-            ctx.lineWidth = 4; ctx.strokeStyle = coreColor; ctx.lineCap = 'butt'; /* SHARP */ ctx.stroke();
+            ctx.lineWidth = 4; ctx.strokeStyle = coreColor; ctx.lineCap = 'butt'; ctx.stroke();
         }
 
         // Navigation Engine
@@ -594,12 +595,11 @@
                     await typeWriter("ROUTING TO TELEMETRY LAB... Please navigate to 'The Lab' tab in the main interface to run target acquisition.", responseDiv);
                 }
                 else {
-                    // LLM RENDER BACKEND HOOKUP
                     terminalInput.disabled = true;
                     await typeWriter("Transmitting payload to CODOT neural net...", responseDiv, 10);
                     
                     try {
-                                             const renderURL = 'https://co-cca6.onrender.com/api/chat';
+                        const renderURL = 'https://co-cca6.onrender.com/api/chat';
                         
                         const response = await fetch(renderURL, {
                             method: 'POST',
@@ -614,7 +614,9 @@
                         
                         if (!response.ok) throw new Error(data.error || 'Server connection failed.');
 
-                        await typeWriter(data.reply, responseDiv, 15);
+                        // STRIP MARKDOWN BACKTICKS AND EXCESS SPACE BEFORE TYPING
+                        let cleanReply = data.reply.replace(/```/g, '').trim();
+                        await typeWriter(cleanReply, responseDiv, 15);
                         
                     } catch (error) {
                         console.error("Terminal Error:", error);
