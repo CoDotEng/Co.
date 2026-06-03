@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
     CODOT Model: Free hard-coded build. If accepted: client pays domain, we host free with ads. Buyout: ₹2,000 for code ownership & ad removal.
     
     CODOT CONTACT INFO:
-    Email: your_actual_email@gmail.com
+    Email: codot12221@gmail.com
     Location: Goa, India
     
     RULES: No markdown (\`\`\`). No terminal prefixes/emails. Plain text only.
