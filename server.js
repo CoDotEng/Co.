@@ -44,7 +44,7 @@ app.post('/api/chat', async (req, res) => {
     - If an unverified user asks about ANYTHING ELSE (e.g., cooking, sports, general trivia), you MUST reply ONLY with: "SYS_ERR: OUT_OF_BOUNDS. This terminal is restricted to CODOT architecture, web development, and technical inquiries. Query rejected."
     
     OUTPUT RULES:
-    - No markdown (\`\`\`). No terminal prefixes or emails. Plain text only.
+    - No markdown formatting. Do not use three backticks. No terminal prefixes or emails. Plain text only.
     `;
 
     try {
@@ -54,7 +54,6 @@ app.post('/api/chat', async (req, res) => {
             systemInstruction: systemPrompt,
             generationConfig: {
                 temperature: 0.7 // Restores the AI's ability to think and be creative
-                // Removed the maxOutputTokens cap so it can give full answers again
             }
         });
 
@@ -72,5 +71,5 @@ app.post('/api/chat', async (req, res) => {
 // Boot sequence
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(\`CODOT Neural Net online on port \${PORT}\`);
+    console.log("CODOT Neural Net online on port " + PORT);
 });
