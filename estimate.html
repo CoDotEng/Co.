@@ -502,6 +502,7 @@
             const ticketID = generateTicketID();
 
             try {
+                // 1. Log the lead in Firebase (Your existing database setup)
                 await addDoc(collection(db, "applications"), {
                     ticketID: ticketID,
                     name: name,
@@ -514,12 +515,28 @@
                     timestamp: serverTimestamp()
                 });
 
+                // 2. Format the project specs for the Discord notification
+                const projectSpecs = `Scale: ${pages} Pages | Features: ${selectedFeatures.length > 0 ? selectedFeatures.join(', ') : 'None'} | Notes: ${description || 'N/A'}`;
+
+                // 3. Fire the payload to your Node Server (which then pings Discord)
+                await fetch('/api/lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        projectType: projectSpecs,
+                        budget: calculatedPrice
+                    })
+                });
+
+                // 4. Update the UI to show the success ticket
                 formWrapper.style.display = "none";
                 successBox.style.display = "block";
                 displayTicketID.innerText = ticketID;
 
             } catch (error) {
-                console.error("Error adding document: ", error);
+                console.error("Error adding document or triggering webhook: ", error);
                 alert("Database transmission failed. Please try again.");
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Quote Request";
