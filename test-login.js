@@ -9,47 +9,40 @@ import puppeteer from 'puppeteer';
   }); 
   
   const page = await browser.newPage();
-
-  // 👁️ X-RAY VISION: Forward all browser console logs to the GitHub terminal
+  
+  // Keep X-Ray vision on just in case
   page.on('console', msg => console.log(`💻 BROWSER LOG: ${msg.text()}`));
-  page.on('pageerror', error => console.log(`💥 BROWSER ERROR: ${error.message}`));
-  page.on('requestfailed', req => console.log(`❌ NETWORK FAIL: ${req.url()}`));
 
   try {
     console.log("📍 Navigating to login.html...");
-    // networkidle0 means wait until there are NO active network requests
     await page.goto('http://localhost:3000/login.html', { waitUntil: 'networkidle0' }); 
 
     console.log("⏳ Waiting for the vault UI to render...");
-    // Upped the timeout to 15 seconds just in case the GitHub server is slow
     await page.waitForSelector('#loginEmail', { visible: true, timeout: 15000 });
 
-    console.log("⌨️ Entering credentials...");
+    console.log("⌨️ Entering fake credentials...");
     await page.type('#loginEmail', 'test@codot.com'); 
     await page.type('#loginPassword', 'supersecretpassword'); 
 
-    console.log("🚀 Hitting submit...");
-    await Promise.all([
-      page.click('#authBtn'), 
-      page.waitForNavigation({ waitUntil: 'networkidle2' }) 
-    ]);
+    console.log("🚀 Hitting submit and waiting for the rejection...");
+    await page.click('#authBtn'); 
+    
+    // Instead of waiting for a new page, we wait for your red error box to pop up
+    await page.waitForSelector('#alertBox', { visible: true, timeout: 10000 });
 
-    const currentUrl = page.url();
-    if (currentUrl.includes('dashboard.html')) {
-      console.log("✅ SUCCESS: Successfully breached the mainframe and hit the dashboard!");
+    // Read the text inside the error box
+    const alertText = await page.$eval('#alertBox', el => el.innerText);
+    
+    if (alertText.includes('Invalid credentials')) {
+      console.log(`✅ SUCCESS: The UI works and Firebase successfully blocked us with: "${alertText}"`);
       process.exit(0);
     } else {
-      console.log("❌ FAILED: Still stuck at the gate.");
+      console.log(`❌ FAILED: We got an unexpected error message: "${alertText}"`);
       process.exit(1);
     }
+    
   } catch (error) {
     console.error("⚠️ The bot crashed:", error.message);
-    
-    console.log("\n🔍 --- DUMPING WHAT THE BOT ACTUALLY SAW ---");
-    const html = await page.content();
-    console.log(html.substring(0, 1500)); // Print the first 1500 characters of the HTML
-    console.log("-------------------------------------------\n");
-    
     process.exit(1);
   } finally {
     await browser.close();
