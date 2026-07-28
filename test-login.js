@@ -10,23 +10,25 @@ import puppeteer from 'puppeteer';
   
   const page = await browser.newPage();
 
+  // 👁️ X-RAY VISION: Forward all browser console logs to the GitHub terminal
+  page.on('console', msg => console.log(`💻 BROWSER LOG: ${msg.text()}`));
+  page.on('pageerror', error => console.log(`💥 BROWSER ERROR: ${error.message}`));
+  page.on('requestfailed', req => console.log(`❌ NETWORK FAIL: ${req.url()}`));
+
   try {
     console.log("📍 Navigating to login.html...");
-    await page.goto('http://localhost:3000/login.html'); 
+    // networkidle0 means wait until there are NO active network requests
+    await page.goto('http://localhost:3000/login.html', { waitUntil: 'networkidle0' }); 
 
-    // THE FIX: Force the bot to wait for the Firebase loading ring to disappear 
-    // and the email input to actually become visible on the screen.
     console.log("⏳ Waiting for the vault UI to render...");
-    await page.waitForSelector('#loginEmail', { visible: true, timeout: 10000 });
+    // Upped the timeout to 15 seconds just in case the GitHub server is slow
+    await page.waitForSelector('#loginEmail', { visible: true, timeout: 15000 });
 
     console.log("⌨️ Entering credentials...");
     await page.type('#loginEmail', 'test@codot.com'); 
     await page.type('#loginPassword', 'supersecretpassword'); 
 
     console.log("🚀 Hitting submit...");
-    
-    // Notice we wrap the click and the wait in a Promise.all 
-    // so it knows exactly when the page transition is done.
     await Promise.all([
       page.click('#authBtn'), 
       page.waitForNavigation({ waitUntil: 'networkidle2' }) 
@@ -41,7 +43,13 @@ import puppeteer from 'puppeteer';
       process.exit(1);
     }
   } catch (error) {
-    console.error("⚠️ The bot crashed:", error);
+    console.error("⚠️ The bot crashed:", error.message);
+    
+    console.log("\n🔍 --- DUMPING WHAT THE BOT ACTUALLY SAW ---");
+    const html = await page.content();
+    console.log(html.substring(0, 1500)); // Print the first 1500 characters of the HTML
+    console.log("-------------------------------------------\n");
+    
     process.exit(1);
   } finally {
     await browser.close();
