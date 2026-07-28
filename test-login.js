@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+import puppeteer from 'puppeteer';
 
 (async () => {
   console.log("🚦 Booting up the ghost browser...");
@@ -10,12 +10,12 @@ const puppeteer = require('puppeteer');
     await page.goto('http://localhost:3000/login.html'); 
 
     console.log("⌨️ Entering credentials...");
-    await page.type('#username', 'test_user'); // Change #username if your HTML ID is different
-    await page.type('#password', 'supersecretpassword'); // Change #password if needed
+    await page.type('#username', 'test_user'); // Change if your HTML ID is different
+    await page.type('#password', 'supersecretpassword'); // Change if needed
 
     console.log("🚀 Hitting submit...");
     await Promise.all([
-      page.click('#submit-btn'), // Change #submit-btn to match your HTML
+      page.click('#submit-btn'), // Change to match your HTML button ID
       page.waitForNavigation({ waitUntil: 'networkidle2' }) 
     ]);
 
