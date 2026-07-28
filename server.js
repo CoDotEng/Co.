@@ -1,8 +1,14 @@
 import express from 'express';
 import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
+
+// 🔥 UPGRADE: Wrap Express in a raw HTTP server and attach the WebSocket engine
+const httpServer = createServer(app);
+const io = new Server(httpServer, { cors: { origin: "*" } });
 
 app.use(cors()); 
 app.use(express.json());
@@ -137,7 +143,29 @@ app.post('/api/lead', async (req, res) => {
     }
 });
 
+// 📡 LIVE TELEMETRY UPLINK
+io.on('connection', (socket) => {
+    console.log('⚡ A client locked onto the live telemetry stream.');
+
+    // Simulated live data: Push this payload to the client every 3 seconds
+    const telemetryLoop = setInterval(() => {
+        socket.emit('live_status', {
+            phase: "Phase 2: Architecture Drafting",
+            serverLoad: Math.floor(Math.random() * 100) + "%",
+            uptime: process.uptime().toFixed(1) + "s"
+        });
+    }, 3000);
+
+    // Kill the feed to save memory when the client closes the tab
+    socket.on('disconnect', () => {
+        console.log('🔌 Client disconnected from telemetry.');
+        clearInterval(telemetryLoop);
+    });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("CODOT Neural Net online on port " + PORT);
+
+// 🔥 UPGRADE: Use httpServer instead of app to boot the web server AND the socket engine
+httpServer.listen(PORT, () => {
+    console.log("CODOT Neural Net & Telemetry online on port " + PORT);
 });
