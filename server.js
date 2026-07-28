@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors()); 
 app.use(express.json());
-
+app.use(express.static(process.cwd()));
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // THE MEMORY VAULT
