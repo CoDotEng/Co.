@@ -1,0 +1,30 @@
+name: Ghost Driver Automation
+
+# This tells GitHub to run the bot every time you push code to the main branch
+on:
+  push:
+    branches: [ main ] 
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest # GitHub gives us a free Linux server
+
+    steps:
+      - name: 🏎️ Grab the code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm install
+          npm install puppeteer
+
+      - name: 🔥 Start Server & Unleash Bot
+        run: |
+          node server.js &  # The '&' runs your website in the background
+          sleep 5           # Wait 5 seconds to let the server fully boot
+          node test-login.js # Fire the bot
