@@ -3,7 +3,6 @@ import puppeteer from 'puppeteer';
 (async () => {
   console.log("🚦 Booting up the ghost browser...");
   
-  // We added the args array here to bypass the Linux sandbox limits
   const browser = await puppeteer.launch({ 
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -15,13 +14,14 @@ import puppeteer from 'puppeteer';
     console.log("📍 Navigating to login.html...");
     await page.goto('http://localhost:3000/login.html'); 
 
+    // THE FIX IS RIGHT HERE: Using the exact IDs from your HTML
     console.log("⌨️ Entering credentials...");
-    await page.type('#username', 'test_user'); 
-    await page.type('#password', 'supersecretpassword'); 
+    await page.type('#loginEmail', 'test@codot.com'); 
+    await page.type('#loginPassword', 'supersecretpassword'); 
 
     console.log("🚀 Hitting submit...");
     await Promise.all([
-      page.click('#submit-btn'), 
+      page.click('#authBtn'), 
       page.waitForNavigation({ waitUntil: 'networkidle2' }) 
     ]);
 
