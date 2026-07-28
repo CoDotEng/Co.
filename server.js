@@ -7,6 +7,7 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 app.use(express.static(process.cwd()));
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // THE MEMORY VAULT
@@ -93,6 +94,46 @@ app.post('/api/chat', async (req, res) => {
     } catch (error) {
         console.error("AI Core Error:", error);
         res.status(500).json({ error: 'SYS_ERR: Neural network offline.' });
+    }
+});
+
+// THE TRIPWIRE ENDPOINT FOR ESTIMATES/BUYOUTS
+app.post('/api/lead', async (req, res) => {
+    // We expect the frontend to send us these details
+    const { name, email, projectType, budget } = req.body;
+
+    // Your live Discord Webhook
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1531698563854237837/dXy8g3swkqDVmHHoUgsOeqK7LEdQOjaVvs9KhSm31Qk3qNs0F9iDw0V7uBO5GBwSLgjK";
+
+    // Format the message so it looks brutalist and clean in Discord
+    const discordPayload = {
+        content: `🚨 **NEW CODOT LEAD DETECTED** 🚨`,
+        embeds: [{
+            title: "Client Estimate Request",
+            color: 0x00e5ff, // Matches your neon cyan accent color
+            fields: [
+                { name: "Name", value: name || "Unknown", inline: true },
+                { name: "Email", value: email || "Unknown", inline: true },
+                { name: "Project", value: projectType || "Not specified" },
+                { name: "Budget", value: budget || "Not specified" }
+            ],
+            footer: { text: "CODOT Server Uplink" },
+            timestamp: new Date().toISOString()
+        }]
+    };
+
+    try {
+        // Fire the payload to Discord
+        await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(discordPayload)
+        });
+
+        res.status(200).json({ success: true, message: "Lead transmitted to HQ." });
+    } catch (error) {
+        console.error("Webhook misfire:", error);
+        res.status(500).json({ success: false, error: "Transmission failed." });
     }
 });
 
