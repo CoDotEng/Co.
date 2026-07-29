@@ -15,7 +15,7 @@ import puppeteer from 'puppeteer';
 
   try {
     console.log("📍 Navigating to login.html...");
-    await page.goto('http://localhost:3000/login.html', { waitUntil: 'networkidle0' }); 
+    await page.goto('https://codot-core.onrender.com/login.html', { waitUntil: 'networkidle0' });
 
     console.log("⏳ Waiting for the vault UI to render...");
     await page.waitForSelector('#loginEmail', { visible: true, timeout: 15000 });
