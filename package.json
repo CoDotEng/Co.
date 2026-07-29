@@ -1,7 +1,6 @@
 {
-  "name": "codot-agency",
+  "name": "codot-core",
   "version": "1.0.0",
-  {
   "type": "module",
   "dependencies": {
     "express": "^4.19.2",
