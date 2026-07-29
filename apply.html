@@ -409,6 +409,7 @@
 
                 // Step B: Package the data AND the physical file
                 const formData = new FormData();
+                formData.append("name", name); // <-- THIS IS THE FIX. SHIPS THE NAME NOW.
                 formData.append("email", email);
                 formData.append("projectType", type);
                 formData.append("projectDesc", description);
