@@ -315,6 +315,16 @@
                     <textarea id="description" class="form-control" placeholder="Tell us about your business and what you need..." required></textarea>
                 </div>
 
+                <!-- ADDED: The File Upload Field -->
+                <div class="form-group mb-4">
+                    <label for="fileInput">Project Files (Optional)</label>
+                    <input type="file" 
+                           id="fileInput" 
+                           name="projectFile" 
+                           class="form-control" 
+                           style="background-color: #1a1a1a; border-color: #333;">
+                </div>
+
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
             </form>
         </div>
@@ -374,37 +384,58 @@
 
             // Disable button and show loading text
             submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
+            submitBtn.innerText = "Submitting & Uploading...";
 
             // Get form values
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const type = document.getElementById('type').value;
             const description = document.getElementById('description').value;
+            const fileInput = document.getElementById('fileInput');
 
-            // Generate Ticket ID
             const ticketID = generateTicketID();
 
             try {
-                // Save data to Firestore in a collection called "applications"
+                // Step A: Save tracking data to Firebase Firestore
                 await addDoc(collection(db, "applications"), {
                     ticketID: ticketID,
                     name: name,
                     email: email,
                     type: type,
                     description: description,
-                    status: "Application Under Review", // Default status for new entries
+                    status: "Application Under Review",
                     timestamp: serverTimestamp()
                 });
 
-                // On Success: Hide form, show success box
+                // Step B: Package the data AND the physical file
+                const formData = new FormData();
+                formData.append("email", email);
+                formData.append("projectType", type);
+                formData.append("projectDesc", description);
+                
+                // If the user actually attached a file, append it to the payload
+                if (fileInput.files.length > 0) {
+                    formData.append("projectFile", fileInput.files[0]);
+                }
+
+                // Step C: Blast the whole package to your live Render engine
+                const renderResponse = await fetch('https://codot-core.onrender.com/api/lead', {
+                    method: 'POST',
+                    body: formData // Note: We do NOT set headers manually when using FormData
+                });
+
+                if (!renderResponse.ok) {
+                    console.error("Render Backend Error:", await renderResponse.text());
+                }
+
+                // Step D: On Success - Hide form, show success box
                 formWrapper.style.display = "none";
                 successBox.style.display = "block";
                 displayTicketID.innerText = ticketID;
 
             } catch (error) {
-                console.error("Error adding document: ", error);
-                alert("Something went wrong. Please try again.");
+                console.error("Error submitting application: ", error);
+                alert("Something went wrong with the upload. Please try again.");
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Application";
             }
