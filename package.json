@@ -1,14 +1,13 @@
 {
   "name": "codot-agency",
   "version": "1.0.0",
+  {
   "type": "module",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
-    "@google/generative-ai": "latest",
     "express": "^4.19.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "@google/generative-ai": "^0.14.0",
+    "socket.io": "^4.7.5",
     "dotenv": "^16.4.5",
     "googleapis": "^140.0.0"
   }
