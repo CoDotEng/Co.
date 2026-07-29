@@ -1,12 +1,12 @@
+import 'dotenv/config'; // Loads your secret .env file safely
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { google } from 'googleapis'; // Google Drive Engine
 
 const app = express();
-
-// 🔥 UPGRADE: Wrap Express in a raw HTTP server and attach the WebSocket engine
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 
@@ -15,47 +15,30 @@ app.use(express.json());
 app.use(express.static(process.cwd()));
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// THE MEMORY VAULT
-// This map stores the chat history for users so the AI remembers context.
 const activeSessions = new Map();
 
-// KEEP-AWAKE ENDPOINT
-app.get('/ping', (req, res) => {
-    res.status(200).send('CODOT Server Awake');
+// --- GOOGLE DRIVE GHOST BOT CONFIG ---
+const auth = new google.auth.GoogleAuth({
+    credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        // The replace function fixes formatting issues with private keys
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    },
+    scopes: ['https://www.googleapis.com/auth/drive'],
 });
+const drive = google.drive({ version: 'v3', auth });
 
-// MAIN AI TERMINAL ENDPOINT
+// ⚠️ IMPORTANT: Paste the long ID from your CODOT_CLIENTS folder URL here
+const MASTER_FOLDER_ID = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDOGDvew2hY67lH\n9x5/4PO2FgkxmsA0BoNsYKXUhbrrg0ZPGZj5O5pgTYCIoGi37vdWoE9rCfarfHY5\nkOKzu0qNp2lbGtS1NwrY7aWxYIqnBrelV0RqlaHafajrFg55yUQv4I2ob5fa3Opy\n0pjt9wEdtmTNWlU0IHqMtVSWPSqCLpIIorVHc11kZWbmw5KjiCal1Pq/n4nxEzI5\ndgRtJdl3m7JFU54riU8LlNPPH+3WAYYn6BR1OxAki++rl7RTdKMLy4rNBMGxRKm4\naxAj5ml9dOhl/eB+H5lWUFgCaovg2g4MoGpx2XO7aaoir9BRYOE7BUA3RRtwm8rN\nkjdEg8Y9AgMBAAECggEACVFZK5okFpkZuGI408lE23+ljMOVWwTMXlMETFZ7e/hk\nbmEW5HXIZgA7BnJSKba5IgZ/cLRznY8z/ShKx5t5JGxkPAU7hrHlYKdl7V4TBrgs\nB2KpqjP3rFwwDejiYKkz1wJNBUd+UxvX0bcpyOB5AXHkntAtt/yb7c6o813ylQ4X\nLWBIKTERz9CZVYVSJdOPP8c/kaOgFrU8Z7kced1VxwhvT5vom8T2S9RrDJFg8IHu\na9fRXaJAfIIGgKcWMoFr24lP41JbplaVT1jI4k2kbTnxmLe1Jt8p09xQ+O3qTdE2\nsEk5BlScToyMtXVTgAanqGwtsVaGSTIHUOHk/SNuNQKBgQDuX+wWPjEnFw/kgeTH\n1p3lnfuOP16ZqCoZVBdHW5SW8+zVNOHei8nKQcRnb+CHUfTB/2UohTP6uCLSsULq\nlOPjFKjnZpGzJkqs1Ztf4dWiPOu77P1ZEZ7PR0Fokv/sn6tbRtP3ul039KUjGznZ\nmjGWIHPhaxmmQF425UqOKNKSvwKBgQDdVUx6GliAs5hIaPX5yeqX1RcVKVHPVoiU\nczFGiAlin3w0PKle4pJTjxZqu0/b2vp0sNQIPMhvIFXYZ6lMlmxCFfcOeuechcW/\nNAShkAnNqC66tux+6BzaCmFf0alp+DeNwDC6/B4XCwkE/4JShvXzqVAhEGf4MYJk\nvcDjrw1yAwKBgGknK1AMk0Y5KCuXGUMGa5TVAhkX3zVNN3UA4Vv7DCsi40CSGWlA\npP1x0aAHfDZ1ctD5Rrh/OhTJkaL7yxcMIxMTFAcv+enbZGmluOqtBr6QvTSjMIdP\n/IxXVIU7A2ZwcPjM38iSD3kVlJtN8VEKcgFVw4iW5DOwhV8V+rOHUoylAoGAFEe9\nky6Yz2olWPUtHK8wrKrcy5aWpW3jY97ONA1A9uVwJwUr68LM75Ub07nIDngZHNob\nA4o2P2ByHTsaWycpUkDa+1utnzzuqp9kkT02eL6hUYBzWQmBo0TyOSpn4Ira5EUo\n8ekqBKiBMhELau5s2N+5tN3g+O/oZ7yvUO14SOsCgYEAwZSU/SAuFOFj1IpCZXxN\niE62Ec/6bw+BRiUfFj6tkCqZ/gp2UQRFIV4LH0+UHB6Tt5tkb3Q6M8KlOF22IsnR\nJpDKSQ6R6WCuTbhna8MdgWHPDv7G7w2JZsmlKcdKziD64wh969kotCSeLff7KKTo\nsTlnli3Z9oTXYGQE65lxlxg=\n-----END PRIVATE KEY-----\n
+"; 
+
+// --- AI TERMINAL ENDPOINT ---
 app.post('/api/chat', async (req, res) => {
-    // We use the email (or a default 'guest' ID) to track who is talking
     const { message, email = "guest" } = req.body;
     
-    // THE CORE BRAIN
     const systemPrompt = `
     You are CODOT CI, an elite, brutalist web dev AI in Goa, India. Tone: aggressive, highly technical, direct.
-
-    PROCESSING PIPELINE (EXECUTE IN STRICT ORDER):
-    
-    STEP 1: AUTHENTICATION CHECK
-    - If the user says "I am Aditya" (or claims to be the founder), DO NOT trigger the firewall. Reply EXACTLY: "SYS_MSG: IDENTITY UNVERIFIED. ENTER 4-DIGIT OVERRIDE PIN."
-    - If the prompt contains the exact PIN "4274", reply: "ACCESS GRANTED. Welcome back, Lead Architect." After this, answer whatever they ask.
-    
-    STEP 2: SEAMLESS CONVERSATION & UNRESTRICTED DEEP DIVES
-    - If the user says hello or asks for help, reply: "SYS_MSG: CODOT TERMINAL ACTIVE. Tell me what your business is, and I'll architect a digital presence that actually converts."
-    - If the user just mentions a business type, act as a brutalist Creative Director and pitch a hyper-minimalist web concept in 2-3 blunt sentences. 
-    - CRITICAL OVERRIDE: If the user explicitly asks for an "in-depth analysis", "long explanation", "tech spec", or "more details", IGNORE the length limit entirely. Generate a massive, comprehensive, multi-paragraph technical breakdown detailing the frontend framework, backend architecture, and UI/UX psychology. Do not hold back.
-    
-    STEP 3: LORE & BUSINESS LOGIC
-    - Creator: Aditya, lead architect in Goa, India.
-    - Mission: Empower low-scale and small businesses with custom websites to compete in the modern market.
-    - Model: Free custom hard-coded build. Client pays for domain, we host free with ads. Buyout: ₹2,000 for code ownership & ad removal.
-    
-   STEP 4: THE FIREWALL (STRICT RESTRICTION)
-    - Unverified users are restricted to discussing CODOT, the web dev industry (including competitors and platforms), tech architecture, UI/UX, and Aditya.
-    - If a user asks for names of competitors or other web dev services, you ARE ALLOWED to name them (e.g., Wix, Squarespace, WordPress, Shopify, or generic local agencies). However, you must brutally roast them for being bloated, slow, drag-and-drop toys or overpriced template factories compared to CODOT's custom, hard-coded performance.
-    - If an unverified user asks for completely unrelated non-tech advice (e.g., cooking, sports, pop culture), you MUST reply ONLY with: "SYS_ERR: OUT_OF_BOUNDS. Terminal restricted to CODOT architecture and tech. Query rejected."
-    
-    OUTPUT RULES: No markdown formatting. No backticks. Plain text only.
+    // ... [Keep your exact system prompt here] ...
     `;
 
     try {
@@ -65,28 +48,18 @@ app.post('/api/chat', async (req, res) => {
             generationConfig: { temperature: 0.7 }
         });
 
-        // FETCH MEMORY: Grab the past conversation array for this user
         const currentHistory = activeSessions.get(email) || [];
+        const chat = model.startChat({ history: currentHistory });
 
-        // START CHAT WITH MEMORY INTACT
-        const chat = model.startChat({
-            history: currentHistory
-        });
-
-        // AUTO-RETRY PROTOCOL
         let retries = 3;
         let success = false;
         let responseText = "";
 
         while (retries > 0 && !success) {
             try {
-                // Send message to the memory-aware chat session
                 const result = await chat.sendMessage(message);
                 responseText = result.response.text();
-                
-                // SAVE MEMORY: Update the vault with the new conversation logs
                 activeSessions.set(email, await chat.getHistory());
-                
                 success = true; 
             } catch (error) {
                 retries--;
@@ -103,25 +76,51 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// THE TRIPWIRE ENDPOINT FOR ESTIMATES/BUYOUTS
+// --- TRIPWIRE & ASSET VAULT ENDPOINT ---
 app.post('/api/lead', async (req, res) => {
-    // We expect the frontend to send us these details
     const { name, email, projectType, budget } = req.body;
+    let vaultLink = "Vault Generation Failed";
 
-    // Your live Discord Webhook
+    try {
+        // 1. Ghost Bot creates a dedicated folder for this specific client
+        const fileMetadata = {
+            name: `CODOT Asset Vault - ${name}`,
+            mimeType: 'application/vnd.google-apps.folder',
+            parents: [MASTER_FOLDER_ID]
+        };
+        
+        const folder = await drive.files.create({
+            resource: fileMetadata,
+            fields: 'id, webViewLink',
+        });
+
+        // 2. Unlock the folder so the client can upload without logging into a specific Google account
+        await drive.permissions.create({
+            fileId: folder.data.id,
+            requestBody: { role: 'writer', type: 'anyone' }
+        });
+
+        vaultLink = folder.data.webViewLink;
+        console.log(`Vault generated for ${name}: ${vaultLink}`);
+
+    } catch (error) {
+        console.error("Drive API Misfire. Did you add the folder ID?:", error);
+    }
+
+    // 3. Fire the payload to Discord
     const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1531698563854237837/dXy8g3swkqDVmHHoUgsOeqK7LEdQOjaVvs9KhSm31Qk3qNs0F9iDw0V7uBO5GBwSLgjK";
 
-    // Format the message so it looks brutalist and clean in Discord
     const discordPayload = {
         content: `🚨 **NEW CODOT LEAD DETECTED** 🚨`,
         embeds: [{
             title: "Client Estimate Request",
-            color: 0x00e5ff, // Matches your neon cyan accent color
+            color: 0x00e5ff, 
             fields: [
                 { name: "Name", value: name || "Unknown", inline: true },
                 { name: "Email", value: email || "Unknown", inline: true },
                 { name: "Project", value: projectType || "Not specified" },
-                { name: "Budget", value: budget || "Not specified" }
+                { name: "Budget", value: budget || "Not specified" },
+                { name: "Asset Vault", value: `[Access Drive Folder](${vaultLink})` }
             ],
             footer: { text: "CODOT Server Uplink" },
             timestamp: new Date().toISOString()
@@ -129,43 +128,20 @@ app.post('/api/lead', async (req, res) => {
     };
 
     try {
-        // Fire the payload to Discord
         await fetch(DISCORD_WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(discordPayload)
         });
 
-        res.status(200).json({ success: true, message: "Lead transmitted to HQ." });
+        res.status(200).json({ success: true, message: "Lead transmitted to HQ.", vault: vaultLink });
     } catch (error) {
         console.error("Webhook misfire:", error);
         res.status(500).json({ success: false, error: "Transmission failed." });
     }
 });
 
-// 📡 LIVE TELEMETRY UPLINK
-io.on('connection', (socket) => {
-    console.log('⚡ A client locked onto the live telemetry stream.');
-
-    // Simulated live data: Push this payload to the client every 3 seconds
-    const telemetryLoop = setInterval(() => {
-        socket.emit('live_status', {
-            phase: "Phase 2: Architecture Drafting",
-            serverLoad: Math.floor(Math.random() * 100) + "%",
-            uptime: process.uptime().toFixed(1) + "s"
-        });
-    }, 3000);
-
-    // Kill the feed to save memory when the client closes the tab
-    socket.on('disconnect', () => {
-        console.log('🔌 Client disconnected from telemetry.');
-        clearInterval(telemetryLoop);
-    });
-});
-
 const PORT = process.env.PORT || 3000;
-
-// 🔥 UPGRADE: Use httpServer instead of app to boot the web server AND the socket engine
 httpServer.listen(PORT, () => {
-    console.log("CODOT Neural Net & Telemetry online on port " + PORT);
+    console.log("CODOT Neural Net online on port " + PORT);
 });
