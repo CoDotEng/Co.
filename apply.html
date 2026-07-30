@@ -329,13 +329,15 @@
                     <textarea id="description" class="form-control" placeholder="Tell us about your business and what you need..." required></textarea>
                 </div>
 
+                <!-- 🔥 UPGRADED FRONTEND UI: Multiple attribute added, size rules listed -->
                 <div class="form-group mb-4">
-                    <label for="fileInput">Project Files (Optional)</label>
+                    <label for="fileInput">Project Files (Max 4 files, 15MB each)</label>
                     <input type="file" 
                            id="fileInput" 
                            name="projectFile" 
                            class="form-control" 
-                           style="background-color: #1a1a1a; border-color: #333;">
+                           style="background-color: #1a1a1a; border-color: #333;"
+                           multiple>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
@@ -364,7 +366,6 @@
     <!-- 🔥 BULLETPROOF GATEKEEPER ENGINE 🔥 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // 🔥 FIX: Added 'or' query to catch both legacy and new data architectures
         import { getFirestore, collection, addDoc, serverTimestamp, query, where, or, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -402,7 +403,7 @@
             if (emailField) { emailField.value = currentUserEmail; }
 
             try {
-                // 🔥 THE FIX: Scans BOTH old ('email') and new ('authEmail') records to prevent ghost bypasses
+                // Scans BOTH old ('email') and new ('authEmail') records to prevent ghost bypasses
                 const q = query(
                     collection(db, "applications"), 
                     or(
@@ -414,7 +415,6 @@
                 const querySnapshot = await getDocs(q);
                 let pendingCount = 0;
 
-                // Locally count the statuses so Firebase doesn't demand a composite index and crash
                 querySnapshot.forEach((doc) => {
                     if (doc.data().status === "Application Under Review") {
                         pendingCount++;
@@ -464,6 +464,39 @@
                 const fileInput = document.getElementById('fileInput');
                 const ticketID = generateTicketID();
 
+                // 2. Package for Render Engine
+                const formData = new FormData();
+                formData.append("name", name); 
+                formData.append("email", contactEmail); 
+                formData.append("projectType", type);
+                formData.append("projectDesc", description);
+                
+                // 🔥 FRONTEND SECURITY CHECKS: Intercept files before the server request
+                if (fileInput && fileInput.files.length > 0) {
+                    // 1. Check Max Count Limit
+                    if (fileInput.files.length > 4) {
+                        alert("Security Protocol: Maximum 4 files allowed.");
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = "Submit Application";
+                        return; // Stop the upload
+                    }
+
+                    // 2. Loop through and check Max Size Limit (15MB)
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        const fileSizeMB = file.size / (1024 * 1024);
+                        
+                        if (fileSizeMB > 15) {
+                            alert(`Security Protocol: File "${file.name}" exceeds the 15MB limit.`);
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = "Submit Application";
+                            return; // Stop the upload
+                        }
+                        // 3. If safe, attach to the payload
+                        formData.append("projectFile", file);
+                    }
+                }
+
                 try {
                     // 1. Log to Firebase
                     await addDoc(collection(db, "applications"), {
@@ -476,17 +509,6 @@
                         status: "Application Under Review",
                         timestamp: serverTimestamp()
                     });
-
-                    // 2. Package for Render Engine
-                    const formData = new FormData();
-                    formData.append("name", name); 
-                    formData.append("email", contactEmail); 
-                    formData.append("projectType", type);
-                    formData.append("projectDesc", description);
-                    
-                    if (fileInput && fileInput.files.length > 0) {
-                        formData.append("projectFile", fileInput.files[0]);
-                    }
 
                     // 3. Fire to Backend
                     const renderResponse = await fetch('https://codot-core.onrender.com/api/lead', {
