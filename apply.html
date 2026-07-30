@@ -348,12 +348,12 @@
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
+    <!-- 🔥 GATEKEEPER ENGINE 🔥 -->
     <script type="module">
-        // 1. Import Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // 2. Your Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD0PjmGveJ_QS4s3S0wFwiDjxdeE4tRKzw",
             authDomain: "codot-agency.firebaseapp.com",
@@ -363,84 +363,122 @@
             appId: "1:22678307444:web:59c72496bad5db86b3c721"
         };
 
-        // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        // 4. Form Logic
         const form = document.getElementById('applicationForm');
         const submitBtn = document.getElementById('submitBtn');
-        const formWrapper = document.getElementById('formWrapper');
+        const formWrapper = document.getElementById('formWrapper'); 
         const successBox = document.getElementById('successBox');
         const displayTicketID = document.getElementById('displayTicketID');
+        const emailField = document.getElementById('email');
 
-        // Function to generate a random 6-character alphanumeric string
+        let currentUserEmail = "";
+
+        // --- AUTH & SPAM RADAR ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // Bounce unauthenticated ghost traffic straight back to login
+                window.location.href = "login.html";
+                return;
+            }
+            
+            currentUserEmail = user.email;
+            
+            // Auto-fill and brick the email field so they can't inspect-element to spoof it
+            if (emailField) {
+                emailField.value = currentUserEmail;
+                emailField.readOnly = true;
+                emailField.style.opacity = "0.5";
+                emailField.style.cursor = "not-allowed";
+            }
+
+            // Scan Firebase for pending applications tied to this exact email
+            const q = query(
+                collection(db, "applications"), 
+                where("email", "==", currentUserEmail),
+                where("status", "==", "Application Under Review")
+            );
+
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.size >= 2) {
+                // Nuke the form UI and deploy the lockdown message
+                if (formWrapper) {
+                    formWrapper.innerHTML = `
+                        <div style="text-align: center; padding: 3rem 2rem; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); border-radius: 8px;">
+                            <h3 style="color: #ef4444; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif;">System Locked</h3>
+                            <p style="color: #888888;">You currently have <strong>${querySnapshot.size}</strong> pending requests in the queue.</p>
+                            <p style="color: #888888; margin-top: 1rem;">To prevent gridlock, you must wait for a developer to approve or review your current builds before submitting another.</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+
         function generateTicketID() {
             return 'CO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent page refresh
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Encrypting & Uploading...";
 
-            // Disable button and show loading text
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting & Uploading...";
+                const name = document.getElementById('name').value;
+                const type = document.getElementById('type').value;
+                const description = document.getElementById('description').value;
+                const fileInput = document.getElementById('fileInput');
+                const ticketID = generateTicketID();
 
-            // Get form values
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const type = document.getElementById('type').value;
-            const description = document.getElementById('description').value;
-            const fileInput = document.getElementById('fileInput');
+                try {
+                    // 1. Log to Firebase
+                    await addDoc(collection(db, "applications"), {
+                        ticketID: ticketID,
+                        name: name,
+                        email: currentUserEmail, // Forces the auth email, overriding any hacks
+                        type: type,
+                        description: description,
+                        status: "Application Under Review",
+                        timestamp: serverTimestamp()
+                    });
 
-            const ticketID = generateTicketID();
+                    // 2. Package for Render/Google Drive
+                    const formData = new FormData();
+                    formData.append("name", name); 
+                    formData.append("email", currentUserEmail);
+                    formData.append("projectType", type);
+                    formData.append("projectDesc", description);
+                    
+                    if (fileInput && fileInput.files.length > 0) {
+                        formData.append("projectFile", fileInput.files[0]);
+                    }
 
-            try {
-                // Step A: Save tracking data to Firebase Firestore
-                await addDoc(collection(db, "applications"), {
-                    ticketID: ticketID,
-                    name: name,
-                    email: email,
-                    type: type,
-                    description: description,
-                    status: "Application Under Review",
-                    timestamp: serverTimestamp()
-                });
+                    // 3. Fire to Render Engine
+                    const renderResponse = await fetch('https://codot-core.onrender.com/api/lead', {
+                        method: 'POST',
+                        body: formData 
+                    });
 
-                // Step B: Package the data AND the physical file
-                const formData = new FormData();
-                formData.append("name", name); // <-- THIS IS THE FIX. SHIPS THE NAME NOW.
-                formData.append("email", email);
-                formData.append("projectType", type);
-                formData.append("projectDesc", description);
-                
-                // If the user actually attached a file, append it to the payload
-                if (fileInput.files.length > 0) {
-                    formData.append("projectFile", fileInput.files[0]);
+                    if (!renderResponse.ok) {
+                        console.error("Render Engine Error:", await renderResponse.text());
+                    }
+
+                    // 4. Trigger UI Success State
+                    if (formWrapper) formWrapper.style.display = "none";
+                    if (successBox) successBox.style.display = "block";
+                    if (displayTicketID) displayTicketID.innerText = ticketID;
+
+                } catch (error) {
+                    console.error("Critical submission failure: ", error);
+                    alert("Upload failed. The server might be throttling. Please try again.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Application";
                 }
-
-                // Step C: Blast the whole package to your live Render engine
-                const renderResponse = await fetch('https://codot-core.onrender.com/api/lead', {
-                    method: 'POST',
-                    body: formData // Note: We do NOT set headers manually when using FormData
-                });
-
-                if (!renderResponse.ok) {
-                    console.error("Render Backend Error:", await renderResponse.text());
-                }
-
-                // Step D: On Success - Hide form, show success box
-                formWrapper.style.display = "none";
-                successBox.style.display = "block";
-                displayTicketID.innerText = ticketID;
-
-            } catch (error) {
-                console.error("Error submitting application: ", error);
-                alert("Something went wrong with the upload. Please try again.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Application";
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>
