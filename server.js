@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
-import { Readable } from 'stream'; // Upgraded file streaming
+import { Readable } from 'stream';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
 
@@ -13,15 +13,20 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json()); 
 
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'), 
-  },
-  scopes: ['https://www.googleapis.com/auth/drive'],
+// 🔥 THE NEW OAUTH2 ENGINE 🔥
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "https://developers.google.com/oauthplayground" 
+);
+
+// Lock in the master refresh token
+oauth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
 });
 
-const drive = google.drive({ version: 'v3', auth });
+// Boot up the Drive API using the VIP token
+const drive = google.drive({ version: 'v3', auth: oauth2Client });
 const MASTER_FOLDER_ID = process.env.DRIVE_MASTER_FOLDER_ID; 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -30,7 +35,7 @@ app.post('/api/lead', upload.single('projectFile'), async (req, res) => {
   try {
     console.log("🔥 Incoming lead detected...");
 
-    // 1. Extract data properly (Added clientName)
+    // 1. Extract data
     const clientName = req.body.name || "Unknown Client";
     const clientEmail = req.body.email || "No Email Provided";
     const projectType = req.body.projectType || "Unknown Project";
@@ -53,11 +58,10 @@ app.post('/api/lead', upload.single('projectFile'), async (req, res) => {
     const newFolderLink = folderRes.data.webViewLink;
     console.log(`✅ Vault created: ${newFolderLink}`);
 
-    // 3. Upload the File (Upgraded Stream Engine)
+    // 3. Upload the File
     if (req.file) {
       console.log(`📦 File detected: ${req.file.originalname}. Piping to Drive...`);
       
-      // Convert buffer to a highly stable Readable stream
       const bufferStream = Readable.from(req.file.buffer);
 
       await drive.files.create({
@@ -79,7 +83,7 @@ app.post('/api/lead', upload.single('projectFile'), async (req, res) => {
       const discordMessage = {
         embeds: [{
           title: "🚨 NEW CODOT LEAD DETECTED 🚨",
-          color: 0x00E5FF, // Cyan accent to match your site
+          color: 0x00E5FF, 
           fields: [
             { name: "Name", value: clientName, inline: true },
             { name: "Email", value: clientEmail, inline: true },
@@ -102,7 +106,6 @@ app.post('/api/lead', upload.single('projectFile'), async (req, res) => {
     res.status(200).json({ success: true, folderUrl: newFolderLink });
 
   } catch (error) {
-    // If anything fails, it will print the EXACT reason here in Render
     console.error("❌ CRITICAL FAILURE:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
