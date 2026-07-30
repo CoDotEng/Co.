@@ -137,7 +137,7 @@
             border-radius: 12px;
             padding: 3rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: none; /* 🔥 LOOPHOLE PATCH: Hidden by default so they can't sneak in */
+            display: none; /* 🔥 HIDDEN BY DEFAULT */
         }
 
         /* Loading State */
@@ -312,7 +312,6 @@
                 
                 <div class="form-group">
                     <label for="email">Contact Email Address</label>
-                    <!-- 🔥 EDITABLE EMAIL FEATURE: The lock is removed. -->
                     <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
                 </div>
 
@@ -362,10 +361,11 @@
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
-    <!-- 🔥 UPGRADED GATEKEEPER ENGINE 🔥 -->
+    <!-- 🔥 BULLETPROOF GATEKEEPER ENGINE 🔥 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // 🔥 FIX: Added 'or' query to catch both legacy and new data architectures
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, or, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
@@ -394,44 +394,55 @@
         // --- AUTH & SPAM RADAR ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                // If they aren't logged in, bounce them immediately
                 window.location.href = "login.html";
                 return;
             }
             
             currentUserEmail = user.email;
-            
-            // Auto-fill the email, but leave it editable
-            if (emailField) {
-                emailField.value = currentUserEmail;
-            }
+            if (emailField) { emailField.value = currentUserEmail; }
 
-            // 🔥 THE PRO-MOVE: We check the database for their SECRET auth email, not the one in the form box.
-            const q = query(
-                collection(db, "applications"), 
-                where("authEmail", "==", currentUserEmail), // Un-hackable tracker
-                where("status", "==", "Application Under Review")
-            );
+            try {
+                // 🔥 THE FIX: Scans BOTH old ('email') and new ('authEmail') records to prevent ghost bypasses
+                const q = query(
+                    collection(db, "applications"), 
+                    or(
+                        where("authEmail", "==", currentUserEmail),
+                        where("email", "==", currentUserEmail)
+                    )
+                );
 
-            const querySnapshot = await getDocs(q);
-            
-            // Turn off the loader
-            if (authLoader) authLoader.style.display = "none";
-            
-            if (querySnapshot.size >= 2) {
-                // Slam the door on them
-                if (formWrapper) {
-                    formWrapper.style.display = "block"; // Make the box visible
-                    formWrapper.innerHTML = `
-                        <div style="text-align: center; padding: 3rem 2rem; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); border-radius: 8px;">
-                            <h3 style="color: #ef4444; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif;">System Locked</h3>
-                            <p style="color: #888888;">You currently have <strong>${querySnapshot.size}</strong> pending requests in the queue.</p>
-                            <p style="color: #888888; margin-top: 1rem;">To prevent gridlock, you must wait for a developer to approve or review your current builds before submitting another.</p>
-                        </div>
-                    `;
+                const querySnapshot = await getDocs(q);
+                let pendingCount = 0;
+
+                // Locally count the statuses so Firebase doesn't demand a composite index and crash
+                querySnapshot.forEach((doc) => {
+                    if (doc.data().status === "Application Under Review") {
+                        pendingCount++;
+                    }
+                });
+                
+                if (authLoader) authLoader.style.display = "none";
+                
+                if (pendingCount >= 2) {
+                    // System Lockout
+                    if (formWrapper) {
+                        formWrapper.style.display = "block";
+                        formWrapper.innerHTML = `
+                            <div style="text-align: center; padding: 3rem 2rem; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); border-radius: 8px;">
+                                <h3 style="color: #ef4444; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif;">System Locked</h3>
+                                <p style="color: #888888;">You currently have <strong>${pendingCount}</strong> pending requests in the queue.</p>
+                                <p style="color: #888888; margin-top: 1rem;">To prevent gridlock, you must wait for a developer to approve or review your current builds before submitting another.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Passed security check
+                    if (formWrapper) formWrapper.style.display = "block";
                 }
-            } else {
-                // They pass the check. Unhide the form!
+            } catch (error) {
+                console.error("Gatekeeper Error:", error);
+                // Failsafe: Let them see the form if network crashes
+                if (authLoader) authLoader.style.display = "none";
                 if (formWrapper) formWrapper.style.display = "block";
             }
         });
@@ -449,7 +460,7 @@
                 const name = document.getElementById('name').value;
                 const type = document.getElementById('type').value;
                 const description = document.getElementById('description').value;
-                const contactEmail = document.getElementById('email').value; // Get whatever they typed
+                const contactEmail = document.getElementById('email').value;
                 const fileInput = document.getElementById('fileInput');
                 const ticketID = generateTicketID();
 
@@ -458,18 +469,18 @@
                     await addDoc(collection(db, "applications"), {
                         ticketID: ticketID,
                         name: name,
-                        email: contactEmail, // Where they want us to contact them
-                        authEmail: currentUserEmail, // 🔥 The hidden tracker to prevent spam
+                        email: contactEmail, 
+                        authEmail: currentUserEmail, 
                         type: type,
                         description: description,
                         status: "Application Under Review",
                         timestamp: serverTimestamp()
                     });
 
-                    // 2. Package for Render/Google Drive
+                    // 2. Package for Render Engine
                     const formData = new FormData();
                     formData.append("name", name); 
-                    formData.append("email", contactEmail); // Send the preferred contact email to Discord
+                    formData.append("email", contactEmail); 
                     formData.append("projectType", type);
                     formData.append("projectDesc", description);
                     
@@ -477,7 +488,7 @@
                         formData.append("projectFile", fileInput.files[0]);
                     }
 
-                    // 3. Fire to Render Engine
+                    // 3. Fire to Backend
                     const renderResponse = await fetch('https://codot-core.onrender.com/api/lead', {
                         method: 'POST',
                         body: formData 
