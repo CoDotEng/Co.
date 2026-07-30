@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Lab | CODOT Telemetry</title>
+    <title>The Lab | CODOT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS (BRUTALIST) --- */
@@ -35,7 +35,8 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, .logo { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        h1, h2, h3, h4, h5 { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .logo { font-family: 'Space Grotesk', sans-serif; } /* 🔥 FIX: Removed uppercase override so "Co." renders correctly */
         a { text-decoration: none; color: var(--text-main); transition: color 0.2s ease; }
 
         /* =========================================
@@ -220,7 +221,7 @@
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
-            <a href="diagnostics.html">The Lab</a>
+            <a href="diagnostics.html" class="active">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
             <a href="dashboard.html">Dashboard</a> 
@@ -238,7 +239,7 @@
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
-            <a href="diagnostics.html">The Lab</a>
+            <a href="diagnostics.html" class="active">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
             <a href="dashboard.html">Dashboard</a> 
@@ -248,7 +249,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // --- DYNAMIC HIGHLIGHTER ENGINE ---
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
@@ -261,7 +261,6 @@
                 }
             });
 
-            // --- MOBILE TOGGLE ENGINE ---
             const mobileToggle = document.getElementById('mobileToggle');
             const mobileOverlay = document.getElementById('mobileOverlay');
             const body = document.body;
@@ -282,11 +281,12 @@
     <main class="main-content">
         
         <div class="hero-command">
-            <h1>Target Acquisition</h1>
-            <p>Enter target infrastructure URL to initiate telemetry.</p>
+            <!-- 🔥 FIX: Simplified header text -->
+            <h1>Performance Lab</h1>
+            <p>Enter any website URL to run a deep-dive performance scan.</p>
             <div class="target-input-group">
                 <input type="url" id="targetUrl" placeholder="https://target-domain.com" required>
-                <button id="runTelemetryBtn" class="btn-submit">Initiate Sequence</button>
+                <button id="runTelemetryBtn" class="btn-submit">Run Scan</button>
             </div>
         </div>
 
@@ -294,8 +294,9 @@
             
             <div class="module-card" id="coreEngineCard">
                 <div class="module-header">
-                    <h3>Core Engine Telemetry</h3>
-                    <p>Lighthouse performance extraction and vital tracking.</p>
+                    <!-- 🔥 FIX: Simplified copy -->
+                    <h3>Core Performance</h3>
+                    <p>Lighthouse speed score and web vitals.</p>
                 </div>
                 
                 <div class="speedometer-wrapper">
@@ -327,19 +328,20 @@
                     </div>
                 </div>
 
-                <div class="verdict-box" id="auditVerdict">AWAITING TARGET PARAMETERS</div>
+                <div class="verdict-box" id="auditVerdict">AWAITING TARGET URL</div>
                 <div id="diagList"></div>
             </div>
 
             <div class="module-card" id="dragRaceCard">
                 <div class="module-header">
-                    <h3>Sector Drag Race</h3>
-                    <p>Concurrent latency test vs competitor architecture.</p>
+                    <!-- 🔥 FIX: Simplified copy -->
+                    <h3>Competitor Drag Race</h3>
+                    <p>Head-to-head speed test against a rival website.</p>
                 </div>
                 
                 <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
                     <input type="url" id="competitorUrl" placeholder="https://rival-domain.com" style="flex: 1; padding: 1rem; background-color: #000; color: #fff; border: 1px solid var(--border-color); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;">
-                    <button id="runRaceBtn" class="btn-submit" style="padding: 1rem 1.5rem; font-size: 0.85rem;">ENGAGE</button>
+                    <button id="runRaceBtn" class="btn-submit" style="padding: 1rem 1.5rem; font-size: 0.85rem;">RACE</button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
@@ -355,20 +357,21 @@
                     </div>
                 </div>
 
-                <div class="verdict-box" id="raceVerdict">AWAITING RIVAL PARAMETERS</div>
+                <div class="verdict-box" id="raceVerdict">AWAITING RIVAL URL</div>
             </div>
 
             <div class="module-card" id="payloadCard">
                 <div class="module-header">
-                    <h3>Payload Weigh-In</h3>
-                    <p>DOM structural depth and asset bloat evaluation.</p>
+                    <!-- 🔥 FIX: Simplified copy -->
+                    <h3>Code Bloat & Payload</h3>
+                    <p>Checking for heavy files and messy code structures.</p>
                 </div>
 
-                <button id="runPayloadBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem;">SCAN PAYLOAD</button>
+                <button id="runPayloadBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem;">ANALYZE PAYLOAD</button>
                 
                 <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">TOTAL MASS</span>
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--text-muted);">TOTAL PAGE SIZE</span>
                         <span id="valMass" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;">-- MB</span>
                     </div>
                     <div style="height: 8px; background: #111; border: 1px solid #333; margin-bottom: 1.5rem;">
@@ -389,16 +392,17 @@
                     </div>
                 </div>
 
-                <div class="verdict-box" id="payloadVerdict">AWAITING PAYLOAD EXTRACTION</div>
+                <div class="verdict-box" id="payloadVerdict">AWAITING SCAN</div>
             </div>
 
             <div class="module-card" id="threatCard">
                 <div class="module-header">
-                    <h3>Threat Matrix</h3>
-                    <p>Security protocol and vulnerability payload analysis.</p>
+                    <!-- 🔥 FIX: Simplified copy -->
+                    <h3>Security Sweep</h3>
+                    <p>Checking for basic security flaws and exposed vulnerabilities.</p>
                 </div>
 
-                <button id="runSecurityBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem; background-color: var(--error-text); color: #fff;">SCAN VULNERABILITIES</button>
+                <button id="runSecurityBtn" class="btn-submit" style="width: 100%; margin-bottom: 1.5rem; font-size: 0.85rem; background-color: var(--error-text); color: #fff;">RUN SECURITY SWEEP</button>
                 
                 <div style="background: #050505; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111; padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
@@ -427,6 +431,7 @@
         <p>&copy; 2026 CODOT Agency. Built differently.</p>
     </footer>
 
+    <!-- 🔥 FIX: Updated JS responses to match simplified tone -->
     <script>
         const API_KEY = "AIzaSyACKyhf3nWY7UZ91FD9L63nbwkYSfGVMig";
 
@@ -447,12 +452,12 @@
             const valCLS = document.getElementById('valCLS');
             const diagList = document.getElementById('diagList');
 
-            if (!urlInput) { alert("ERROR: Missing target URL parameter."); return; }
+            if (!urlInput) { alert("Please enter a target URL."); return; }
             
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> INTERROGATING...';
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> SCANNING...';
             scoreDisplay.innerText = "0"; scoreDisplay.style.color = "#fff";
             gaugeFill.style.strokeDashoffset = 125.6; gaugeFill.style.stroke = "var(--border-color)";
-            verdictDisplay.innerText = "EXTRACTING RAW TELEMETRY..."; verdictDisplay.style.color = "var(--text-muted)";
+            verdictDisplay.innerText = "ANALYZING PERFORMANCE..."; verdictDisplay.style.color = "var(--text-muted)";
             valLCP.innerText = "---"; valTBT.innerText = "---"; valFCP.innerText = "---"; valCLS.innerText = "---";
             diagList.innerHTML = "";
 
@@ -479,9 +484,9 @@
                 let themeColor = finalScore >= 90 ? "var(--success)" : (finalScore >= 50 ? "var(--warning)" : "var(--error-text)");
                 gaugeFill.style.stroke = themeColor; scoreDisplay.style.color = themeColor; verdictDisplay.style.color = themeColor;
                 
-                if (finalScore >= 90) verdictDisplay.innerText = "SYSTEM OPTIMAL: ARCHITECTURE PASS";
-                else if (finalScore >= 50) verdictDisplay.innerText = "SUBOPTIMAL: THREAD BLOCKING DETECTED";
-                else verdictDisplay.innerText = "CRITICAL FAIL: IMMEDIATE REBUILD REQUIRED";
+                if (finalScore >= 90) verdictDisplay.innerText = "OPTIMAL: PASS";
+                else if (finalScore >= 50) verdictDisplay.innerText = "NEEDS WORK: ISSUES DETECTED";
+                else verdictDisplay.innerText = "CRITICAL: IMMEDIATE REBUILD REQUIRED";
 
                 let issueFound = false;
                 for (const key in audits) {
@@ -504,14 +509,14 @@
                         `;
                     }
                 }
-                if (!issueFound) diagList.innerHTML = `<div style="padding: 1.5rem; color: var(--success); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--success); background: #000; text-align: center;">NO CRITICAL FAULTS. SYSTEM CLEAR.</div>`;
+                if (!issueFound) diagList.innerHTML = `<div style="padding: 1.5rem; color: var(--success); font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--success); background: #000; text-align: center;">NO CRITICAL FAULTS DETECTED.</div>`;
 
             } catch (error) {
                 console.error("Telemetry Error:", error);
                 scoreDisplay.innerText = "ERR"; gaugeFill.style.stroke = "var(--error-text)";
-                verdictDisplay.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdictDisplay.style.color = "var(--error-text)";
+                verdictDisplay.innerText = "SCAN FAILED. VERIFY URL."; verdictDisplay.style.color = "var(--error-text)";
             } finally {
-                btn.disabled = false; btn.innerText = "Initiate Sequence";
+                btn.disabled = false; btn.innerText = "RUN SCAN";
             }
         });
 
@@ -526,13 +531,13 @@
             const lcpA = document.getElementById('raceLcpA'); const lcpB = document.getElementById('raceLcpB');
             const verdict = document.getElementById('raceVerdict');
 
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
-            if (!rivalInput) { alert("ERROR: Missing rival target."); return; }
+            if (!baseInput) { alert("Please enter your website URL at the top of the page first."); return; }
+            if (!rivalInput) { alert("Please enter a competitor URL to race against."); return; }
 
             btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> RACING...';
             scoreA.innerText = "0"; scoreA.style.color = "#fff"; scoreB.innerText = "0"; scoreB.style.color = "#fff";
             lcpA.innerText = "LCP: SCANNING"; lcpB.innerText = "LCP: SCANNING";
-            verdict.innerText = "CONCURRENT TELEMETRY ENGAGED..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+            verdict.innerText = "RUNNING SPEED TEST..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
 
             try {
                 let urlA = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
@@ -555,33 +560,33 @@
 
                 if (finalA > finalB) {
                     scoreA.style.color = "var(--success)"; scoreB.style.color = "var(--error-text)";
-                    verdict.innerText = `VICTORY: OUTPERFORMING RIVAL BY ${finalA - finalB} POINTS.`;
+                    verdict.innerText = `WIN: OUTPERFORMING RIVAL BY ${finalA - finalB} POINTS.`;
                     verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
                 } else if (finalA < finalB) {
                     scoreA.style.color = "var(--error-text)"; scoreB.style.color = "var(--success)";
-                    verdict.innerText = `CRITICAL: RIVAL OUTPERFORMING ARCHITECTURE BY ${finalB - finalA} POINTS.`;
+                    verdict.innerText = `LOSS: RIVAL OUTPERFORMING YOU BY ${finalB - finalA} POINTS.`;
                     verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
                 } else {
                     scoreA.style.color = "var(--warning)"; scoreB.style.color = "var(--warning)";
-                    verdict.innerText = "DEAD HEAT: ARCHITECTURES DEADLOCKED.";
+                    verdict.innerText = "TIE: DEAD HEAT.";
                     verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
                 }
 
             } catch (error) {
                 console.error("Race Error:", error);
                 scoreA.innerText = "ERR"; scoreB.innerText = "ERR";
-                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URLs."; verdict.style.color = "var(--error-text)";
+                verdict.innerText = "TEST FAILED. VERIFY URLs."; verdict.style.color = "var(--error-text)";
             } finally {
-                btn.disabled = false; btn.innerText = "ENGAGE";
+                btn.disabled = false; btn.innerText = "RACE";
             }
         });
 
         // ==========================================
-        // MODULE 3: PAYLOAD WEIGH-IN (BULLETPROOF)
+        // MODULE 3: PAYLOAD WEIGH-IN
         // ==========================================
         document.getElementById('runPayloadBtn').addEventListener('click', async () => {
             const baseInput = document.getElementById('targetUrl').value.trim();
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+            if (!baseInput) { alert("Please enter your website URL at the top of the page first."); return; }
 
             const btn = document.getElementById('runPayloadBtn');
             const valMass = document.getElementById('valMass');
@@ -591,10 +596,10 @@
             const domBar = document.getElementById('domBar');
             const verdict = document.getElementById('payloadVerdict');
 
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> WEIGHING...';
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> ANALYZING...';
             valMass.innerText = "--"; valDOM.innerText = "--"; valJS.innerText = "--";
             massBar.style.width = "0%"; domBar.style.width = "0%";
-            verdict.innerText = "EXTRACTING ASSET CHUNKS..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+            verdict.innerText = "CHECKING PAGE WEIGHT..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
 
             try {
                 let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
@@ -622,30 +627,30 @@
                 valJS.innerText = jsTime + " s";
 
                 if (massMB > 3 || domCount > 1000) {
-                    verdict.innerText = "CRITICAL: MASSIVE BLOAT DETECTED. CHASSIS OVERLOADED.";
+                    verdict.innerText = "CRITICAL: MASSIVE BLOAT DETECTED.";
                     verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
                 } else if (massMB > 1.5 || domCount > 600) {
-                    verdict.innerText = "WARNING: UNOPTIMIZED ASSETS. REDUCE PAYLOAD.";
+                    verdict.innerText = "WARNING: UNOPTIMIZED FILES FOUND. REDUCE PAYLOAD.";
                     verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
                 } else {
-                    verdict.innerText = "OPTIMAL: PAYLOAD WITHIN ACCEPTABLE PARAMETERS.";
+                    verdict.innerText = "OPTIMAL: PAGE SIZE IS GOOD.";
                     verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
                 }
 
             } catch (error) {
                 console.error("Payload Error:", error);
-                verdict.innerText = "TELEMETRY FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
+                verdict.innerText = "SCAN FAILED. VERIFY URL."; verdict.style.color = "var(--error-text)";
             } finally {
-                btn.disabled = false; btn.innerText = "SCAN PAYLOAD";
+                btn.disabled = false; btn.innerText = "ANALYZE PAYLOAD";
             }
         });
 
         // ==========================================
-        // MODULE 4: THREAT MATRIX (BULLETPROOF)
+        // MODULE 4: THREAT MATRIX
         // ==========================================
         document.getElementById('runSecurityBtn').addEventListener('click', async () => {
             const baseInput = document.getElementById('targetUrl').value.trim();
-            if (!baseInput) { alert("ERROR: Missing primary target in Hero section."); return; }
+            if (!baseInput) { alert("Please enter your website URL at the top of the page first."); return; }
 
             const btn = document.getElementById('runSecurityBtn');
             const secHttps = document.getElementById('secHttps');
@@ -657,7 +662,7 @@
             secHttps.innerText = "SCANNING"; secHttps.style.color = "var(--text-muted)";
             secLibs.innerText = "SCANNING"; secLibs.style.color = "var(--text-muted)";
             secCsp.innerText = "SCANNING"; secCsp.style.color = "var(--text-muted)";
-            verdict.innerText = "RUNNING VULNERABILITY SWEEP..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
+            verdict.innerText = "CHECKING SECURITY PROTOCOLS..."; verdict.style.color = "var(--text-muted)"; verdict.style.borderColor = "var(--border-color)";
 
             try {
                 let url = /^https?:\/\//i.test(baseInput) ? baseInput : 'https://' + baseInput;
@@ -683,21 +688,21 @@
                 secCsp.style.color = hasCsp ? "var(--success)" : "var(--error-text)";
 
                 if (!hasHttps || hasVulnLibs) {
-                    verdict.innerText = "CRITICAL: ARCHITECTURE COMPROMISED. HIGH LIABILITY RISK.";
+                    verdict.innerText = "CRITICAL: SECURITY FLAWS DETECTED.";
                     verdict.style.color = "var(--error-text)"; verdict.style.borderColor = "var(--error-text)";
                 } else if (!hasCsp) {
-                    verdict.innerText = "WARNING: NO XSS PROTECTION. VULNERABLE TO INJECTION.";
+                    verdict.innerText = "WARNING: NO XSS PROTECTION FOUND.";
                     verdict.style.color = "var(--warning)"; verdict.style.borderColor = "var(--warning)";
                 } else {
-                    verdict.innerText = "SECURE: INFRASTRUCTURE LOCKED DOWN.";
+                    verdict.innerText = "SECURE: NO MAJOR THREATS DETECTED.";
                     verdict.style.color = "var(--success)"; verdict.style.borderColor = "var(--success)";
                 }
 
             } catch (error) {
                 console.error("Security Error:", error);
-                verdict.innerText = "SWEEP FAILURE: VERIFY TARGET URL."; verdict.style.color = "var(--error-text)";
+                verdict.innerText = "SWEEP FAILED. VERIFY URL."; verdict.style.color = "var(--error-text)";
             } finally {
-                btn.disabled = false; btn.innerHTML = "SCAN VULNERABILITIES";
+                btn.disabled = false; btn.innerHTML = "RUN SECURITY SWEEP";
             }
         });
     </script>
