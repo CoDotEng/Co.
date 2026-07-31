@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOCE | Track Procurement // P-ZERO & 300V</title>
+    <!-- Ultra-Aggressive Motorsport Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           VELOCE RACING THEME ENGINE // PROCUREMENT DIVISION
+           ============================================================ */
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --surface-accent: #111111;
+            --text: #ffffff;
+            --mut: #666666;
+            --mut-dark: #222222;
+            --corsa-red: #ff003c; 
+            --pirelli-yellow: #ffd700; /* Pirelli Brand Color */
+            --motul-red: #e3000f; /* Motul Brand Color */
+            --terminal-green: #00ff41; /* For the procurement system */
+            --border-mut: rgba(255, 255, 255, 0.08);
+            --ease: cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- GLOBAL RESET & OPTIMIZATIONS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--mut-dark); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--corsa-red); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .brand, .data-label { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 400; text-transform: uppercase; }
+        a { text-decoration: none; color: inherit; display: inline-block; }
+        ul { list-style: none; }
+        
+        /* --- SECURE PRELOADER --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s var(--ease); will-change: transform;
+        }
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: var(--corsa-red); }
+        .data-label { font-size: 0.75rem; letter-spacing: 3px; color: var(--mut); margin-bottom: 0.5rem; text-align: center;}
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1.5rem; overflow: hidden; position: relative; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- HIGH-PERFORMANCE CUSTOM CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+            will-change: transform;
+        }
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+            transition: background 0.2s;
+        }
+        /* Dynamic Cursor States */
+        .cursor.pirelli-mode { border-color: var(--pirelli-yellow); }
+        .cursor.pirelli-mode::after { background: var(--pirelli-yellow); }
+        .cursor.motul-mode { border-color: var(--motul-red); }
+        .cursor.motul-mode::after { background: var(--motul-red); }
+        .cursor.terminal-mode { border-radius: 0; border: 1px solid var(--terminal-green); width: 15px; height: 25px; animation: blink 1s infinite; }
+        .cursor.terminal-mode::after { display: none; }
+        @keyframes blink { 0%, 49% { background: var(--terminal-green); } 50%, 100% { background: transparent; } }
+
+        /* ============================================================
+           UNIVERSAL NAVIGATION
+           ============================================================ */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2rem; position: fixed; width: 100%; top: 0; z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            backdrop-filter: blur(5px);
+        }
+        .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-status { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #fff; letter-spacing: 2px; border: 1px solid var(--border-mut); padding: 0.4rem 1rem; border-radius: 50px; background: rgba(255,255,255,0.05);}
+        .close-btn { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: #fff; transition: color 0.3s; }
+        .close-btn:hover { color: var(--corsa-red); }
+
+        /* ============================================================
+           HERO SECTION // The Vault
+           ============================================================ */
+        .hero {
+            height: 80vh; position: relative; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 5% 5%; overflow: hidden;
+            background: #000; border-bottom: 1px solid var(--border-mut);
+        }
+        .hero-bg {
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            background: url('https://images.unsplash.com/photo-1599818815124-7eb38b97d19c?q=80&w=2500&auto=format&fit=crop') center/cover;
+            z-index: 1; filter: grayscale(100%) brightness(0.3); opacity: 0.7;
+            will-change: transform;
+        }
+        .hero-content { position: relative; z-index: 3; pointer-events: none; padding-bottom: 4rem;}
+        .hero h1 {
+            font-size: clamp(3rem, 9vw, 8rem); line-height: 0.9; letter-spacing: -3px;
+            margin-bottom: 1rem; color: var(--text); text-transform: uppercase;
+        }
+        .hero p {
+            font-size: 1.1rem; max-width: 600px; color: var(--mut); margin-left: 0.5rem;
+            border-left: 3px solid var(--corsa-red); padding-left: 1.5rem; font-weight: 600;
+        }
+
+        /* ============================================================
+           PIRELLI SECTION // Dynamic Canvas Heatmap
+           ============================================================ */
+        .pirelli-section {
+            padding: 10rem 5%; background: var(--surface); border-bottom: 1px solid var(--border-mut);
+            position: relative; overflow: hidden;
+        }
+        .partner-logo { font-size: 3rem; color: var(--pirelli-yellow); margin-bottom: 2rem; letter-spacing: -2px;}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1400px; margin: 0 auto; position: relative; z-index: 2;}
+        
+        .pirelli-info h2 { font-size: 4rem; line-height: 1; margin-bottom: 1.5rem; letter-spacing: -2px;}
+        .pirelli-info p { color: var(--mut); font-size: 1.1rem; margin-bottom: 3rem; max-width: 500px;}
+        
+        .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .spec-box { border-left: 2px solid var(--mut-dark); padding-left: 1rem; }
+        .spec-box:hover { border-color: var(--pirelli-yellow); }
+        .spec-box h4 { font-size: 1.5rem; margin-bottom: 0.2rem; }
+        .spec-box label { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--mut); letter-spacing: 1px; }
+
+        /* The Canvas Heatmap Container */
+        .heatmap-container {
+            width: 100%; height: 500px; background: #000; border: 1px solid var(--border-mut);
+            border-radius: 8px; position: relative; overflow: hidden;
+        }
+        .heatmap-overlay {
+            position: absolute; top: 1rem; left: 1rem; z-index: 10; pointer-events: none;
+        }
+        .heatmap-overlay h4 { color: var(--pirelli-yellow); font-size: 1.2rem; margin-bottom: 0.2rem;}
+        .heatmap-overlay p { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--mut); }
+        canvas.tire-canvas { width: 100%; height: 100%; display: block; }
+        .temp-readout {
+            position: absolute; bottom: 1rem; right: 1rem; font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem; color: #fff; font-weight: 700; z-index: 10;
+        }
+        .temp-readout span { font-size: 1rem; color: var(--mut); }
+
+        /* ============================================================
+           MOTUL SECTION // Viscosity Simulation
+           ============================================================ */
+        .motul-section {
+            padding: 10rem 5%; background: var(--bg); border-bottom: 1px solid var(--border-mut);
+            position: relative; overflow: hidden;
+        }
+        .motul-section .partner-logo { color: var(--motul-red); }
+        
+        /* Oil drop / liquid aesthetic background */
+        .liquid-bg {
+            position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+            background: radial-gradient(circle at center, rgba(227, 0, 15, 0.05) 0%, transparent 70%);
+            z-index: 1; pointer-events: none;
+        }
+
+        .motul-specs { margin-top: 3rem; background: var(--surface); border: 1px solid var(--border-mut); border-radius: 6px; padding: 2rem; }
+        .motul-row { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px dashed var(--mut-dark); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem;}
+        .motul-row:last-child { border-bottom: none; }
+        .motul-row span.val { color: var(--motul-red); font-weight: 700; }
+
+        /* ============================================================
+           PROCUREMENT TERMINAL // Form UI
+           ============================================================ */
+        .terminal-section { padding: 8rem 5%; background: #000; display: flex; justify-content: center; }
+        .terminal-box {
+            width: 100%; max-width: 900px; background: #050505; border: 1px solid #222;
+            border-radius: 8px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .terminal-header {
+            background: #111; padding: 1rem 2rem; border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .terminal-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--mut); letter-spacing: 2px; }
+        .terminal-dots span { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #333; margin-left: 5px; }
+        
+        .terminal-body { padding: 3rem; font-family: 'IBM Plex Mono', monospace; }
+        
+        .term-line { display: flex; margin-bottom: 2rem; align-items: flex-start; }
+        .term-prompt { color: var(--corsa-red); margin-right: 1rem; font-weight: 700; }
+        .term-content { width: 100%; }
+        
+        /* Custom Terminal Dropdown */
+        .term-select-wrapper { position: relative; width: 100%; max-width: 400px; margin-top: 0.5rem;}
+        .term-select-display {
+            background: transparent; border: 1px solid #333; padding: 1rem; color: var(--terminal-green);
+            font-family: inherit; font-size: 0.9rem; cursor: none; display: flex; justify-content: space-between;
+            transition: border-color 0.3s;
+        }
+        .term-select-display:hover { border-color: var(--mut); }
+        .term-dropdown {
+            position: absolute; top: 100%; left: 0; width: 100%; background: #0a0a0a; border: 1px solid #333;
+            border-top: none; max-height: 0; overflow: hidden; transition: max-height 0.3s var(--ease); z-index: 20;
+        }
+        .term-select-wrapper.open .term-dropdown { max-height: 200px; }
+        .term-option { padding: 1rem; color: var(--mut); cursor: none; transition: background 0.2s, color 0.2s; }
+        .term-option:hover { background: #1a1a1a; color: #fff; }
+
+        /* Auto-typed recommendation area */
+        .recommendation-box {
+            background: rgba(0, 255, 65, 0.02); border: 1px dashed var(--terminal-green);
+            padding: 2rem; margin-top: 3rem; display: none; opacity: 0; transition: opacity 0.5s ease;
+        }
+        .recommendation-box.visible { display: block; opacity: 1; }
+        .rec-title { color: #fff; font-size: 1.2rem; font-family: 'Space Grotesk', sans-serif; margin-bottom: 1.5rem; text-transform: uppercase;}
+        .rec-text { color: var(--terminal-green); font-size: 0.9rem; line-height: 1.6; min-height: 80px;}
+        
+        .magnetic-btn {
+            width: 100%; padding: 1.5rem; border: 1px solid var(--terminal-green); background: transparent;
+            color: var(--terminal-green); font-family: 'IBM Plex Mono', monospace; font-size: 1rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; text-align: center;
+            transition: all 0.3s var(--ease); will-change: transform; margin-top: 2rem;
+        }
+        .magnetic-btn:hover { background: var(--terminal-green); color: #000; box-shadow: 0 0 20px rgba(0,255,65,0.2); }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        footer { padding: 6rem 5%; text-align: center; background: #000; border-top: 1px solid #111;}
+        .codot-badge {
+            background: #111; border: 1px solid #333; padding: 1rem 2.5rem; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; color: #888;
+            transition: all 0.3s ease;
+        }
+        .codot-badge span { color: #00e5ff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; }
+        .codot-badge:hover { background: #00e5ff; color: #000; box-shadow: 0 0 30px rgba(0,229,255,0.4); border-color: #00e5ff; }
+        .codot-badge:hover span { color: #000; text-shadow: none; }
+
+        /* ============================================================
+           SCROLL REVEAL ENGINE
+           ============================================================ */
+        .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 992px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 4rem; }
+            .pirelli-info, .motul-info { text-align: center; }
+            .pirelli-info p, .motul-info p { margin: 0 auto 3rem auto; }
+            .terminal-body { padding: 1.5rem; }
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 4rem; }
+            .spec-grid { grid-template-columns: 1fr; }
+            .heatmap-container { height: 350px; }
+            .term-line { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SYSTEM BOOT SEQUENCE -->
+    <div id="preloader">
+        <div class="data-label">AUTHENTICATING_PARTNER_PORTAL // SECURE_LINK</div>
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- GPU-Accelerated Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Minimal Configurator Nav -->
+    <nav>
+        <div class="brand">VELOCE.</div>
+        <div class="nav-status">PROCUREMENT_TERMINAL</div>
+        <a href="webpg111.html" class="close-btn hover-target">RETURN_</a>
+    </nav>
+
+    <!-- Parallax Hero -->
+    <header class="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-content">
+            <div class="data-label" style="text-align: left; margin-bottom: 1rem;">//_OFFICIAL_TRACK_SUPPLIERS</div>
+            <h1 class="reveal">CONSUMABLES<span style="color:var(--corsa-red);">.</span></h1>
+            <p class="reveal" style="transition-delay: 0.2s;">Secure allocation of Pirelli P-Zero™ Trofeo R compounds and Motul 300V racing lubricants for registered Veloce chassis.</p>
+        </div>
+    </header>
+
+    <!-- PIRELLI RUBBER SECTION -->
+    <section class="pirelli-section reveal hover-pirelli">
+        <div class="grid-2">
+            <div class="pirelli-info">
+                <div class="partner-logo">PIRELLI</div>
+                <h2>P-ZERO™ TROFEO R</h2>
+                <p>The ultimate semi-slick track day tire. Engineered to harness the extreme downforce generated by Veloce aerodynamic packages while maintaining structural integrity over 300 KPH.</p>
+                
+                <div class="spec-grid">
+                    <div class="spec-box">
+                        <h4>70°C - 90°C</h4>
+                        <label>OPTIMAL OPERATING WINDOW</label>
+                    </div>
+                    <div class="spec-box">
+                        <h4>2.2 BAR</h4>
+                        <label>TARGET HOT PRESSURE</label>
+                    </div>
+                    <div class="spec-box">
+                        <h4>Asymmetric</h4>
+                        <label>TREAD PATTERN GEOMETRY</label>
+                    </div>
+                    <div class="spec-box">
+                        <h4>60 TW</h4>
+                        <label>TREADWEAR RATING</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE CANVAS HEATMAP VISUALIZER -->
+            <div class="heatmap-container hover-target">
+                <div class="heatmap-overlay">
+                    <h4>SURFACE TELEMETRY</h4>
+                    <p>LIVE THERMAL IMAGING // INTERACTIVE</p>
+                </div>
+                <canvas class="tire-canvas" id="tireCanvas"></canvas>
+                <div class="temp-readout" id="tempReadout">24<span>°C</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOTUL FLUIDS SECTION -->
+    <section class="motul-section reveal hover-motul">
+        <div class="liquid-bg"></div>
+        <div class="grid-2">
+            <!-- Swapped order for layout variation -->
+            <div style="order: 2;" class="motul-info">
+                <div class="partner-logo" style="font-family:'Space Grotesk'; font-weight:900;">MOTUL</div>
+                <h2>300V RACING FLUIDS</h2>
+                <p>Ester Core® technology. When you are pushing 34 PSI of boost and revving to 8,800 RPM, standard synthetics shear. 300V maintains oil pressure at peak thermal load.</p>
+                
+                <div class="motul-specs">
+                    <div class="data-label" style="text-align:left; margin-bottom: 1.5rem;">//_VISCOSITY_APPLICATIONS</div>
+                    <div class="motul-row">
+                        <span>Sprint / Qualify (Low Dilution)</span>
+                        <span class="val">0W-40</span>
+                    </div>
+                    <div class="motul-row">
+                        <span>Endurance (High Thermal Load)</span>
+                        <span class="val">15W-50</span>
+                    </div>
+                    <div class="motul-row">
+                        <span>Veloce Stage 3 (E85 Blend)</span>
+                        <span class="val">20W-60</span>
+                    </div>
+                </div>
+            </div>
+            <div style="order: 1;">
+                <!-- High-res mechanical image to complement oil -->
+                <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1200&auto=format&fit=crop" style="border-radius: 8px; filter: grayscale(100%) contrast(1.2); border: 1px solid var(--border-mut);" alt="Engine Internals">
+            </div>
+        </div>
+    </section>
+
+    <!-- TERMINAL PROCUREMENT FORM -->
+    <section class="terminal-section reveal hover-terminal">
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <div class="terminal-title">VELOCE_LOGISTICS_v2.4</div>
+                <div class="terminal-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="terminal-body">
+                
+                <div class="term-line">
+                    <div class="term-prompt">root@veloce:~$</div>
+                    <div class="term-content">INITIATE PROCUREMENT SEQUENCE</div>
+                </div>
+
+                <div class="term-line">
+                    <div class="term-prompt">>></div>
+                    <div class="term-content">
+                        SELECT_CHASSIS_SPECIFICATION:
+                        <div class="term-select-wrapper" id="chassisSelect">
+                            <div class="term-select-display hover-target" id="chassisDisplay">[ SELECT SPEC ] ▼</div>
+                            <div class="term-dropdown">
+                                <div class="term-option" data-val="Base">Base Spec // OEM Powertrain</div>
+                                <div class="term-option" data-val="Stage2">Stage 2 // Forced Induction</div>
+                                <div class="term-option" data-val="Stage3">Stage 3 // Track Dedicated</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="term-line" style="margin-top: 3rem;">
+                    <div class="term-prompt">>></div>
+                    <div class="term-content">
+                        SELECT_PRIMARY_USE_CASE:
+                        <div class="term-select-wrapper" id="useSelect">
+                            <div class="term-select-display hover-target" id="useDisplay">[ SELECT USE ] ▼</div>
+                            <div class="term-dropdown">
+                                <div class="term-option" data-val="Street">Fast Road / Canyon</div>
+                                <div class="term-option" data-val="Track">HPDE Track Days</div>
+                                <div class="term-option" data-val="Attack">Competitive Time Attack</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Recommendation Box triggered by JS -->
+                <div class="recommendation-box" id="recBox">
+                    <div class="rec-title">SYSTEM RECOMMENDATION</div>
+                    <!-- JS types text into here -->
+                    <div class="rec-text" id="recText"></div> 
+                    
+                    <!-- Magnetic Submit -->
+                    <button class="magnetic-btn hover-target" id="magBtn">AUTHORIZE ALLOCATION</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Universal Footer -->
+    <footer>
+        <a href="../index.html" class="codot-badge hover-target">
+            Engineered By <span>CODOT Agency</span>
+        </a>
+    </footer>
+
+    <!-- ============================================================
+         PROCUREMENT JAVASCRIPT ENGINE & CANVAS PHYSICS
+         ============================================================ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. SECURE PRELOADER ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
+
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 15) + 2; 
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 30);
+
+            // --- 2. GLOBAL MOUSE & GPU CURSOR ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            const cursor = document.getElementById('cursor');
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function renderCursor() {
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(renderCursor);
+            }
+            requestAnimationFrame(renderCursor); 
+
+            // Standard Hover
+            const hoverTargets = document.querySelectorAll('.hover-target');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '50px'; 
+                    cursor.style.height = '50px';
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                });
+            });
+
+            // Section Specific Cursor Colors (Pirelli Yellow, Motul Red, Terminal Green)
+            const pirelliSec = document.querySelector('.hover-pirelli');
+            const motulSec = document.querySelector('.hover-motul');
+            const termSec = document.querySelector('.hover-terminal');
+
+            pirelliSec.addEventListener('mouseenter', () => cursor.classList.add('pirelli-mode'));
+            pirelliSec.addEventListener('mouseleave', () => cursor.classList.remove('pirelli-mode'));
+            
+            motulSec.addEventListener('mouseenter', () => cursor.classList.add('motul-mode'));
+            motulSec.addEventListener('mouseleave', () => cursor.classList.remove('motul-mode'));
+            
+            termSec.addEventListener('mouseenter', () => cursor.classList.add('terminal-mode'));
+            termSec.addEventListener('mouseleave', () => cursor.classList.remove('terminal-mode'));
+
+            // --- 3. PARALLAX HERO ---
+            const heroBg = document.getElementById('heroBg');
+            window.addEventListener('mousemove', () => {
+                let heroX = (window.innerWidth / 2 - mouseX) * 0.015; 
+                let heroY = (window.innerHeight / 2 - mouseY) * 0.015;
+                heroBg.style.transform = `translate3d(${heroX}px, ${heroY}px, 0)`;
+            });
+
+            // --- 4. LIVE CANVAS TIRE HEATMAP ENGINE ---
+            const canvas = document.getElementById('tireCanvas');
+            const ctx = canvas.getContext('2d');
+            const tempReadout = document.getElementById('tempReadout');
+            
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Variables for tire simulation
+            let targetTemp = 24; // Base cold temp
+            let currentTemp = 24;
+
+            // Update target temperature based on mouse X position over the canvas
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                // Map X position to a temperature (24C to 110C)
+                let percent = x / rect.width;
+                targetTemp = 24 + (percent * 86);
+            });
+            canvas.addEventListener('mouseleave', () => {
+                targetTemp = 24; // Cool down when mouse leaves
+            });
+
+            function drawHeatmap() {
+                // Smooth interpolation for temperature
+                currentTemp += (targetTemp - currentTemp) * 0.05;
+                
+                // Update text readout
+                tempReadout.innerHTML = Math.floor(currentTemp) + "<span>°C</span>";
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Determine color based on temperature
+                // Cold (24-50) = Blue -> Dark
+                // Optimal (70-90) = Red -> Yellow
+                // Overheat (90+) = White/Yellow
+                let r = 0, g = 0, b = 0, alpha = 0.8;
+                if (currentTemp < 50) {
+                    b = 255; r = 0; g = Math.floor((currentTemp/50)*100);
+                } else if (currentTemp < 90) {
+                    b = 0; r = 255; g = Math.floor(((currentTemp-50)/40)*255); // Red to Yellow
+                } else {
+                    r = 255; g = 255; b = 255; // White hot
+                }
+
+                const heatColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+
+                // Draw fake "Tire Tread" pattern
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                // Background glow
+                const grad = ctx.createRadialGradient(centerX, centerY, 50, centerX, centerY, canvas.width/1.5);
+                grad.addColorStop(0, heatColor);
+                grad.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = grad;
+                ctx.fillRect(0,0, canvas.width, canvas.height);
+
+                // Draw structural lines to look like telemetry mesh
+                ctx.strokeStyle = `rgba(255,255,255,0.1)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let i=0; i<canvas.width; i+=40) {
+                    ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height);
+                }
+                for(let i=0; i<canvas.height; i+=40) {
+                    ctx.moveTo(0, i); ctx.lineTo(canvas.width, i);
+                }
+                ctx.stroke();
+
+                // Draw the "Contact Patch"
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.5)`;
+                // Width changes based on temp to simulate pressure expansion
+                let patchWidth = 200 + (currentTemp * 0.5); 
+                ctx.fillRect(centerX - patchWidth/2, centerY - 150, patchWidth, 300);
+
+                requestAnimationFrame(drawHeatmap);
+            }
+            drawHeatmap();
+
+            // --- 5. TERMINAL PROCUREMENT LOGIC (Custom Dropdowns & Typing Effect) ---
+            const chassisSelect = document.getElementById('chassisSelect');
+            const chassisDisplay = document.getElementById('chassisDisplay');
+            const useSelect = document.getElementById('useSelect');
+            const useDisplay = document.getElementById('useDisplay');
+            
+            const recBox = document.getElementById('recBox');
+            const recText = document.getElementById('recText');
+
+            let selectedChassis = null;
+            let selectedUse = null;
+
+            // Toggle Dropdowns
+            chassisDisplay.addEventListener('click', () => {
+                chassisSelect.classList.toggle('open');
+                useSelect.classList.remove('open');
+            });
+            useDisplay.addEventListener('click', () => {
+                useSelect.classList.toggle('open');
+                chassisSelect.classList.remove('open');
+            });
+
+            // Handle Selection
+            document.querySelectorAll('#chassisSelect .term-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    selectedChassis = e.target.getAttribute('data-val');
+                    chassisDisplay.innerText = e.target.innerText;
+                    chassisSelect.classList.remove('open');
+                    checkTerminalLogic();
+                });
+            });
+            document.querySelectorAll('#useSelect .term-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    selectedUse = e.target.getAttribute('data-val');
+                    useDisplay.innerText = e.target.innerText;
+                    useSelect.classList.remove('open');
+                    checkTerminalLogic();
+                });
+            });
+
+            // Typewriter effect function
+            let typeInterval;
+            function typeString(str, element) {
+                element.innerHTML = "";
+                let i = 0;
+                clearInterval(typeInterval);
+                typeInterval = setInterval(() => {
+                    element.innerHTML += str.charAt(i);
+                    i++;
+                    if (i >= str.length) clearInterval(typeInterval);
+                }, 20); // Typing speed
+            }
+
+            // Logic to generate recommendation
+            function checkTerminalLogic() {
+                if (selectedChassis && selectedUse) {
+                    recBox.classList.add('visible');
+                    
+                    let rubber = "";
+                    let oil = "";
+
+                    // Matrix Logic
+                    if (selectedChassis === "Stage3" || selectedUse === "Attack") {
+                        rubber = "Pirelli P-Zero Trofeo R // Hard Compound (Heat tolerant)";
+                        oil = "Motul 300V 20W-60 // E85 Dilution Protection";
+                    } else if (selectedChassis === "Stage2" && selectedUse === "Track") {
+                        rubber = "Pirelli P-Zero Trofeo R // Medium Compound";
+                        oil = "Motul 300V 15W-50 // Endurance Load";
+                    } else {
+                        rubber = "Pirelli P-Zero Corsa // Street-Track Hybrid";
+                        oil = "Motul 300V 0W-40 // Sprint Application";
+                    }
+
+                    const outputStr = `> ANALYZING CHASSIS LOAD... OK<br>> CALCULATING THERMAL DYNAMICS... OK<br><br>> RECOMMENDED RUBBER ALLOCATION:<br>  ${rubber}<br><br>> RECOMMENDED FLUID SPECIFICATION:<br>  ${oil}<br><br>> AWAITING AUTHORIZATION...`;
+                    
+                    // The typing effect handles raw text, so we simulate typing the HTML tags slightly faster or just use innerHTML directly for the effect if needed. For simplicity, we just dump it directly but simulate a delay.
+                    recText.innerHTML = "PROCESSING DATA...";
+                    setTimeout(() => {
+                        recText.innerHTML = outputStr;
+                    }, 800);
+                }
+            }
+
+            // --- 6. MAGNETIC SUBMIT BUTTON ---
+            const magBtn = document.getElementById('magBtn');
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => magRect = magBtn.getBoundingClientRect());
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                magBtn.style.transform = `translate3d(${x * 0.2}px, ${y * 0.2}px, 0)`;
+            });
+            magBtn.addEventListener('mouseleave', () => {
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
+            
+            magBtn.addEventListener('click', () => {
+                magBtn.innerText = "ALLOCATION SECURED.";
+                magBtn.style.background = "var(--terminal-green)";
+                magBtn.style.color = "#000";
+            });
+
+            // --- 7. BATCHED SCROLL REVEAL ENGINE ---
+            const reveals = document.querySelectorAll(".reveal");
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }); 
+
+            reveals.forEach(reveal => revealObserver.observe(reveal));
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    if (reveal.getBoundingClientRect().top < window.innerHeight) reveal.classList.add("active");
+                });
+            }, 100);
+
+        });
+    </script>
+</body>
+</html>
