@@ -25,7 +25,7 @@
         }
 
         h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
-        a { text-decoration: none; color: inherit; cursor: none; }
+        a { text-decoration: none; color: inherit; cursor: none; display: inline-block; }
 
         /* --- PRELOADER --- */
         #preloader {
@@ -43,7 +43,6 @@
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
             border: 2px solid var(--corsa-red); border-radius: 50%;
             pointer-events: none; z-index: 9999;
-            /* DO NOT transition transform here, it causes lag. Only transition width/color */
             transition: width 0.2s, height 0.2s, background 0.2s; mix-blend-mode: difference;
             will-change: transform;
         }
@@ -103,7 +102,7 @@
         
         .tilt-card {
             background: var(--surface); height: 500px; border: 1px solid #222;
-            border-radius: 12px; overflow: hidden; position: relative;
+            border-radius: 12px; overflow: hidden; position: relative; display: block;
             transform-style: preserve-3d; transition: transform 0.2s ease-out; will-change: transform;
         }
         .tilt-img {
@@ -179,11 +178,13 @@
     <div class="cursor" id="cursor"></div>
 
     <nav>
-        <div class="brand">VELOCE.</div>
+        <!-- Logo routes back to the main Veloce homepage -->
+        <a href="webpg111.html" class="brand hover-target">VELOCE.</a>
         <div class="nav-links">
-            <a href="#" class="hover-target">Aero Kits</a>
-            <a href="#" class="hover-target">Powertrain</a>
-            <a href="#" class="hover-target">Gallery</a>
+            <!-- Navbar routes to specific subpages -->
+            <a href="aerokits.html" class="hover-target">Aero Kits</a>
+            <a href="powertrain.html" class="hover-target">Powertrain</a>
+            <a href="gallery.html" class="hover-target">Gallery</a>
         </div>
     </nav>
 
@@ -207,42 +208,43 @@
     <section class="gallery">
         <h2 class="section-title">THE ARSENAL.</h2>
         <div class="grid-3d">
-            <div class="tilt-card hover-target">
+            <!-- 3D Cards are now fully functional links -->
+            <a href="chassis.html" class="tilt-card hover-target">
                 <div class="tilt-img img-1"></div>
                 <div class="tilt-content">
                     <h3>CHASSIS</h3>
                     <p>CARBON MONOCOQUE</p>
                 </div>
-            </div>
-            <div class="tilt-card hover-target">
+            </a>
+            <a href="aerokits.html" class="tilt-card hover-target">
                 <div class="tilt-img img-2"></div>
                 <div class="tilt-content">
                     <h3>AERO</h3>
                     <p>ACTIVE WING KITS</p>
                 </div>
-            </div>
-            <div class="tilt-card hover-target">
+            </a>
+            <a href="powertrain.html" class="tilt-card hover-target">
                 <div class="tilt-img img-3"></div>
                 <div class="tilt-content">
                     <h3>POWER</h3>
                     <p>TWIN-TURBO V8</p>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 
-    <!-- Magnetic Physics Button -->
+    <!-- Magnetic Physics Button routes to a configurator/build page -->
     <section class="magnetic-section">
-        <a href="#" class="magnetic-btn hover-target" id="magBtn">BUILD YOURS</a>
+        <a href="build.html" class="magnetic-btn hover-target" id="magBtn">BUILD YOURS</a>
     </section>
 
-    <!-- Seamless Ad Integration -->
-    <section class="ad-space hover-target">
+    <!-- Seamless Ad Integration routes to sponsor page -->
+    <section class="ad-space">
         <div>
             <span class="ad-sponsor">OFFICIAL TRACK PARTNER</span>
             <h3 class="ad-title">PIRELLI P-ZERO™ TROFEO</h3>
         </div>
-        <a href="#" class="ad-btn">Equip Now</a>
+        <a href="equip.html" class="ad-btn hover-target">Equip Now</a>
     </section>
 
     <footer>
@@ -277,7 +279,6 @@
             // --- 2. GLOBAL MOUSE TRACKING (rAF BATCHING) ---
             let mouseX = window.innerWidth / 2;
             let mouseY = window.innerHeight / 2;
-            let isHovering = false;
             
             window.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
@@ -289,17 +290,15 @@
             const heroBg = document.getElementById('heroBg');
 
             function renderLoop() {
-                // Moving cursor via translate3d pushes it to the GPU, preventing layout thrashing
                 cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
                 
-                // Parallax calculations
                 let heroX = (window.innerWidth / 2 - mouseX) * 0.02;
                 let heroY = (window.innerHeight / 2 - mouseY) * 0.02;
                 heroBg.style.transform = `translate3d(${heroX}px, ${heroY}px, 0)`;
 
                 requestAnimationFrame(renderLoop);
             }
-            requestAnimationFrame(renderLoop); // Start the engine
+            requestAnimationFrame(renderLoop);
 
             // Cursor Hover States
             const hoverTargets = document.querySelectorAll('.hover-target');
@@ -320,7 +319,6 @@
             const cards = document.querySelectorAll('.tilt-card');
             cards.forEach(card => {
                 let rect;
-                // CACHE the bounding box on mouseenter so we don't calculate it 60x a second!
                 card.addEventListener('mouseenter', () => {
                     rect = card.getBoundingClientRect(); 
                 });
@@ -341,7 +339,7 @@
 
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-                    rect = null; // Clear cache
+                    rect = null; 
                 });
             });
 
@@ -350,7 +348,7 @@
             let magRect;
             
             magBtn.addEventListener('mouseenter', () => {
-                magRect = magBtn.getBoundingClientRect(); // Cache it
+                magRect = magBtn.getBoundingClientRect(); 
             });
 
             magBtn.addEventListener('mousemove', (e) => {
