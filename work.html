@@ -130,7 +130,7 @@
         .page-header p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
 
         /* --- SECTIONS --- */
-        .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
+        .section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; }
         .section-title { font-size: 2.5rem; margin-bottom: 1rem; text-align: center; }
         .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 4rem; font-size: 1.1rem; }
         
@@ -142,43 +142,89 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-            margin-bottom: 4rem;
+            margin-bottom: 6rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .project-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-        }
-
-        .project-content { padding: 3rem; }
+        .project-content { padding: 4rem 4rem 2rem 4rem; }
         
         .project-header {
             display: flex; justify-content: space-between; align-items: flex-start;
             margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
         }
 
-        .project-title h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .project-category { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
+        .project-title h2 { font-size: 3rem; margin-bottom: 0.5rem; letter-spacing: -1px;}
+        .project-category { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; }
 
         .metrics-container { display: flex; gap: 1rem; flex-wrap: wrap; }
 
         .metric-badge {
-            background: rgba(16, 185, 129, 0.1); color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.5rem 1rem;
+            background: rgba(0, 229, 255, 0.05); color: var(--accent);
+            border: 1px solid rgba(0, 229, 255, 0.2); padding: 0.5rem 1rem;
             border-radius: 50px; font-size: 0.85rem; font-weight: 600;
             display: flex; align-items: center; gap: 0.5rem;
         }
 
-        .project-description { color: var(--text-muted); font-size: 1.1rem; max-width: 800px; margin-bottom: 2rem; }
+        .project-description { color: var(--text-muted); font-size: 1.1rem; max-width: 900px; margin-bottom: 2rem; line-height: 1.8;}
 
         .project-link {
             display: inline-flex; align-items: center; gap: 0.5rem;
             color: var(--bg-color); background-color: var(--accent);
-            padding: 0.8rem 1.5rem; border-radius: 4px; font-weight: 700;
+            padding: 1rem 2rem; border-radius: 4px; font-weight: 700;
             font-family: 'Space Grotesk', sans-serif; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        .project-link:hover { box-shadow: 0 0 15px var(--accent-glow); }
+        .project-link:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-3px); }
+
+        /* --- SCREENSHOT SHOWCASE GRID (The Magic) --- */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 0 4rem 4rem 4rem;
+        }
+
+        .showcase-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: #000;
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease, border-color 0.5s ease;
+        }
+
+        .showcase-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            filter: grayscale(80%) brightness(0.6);
+            transition: filter 0.5s ease, transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: block;
+        }
+
+        /* Hover Physics */
+        .showcase-item:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 229, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.1);
+            z-index: 10;
+        }
+
+        .showcase-item:hover img {
+            filter: grayscale(0%) brightness(1);
+            transform: scale(1.03);
+        }
+
+        /* Featured full-width shot */
+        .item-hero {
+            grid-column: 1 / -1;
+            height: 60vh;
+            min-height: 400px;
+        }
+        .item-standard {
+            height: 350px;
+        }
 
         /* --- THE PROCESS GRID --- */
         .process-grid {
@@ -244,7 +290,7 @@
             padding: 1rem 2.5rem; background-color: transparent; color: var(--accent);
             border: 2px solid var(--accent); font-family: 'Space Grotesk', sans-serif;
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
-            border-radius: 4px; display: inline-block; margin-top: 2rem;
+            border-radius: 4px; display: inline-block; margin-top: 2rem; text-transform: uppercase;
         }
         .btn-outline:hover { background-color: var(--accent); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-glow); }
 
@@ -252,11 +298,14 @@
         footer { text-align: center; padding: 3rem 5%; color: var(--text-muted); }
 
         /* --- ANIMATIONS --- */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 768px) {
             .project-header { flex-direction: column; }
+            .project-content { padding: 2rem; }
+            .showcase-grid { grid-template-columns: 1fr; padding: 0 2rem 2rem 2rem; }
+            .item-hero { height: 40vh; }
         }
     </style>
 </head>
@@ -268,7 +317,7 @@
         <div class="desktop-nav">
             <a href="index.html">Home</a>
             <a href="model.html">How It Works</a>
-            <a href="work.html">Work</a>
+            <a href="work.html" class="active">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
@@ -286,7 +335,7 @@
         <div class="mobile-nav-links">
             <a href="index.html">Home</a>
             <a href="model.html">How It Works</a>
-            <a href="work.html">Work</a>
+            <a href="work.html" class="active">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
             <a href="estimate.html">Instant Quote</a>
@@ -302,32 +351,57 @@
     </header>
 
     <section class="section">
+        <!-- THE NEW VELOCE AUTOMOTIVE PROJECT CARD -->
         <div class="project-card reveal">
             <div class="project-content">
                 <div class="project-header">
                     <div class="project-title">
-                        <span class="project-category">Research & Data / Landing Environment</span>
-                        <h2>Gravity Research</h2>
+                        <span class="project-category">Custom Web Engine / Advanced Telemetry</span>
+                        <h2>VELOCE AUTOMOTIVE</h2>
                     </div>
                     <div class="metrics-container">
                         <div class="metric-badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            100/100 Lighthouse
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                            Custom Physics Engine
                         </div>
                         <div class="metric-badge">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                            Ultra-Fast Load
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            Live HTML5 Canvas
                         </div>
                     </div>
                 </div>
                 
                 <p class="project-description">
-                    A modern, responsive landing environment designed to present complex research insights with absolute clarity. Built entirely with vanilla web technologies to ensure lightning-fast load times. Under the CODOT model, this site features premium ad placements integrated seamlessly into the dark-mode aesthetic, generating passive revenue without disrupting the user experience.
+                    A brutally aggressive, high-end digital environment built for an elite motorsport tuning brand. Engineered completely from scratch without bloated frameworks, this build features custom JavaScript physics, real-time HTML5 Canvas telemetry, 3D Gyro tilt interactions, and a live data-driven configurator. Hardware-accelerated animations ensure it runs at a flawless 60FPS on any device.
                 </p>
 
-                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="project-link">
-                    View Live Project &rarr;
+                <a href="clients/webpg111.html" class="project-link">
+                    Enter Environment &rarr;
                 </a>
+            </div>
+
+            <!-- THE CINEMATIC SCREENSHOT GALLERY -->
+            <div class="showcase-grid">
+                <!-- Massive Hero Shot -->
+                <div class="showcase-item item-hero reveal">
+                    <img src="image_6931d6.jpg" alt="Veloce Home Hero">
+                </div>
+                <!-- Interactive Configurator -->
+                <div class="showcase-item item-standard reveal">
+                    <img src="image_692a53.jpg" alt="Live Configurator HUD">
+                </div>
+                <!-- HTML5 Canvas Dyno -->
+                <div class="showcase-item item-standard reveal">
+                    <img src="image_692e5b.png" alt="Live Hub Dyno Graph">
+                </div>
+                <!-- Cinematic Archive Gallery -->
+                <div class="showcase-item item-standard reveal">
+                    <img src="image_692b6f.jpg" alt="Horizontal Scroll Gallery">
+                </div>
+                <!-- Technical Telemetry Data -->
+                <div class="showcase-item item-standard reveal">
+                    <img src="image_692eb5.png" alt="Technical Specifications Table">
+                </div>
             </div>
         </div>
     </section>
@@ -379,13 +453,12 @@
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Grab all navigation links in both desktop and mobile menus
             const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
             
             allNavLinks.forEach(link => {
-                link.classList.remove("active"); // Strip defaults
+                link.classList.remove("active");
                 if (link.getAttribute("href") === currentPath) {
-                    link.classList.add("active"); // Inject active class for current page
+                    link.classList.add("active");
                 }
             });
 
@@ -398,7 +471,6 @@
                 mobileToggle.classList.toggle('active');
                 mobileOverlay.classList.toggle('active');
                 
-                // Prevent background scrolling when menu is open
                 if (mobileOverlay.classList.contains('active')) {
                     body.style.overflow = 'hidden';
                 } else {
@@ -419,7 +491,7 @@
                 }
             }
             window.addEventListener("scroll", reveal);
-            reveal(); // Trigger once on load
+            reveal(); 
         });
     </script>
 </body>
