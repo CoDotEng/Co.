@@ -1,0 +1,774 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOCE | Aero Kits // Aerodynamic Supremacy</title>
+    <!-- Ultra-Aggressive Motorsport Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           VELOCE RACING THEME ENGINE // AERO DIVISION SPECIFIC
+           ============================================================ */
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --surface-accent: #111111;
+            --text: #ffffff;
+            --mut: #666666;
+            --mut-dark: #333333;
+            --corsa-red: #ff003c; /* Aggressive Motorsport Red */
+            --corsa-red-glow: rgba(255, 0, 60, 0.4);
+            --ad-bg: #111111;
+            --border-mut: rgba(255, 255, 255, 0.05);
+            --ease: cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- GLOBAL RESET & OPTIMIZATIONS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hide default for custom crosshair */ }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .brand, .data-label { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 400; text-transform: uppercase; }
+        
+        a { text-decoration: none; color: inherit; cursor: none; display: inline-block; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        button { border: none; background: transparent; cursor: none; outline: none; }
+
+        /* --- PRELOADER // ENGINE STARTUP --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s var(--ease);
+            will-change: transform;
+        }
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: var(--corsa-red); }
+        .data-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 3px; color: var(--mut); margin-bottom: 0.5rem; }
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1.5rem; overflow: hidden; position: relative; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- HIGH-PERFORMANCE CUSTOM CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            will-change: transform;
+        }
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+        }
+
+        /* ============================================================
+           UNIVERSAL NAVIGATION // Re-used for global consistency
+           ============================================================ */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            mix-blend-mode: difference;
+        }
+        .brand { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-links { display: flex; gap: 3rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-links a.active { color: var(--corsa-red); }
+
+        /* ============================================================
+           KINETIC HERO SECTION // Custom Parallax Engine
+           ============================================================ */
+        .hero {
+            height: 100vh; position: relative; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 5%; overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg) 80%);
+        }
+        /* Custom parallax background moves slower than mouse for depth */
+        .hero-bg {
+            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%;
+            background: url('https://images.unsplash.com/photo-1621217036034-7c309f3e9c63?q=80&w=2500&auto=format&fit=crop') center/cover;
+            z-index: 1; filter: grayscale(100%) contrast(1.3) brightness(0.6); opacity: 0.3;
+            will-change: transform;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, var(--bg) 95%); z-index: 2;
+        }
+        .hero-content { position: relative; z-index: 3; pointer-events: none; }
+        .hero h1 {
+            font-size: clamp(4rem, 12vw, 11rem); line-height: 0.85; letter-spacing: -5px;
+            margin-bottom: 1.5rem; color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,0.4);
+        }
+        .hero h1 span { color: var(--text); -webkit-text-stroke: 0; display: block;}
+        .hero p {
+            font-size: 1.3rem; max-width: 550px; color: var(--mut); margin-left: 0.5rem;
+            border-left: 3px solid var(--corsa-red); padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           TELEMETRY LAB // Wind Tunnel Data Simulation
+           ============================================================ */
+        .telemetry-section {
+            padding: 10rem 5%; background: var(--surface); border-top: 1px solid var(--border-mut);
+        }
+        .telemetry-grid {
+            display: grid; grid-template-columns: 1fr 2fr; gap: 5rem; max-width: 1400px; margin: 0 auto; align-items: center;
+        }
+        .telemetry-info h2 { font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: -2px; line-height: 1.1; margin-bottom: 2rem;}
+        .telemetry-info h2 span { color: var(--corsa-red); }
+        .telemetry-info p { color: var(--mut); font-size: 1.1rem; max-width: 450px;}
+
+        /* Telemetry Data visualization */
+        .telemetry-visual {
+            background: var(--bg); border: 1px solid #1a1a1a; padding: 2rem; border-radius: 8px;
+            font-family: 'IBM Plex Mono', monospace; color: var(--mut); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
+        .telemetry-visual span { color: var(--text); font-weight: 700; }
+        .telemetry-readout { display: flex; flex-direction: column; gap: 0.5rem; }
+        .telemetry-readout label { font-size: 0.75rem; letter-spacing: 1px; color: #444; }
+        .telemetry-readout h4 { font-size: 1.8rem; color: var(--corsa-red); }
+        
+        .realtime-chart {
+            grid-column: span 3; height: 150px; border-bottom: 1px solid #222; border-left: 1px solid #222; position: relative;
+        }
+        .chart-line { position: absolute; bottom: 0; left: 0; width: 0%; height: 2px; background: var(--corsa-red); transition: width 0.1s linear; }
+
+        /* ============================================================
+           COMPONENT SHOWCASE // 3D Gyro Tilt Cards Re-used
+           ============================================================ */
+        .gallery-section { padding: 10rem 5%; }
+        .gallery-header { max-width: 1200px; margin: 0 auto 8rem auto; text-align: center; }
+        .gallery-header h2 { font-size: 4rem; letter-spacing: -2px; margin-bottom: 1rem; }
+        .gallery-header p { color: var(--mut); font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+
+        .grid-3d {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem;
+            perspective: 1500px; max-width: 1400px; margin: 0 auto;
+        }
+        .tilt-card {
+            background: var(--surface); height: 550px; border: 1px solid var(--border-mut);
+            border-radius: 12px; overflow: hidden; position: relative;
+            transform-style: preserve-3d; transition: transform 0.2s var(--ease); will-change: transform;
+            display: block;
+        }
+        .tilt-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0.03) 100%);
+        }
+        .tilt-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; filter: grayscale(100%) contrast(1.1); opacity: 0.7;
+            transition: filter 0.4s ease, opacity 0.4s ease, transform 0.2s var(--ease);
+            transform: translateZ(-100px) scale(1.15); /* Depress inside card */
+            will-change: transform;
+        }
+        .tilt-card:hover .tilt-img { filter: grayscale(0%) contrast(1); opacity: 1; transform: translateZ(-50px) scale(1.1); }
+
+        /* Specific Component Images - Using Placeholder Gradients and patterns to fit dark theme */
+        .img-splitter { background: linear-gradient(180deg, #111 0%, #000 100%); background-image: repeating-linear-gradient(45deg, #1a1a1a 0px, #1a1a1a 2px, transparent 2px, transparent 4px);}
+        .img-skirt { background: linear-gradient(0deg, #111 0%, #000 100%); background-image: repeating-linear-gradient(-45deg, #1a1a1a 0px, #1a1a1a 2px, transparent 2px, transparent 4px); }
+        .img-diffuser { background: radial-gradient(#1a1a1a 10%, #000 70%); background-image: repeating-linear-gradient(90deg, #1a1a1a 0px, #1a1a1a 2px, transparent 2px, transparent 4px); }
+        .img-wing { background: linear-gradient(90deg, #111 0%, #000 100%); background-image: repeating-linear-gradient(0deg, #1a1a1a 0px, #1a1a1a 2px, transparent 2px, transparent 4px);}
+
+        .tilt-content {
+            position: absolute; bottom: 3rem; left: 3rem; right: 3rem; transform: translateZ(100px); /* Pop out */
+            pointer-events: none;
+        }
+        .tilt-content h3 { font-size: 2.5rem; margin-bottom: 0.8rem; letter-spacing: -1px; color: var(--text); text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .tilt-content p { color: var(--corsa-red); font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 1.5rem; }
+        .spec-list { display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border-mut); padding-top: 1.5rem;}
+        .spec-item { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--mut); display: flex; justify-content: space-between; }
+        .spec-item span { color: #fff; }
+
+        /* ============================================================
+           DOWNFORCE COMPARISON // BEFORE/AFTER SLIDER
+           ============================================================ */
+        .comparison-section { padding: 10rem 5%; background: #000; border-top: 1px solid var(--border-mut); }
+        .comparison-header { max-width: 1200px; margin: 0 auto 6rem auto; text-align: center; }
+        .comparison-header h2 { font-size: clamp(3rem, 7vw, 5.5rem); letter-spacing: -3px; margin-bottom: 1.5rem; line-height: 1;}
+        .comparison-header h2 span { color: var(--corsa-red); -webkit-text-stroke: 1px #fff; color: transparent; }
+        .comparison-header p { color: var(--mut); font-size: 1.2rem; max-width: 650px; margin: 0 auto; }
+
+        /* INTERACTIVE SLIDER // HTML5 <input type="range"> method */
+        .comparison-container {
+            width: 100%; max-width: 1200px; margin: 0 auto; height: 650px;
+            position: relative; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-mut);
+        }
+        .comp-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+        }
+        /* Fake Placeholder Images for before/after comparison */
+        .img-before { background-image: url('https://images.unsplash.com/photo-1621217036034-7c309f3e9c63?q=80&w=2500&auto=format&fit=crop'); filter: grayscale(100%) brightness(0.6); }
+        .img-after { background-image: url('https://images.unsplash.com/photo-1621217036034-7c309f3e9c63?q=80&w=2500&auto=format&fit=crop'); filter: contrast(1.1) brightness(0.8); }
+
+        .comp-slider {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,0,60,0.1); border-left: 2px solid var(--corsa-red);
+            will-change: width; overflow: hidden; pointer-events: none; /* Let range input below handle interaction */
+        }
+        /* Custom labels overlayed on the slider */
+        .label-before, .label-after {
+            position: absolute; top: 3rem; font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px;
+            background: #000; color: #fff; padding: 0.6rem 1.2rem; border-radius: 4px; z-index: 10;
+        }
+        .label-before { right: 3rem; }
+        .label-after { left: 3rem; color: var(--corsa-red); border: 1px solid var(--corsa-red); }
+
+        /* The invisible HTML5 range input that acts as the interaction layer */
+        .comp-range {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: col-resize; z-index: 20;
+        }
+
+        /* ============================================================
+           TECHNICAL SPECIFICATIONS TABLE
+           ============================================================ */
+        .spec-section { padding: 10rem 5%; background: var(--surface); }
+        .spec-table-container { max-width: 1000px; margin: 0 auto; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+        .spec-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--mut); }
+        
+        .spec-table th, .spec-table td { padding: 1.5rem 2rem; text-align: left; border-bottom: 1px solid #111; }
+        .spec-table th { background-color: #000; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;}
+        .spec-table tr:hover td { background-color: rgba(255,255,255,0.01); color: #fff; }
+        .spec-table .red { color: var(--corsa-red); font-weight: 700; }
+        .spec-table th.right, .spec-table td.right { text-align: right; }
+
+        /* ============================================================
+           MAGNETIC CTA // ENQUIRE BUTTON
+           ============================================================ */
+        .enquire-section {
+            padding: 8rem 5%; background: #000; text-align: center; border-top: 1px solid var(--border-mut); border-bottom: 1px solid var(--border-mut);
+        }
+        .enquire-section h3 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -1px; }
+        .enquire-section p { color: var(--mut); margin-bottom: 4rem; font-size: 1.1rem; }
+        
+        .magnetic-btn {
+            padding: 1.2rem 4rem; border: 2px solid var(--corsa-red); background: transparent;
+            color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 1rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 3px;
+            transition: all 0.3s var(--ease); will-change: transform;
+        }
+        .magnetic-btn:hover { background: var(--corsa-red); color: #fff; box-shadow: 0 10px 30px var(--corsa-red-glow); }
+
+        /* ============================================================
+           SEAMLESS AD INTEGRATION // GLOBAL consistency
+           ============================================================ */
+        .ad-space {
+            padding: 4rem 5%; background: var(--ad-bg); border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ad-sponsor { font-size: 0.7rem; color: var(--mut); letter-spacing: 4px; display: block; margin-bottom: 0.5rem; text-transform: uppercase;}
+        .ad-title { font-size: 2rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;}
+        .ad-btn { padding: 1rem 2rem; border: 1px solid var(--text); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        .ad-btn:hover { background: var(--text); color: #000; }
+
+        /* ============================================================
+           FOOTER // GLOBAL consistency
+           ============================================================ */
+        footer { padding: 6rem 5%; text-align: center; background: #000;}
+        .codot-badge {
+            background: #111; border: 1px solid #333; padding: 1rem 2.5rem; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; color: #888;
+            transition: all 0.3s ease;
+        }
+        .codot-badge span { color: #00e5ff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; text-shadow: 0 0 10px rgba(0,229,255,0.3); }
+        .codot-badge:hover { background: #00e5ff; color: #000; box-shadow: 0 0 30px rgba(0,229,255,0.4); border-color: #00e5ff; }
+        .codot-badge:hover span { color: #000; text-shadow: none; }
+
+        /* ============================================================
+           SCROLL REVEAL ENGINE // Key for "premium" feel
+           ============================================================ */
+        .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ============================================================
+           RESPONSIVE RE-TUNING
+           ============================================================ */
+        @media (max-width: 992px) {
+            .nav-links { display: none; } /* Hide global links, mobile menu logic not needed for this scope */
+            .telemetry-grid { grid-template-columns: 1fr; gap: 4rem; text-align: center;}
+            .telemetry-info p { margin: 0 auto; }
+            .telemetry-visual { grid-template-columns: repeat(2, 1fr); }
+            .realtime-chart { grid-column: span 2; }
+            .comparison-container { height: 450px; }
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
+            .gallery-header h2, .comparison-header h2 { font-size: 2.8rem; }
+            .grid-3d { gap: 2rem; }
+            .tilt-card { height: 450px; }
+            .tilt-content { bottom: 2rem; left: 2rem; right: 2rem; }
+            .tilt-content h3 { font-size: 2rem; }
+            .spec-table th, .spec-table td { padding: 1rem; font-size: 0.8rem; }
+            .magnetic-btn { width: 100%; padding: 1.2rem; }
+            .ad-space { flex-direction: column; text-align: center; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 0-100 RPM Preloader // Consistency from root -->
+    <div id="preloader">
+        <div class="data-label">BOOTING_AERO_SYSTEMS // VELOCE_99 //</div>
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- GPU-Accelerated Custom Inverted Crosshair Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Universal Navigation // Aero active state -->
+    <nav>
+        <a href="../index.html" class="brand hover-target">VELOCE.</a>
+        <div class="nav-links">
+            <a href="webpg111.html" class="hover-target">Core</a>
+            <a href="aerokits.html" class="hover-target active">Aero</a>
+            <a href="powertrain.html" class="hover-target">Power</a>
+            <a href="gallery.html" class="hover-target">Gallery</a>
+        </div>
+    </nav>
+
+    <!-- Parallax Hero Section // Engineered mood setter -->
+    <header class="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="reveal"><span>Supremacy</span> In Flow<span style="color:var(--corsa-red);">.</span></h1>
+            <p class="reveal" style="transition-delay: 0.2s;">Bespoke aerodynamics engineered using Computational Fluid Dynamics and validated in wind tunnel simulations for track domination.</p>
+        </div>
+    </header>
+
+    <!-- Wind Tunnel Lab Telemetry // Technical Deep Dive -->
+    <section class="telemetry-section reveal">
+        <div class="telemetry-grid">
+            <div class="telemetry-info">
+                <h2>Validated <span>Performance</span>. Zero Hype.</h2>
+                <p>Every Veloce kit undergoes rigorous CFD testing and real-world telemetry logging before deployment. We don’t guess. We know.</p>
+            </div>
+            <!-- Dynamic data visualization visualization -->
+            <div class="telemetry-visual mono">
+                <div class="realtime-chart hover-target">
+                    <div class="chart-line" id="chartFill"></div>
+                    <span style="font-size:0.7rem;position:absolute;top:5px;left:5px;">REALTIME_AIRFLOW // KG_SEC</span>
+                </div>
+                <div class="telemetry-readout">
+                    <label>Drag Coefficient (Cd)</label>
+                    <h4 id="cdValue">0.278</h4>
+                    <span style="color:var(--mut);">OPTIMIZED_STATE</span>
+                </div>
+                <div class="telemetry-readout">
+                    <label>Downforce // 240 KPH</label>
+                    <h4 id="dfValue">1,450 KG</h4>
+                    <span style="color:var(--mut);">MAX_PAYLOAD</span>
+                </div>
+                <div class="telemetry-readout">
+                    <label>Vortex Stability // %</label>
+                    <h4>99.2%</h4>
+                    <span style="color:var(--mut);">STABLE_AIRFLOW</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Component Gallery Header -->
+    <section class="gallery-section reveal">
+        <div class="gallery-header">
+            <div class="data-label">//_COMPONENT_BREAKDOWN_//</div>
+            <h2>Total Aerodynamic Dominance<span style="color:var(--corsa-red);">.</span></h2>
+            <p>From splitter to diffuser, every component is part of a single, coherent engineered system.</p>
+        </div>
+
+        <!-- 3D Gyro Tilt Grid Re-used // Sexy interaction -->
+        <div class="grid-3d">
+            
+            <!-- Carbon Fiber Front Splitter -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-splitter"></div>
+                <div class="tilt-content">
+                    <p>FRONTAL DOMINANCE</p>
+                    <h3>Splitter</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Material // <span>Pre-Preg Carbon</span></div>
+                        <div class="spec-item">Downforce Increase // <span class="red">+120 KG @ 200KPH</span></div>
+                        <div class="spec-item">Mounting // <span>Chassis Hardpoints</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vortex Generator Side Skirts -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-skirt"></div>
+                <div class="tilt-content">
+                    <p>AIRFLOW MANAGEMENT</p>
+                    <h3>Side Skirts</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Primary function // <span>Seal Boundary Layer</span></div>
+                        <div class="spec-item">Vortex Generation // <span class="red">Dual-Cusp Geometry</span></div>
+                        <div class="spec-item">Weight // <span>1.8 KG // PAIR</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kinetic Rear Diffuser -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-diffuser"></div>
+                <div class="tilt-content">
+                    <p>REAR VACUUM EFFECT</p>
+                    <h3>Diffuser</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Primary function // <span>Optimize Underbody Flow</span></div>
+                        <div class="spec-item">Strake geometry // <span class="red">Optimized NACA Profile</span></div>
+                        <div class="spec-item">Compatibility // <span>Model specific HARDPOINTs</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Adjustable Carbon Rear Wing -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-wing"></div>
+                <div class="tilt-content">
+                    <p>MAXIMUM DOWNFORCE</p>
+                    <h3>Rear Wing</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Primary function // <span>Max Rear Grip</span></div>
+                        <div class="spec-item">Adjustment range // <span class="red">0-20 DEG // ACTIVE</span></div>
+                        <div class="spec-item">Material // <span>Autoclaved Carbon // Titan Mounts</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Downforce Comparison Slider // The conversion element -->
+    <section class="comparison-section reveal">
+        <div class="comparison-header">
+            <h2>See the <span>difference</span>. Feel the grip<span style="color:var(--corsa-red);">.</span></h2>
+            <p>Slide to compare a stock setup against a full CODOT Aero package. It’s not about looks, it’s about absolute performance.</p>
+        </div>
+
+        <div class="comparison-container hover-target">
+            <!-- Background Image (Base/Before) -->
+            <div class="comp-img img-before"></div>
+            <!-- Slider Image (Top/After) -->
+            <div class="comp-slider" id="compSlider">
+                <div class="comp-img img-after"></div>
+            </div>
+            <!-- Labels -->
+            <div class="label-before">STOCK CONFIG // 0 KG DOWNFORCE</div>
+            <div class="label-after">VELOCE SPEC // <span id="compData">+1450 KG DOWNFORCE</span></div>
+            <!-- Visible range input handles the interaction -->
+            <input type="range" min="0" max="100" value="50" class="comp-range" id="compRange">
+        </div>
+    </section>
+
+    <!-- Technical Specifications Table // Deep detail for the nerds -->
+    <section class="spec-section reveal">
+        <div class="data-label" style="text-align:center;margin-bottom:3rem;">//_TECHNICAL_SPECIFICATIONS_CHART_V1.1_//</div>
+        <div class="spec-table-container hover-target">
+            <table class="spec-table mono">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Component / Kit</th>
+                        <th>STOCK SPEC</th>
+                        <th>VELOCE SPEC</th>
+                        <th class="right">Net GAIN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Chassis Compatibility</td>
+                        <td>AERO // Carbon Monocoque V2</td>
+                        <td>N/A</td>
+                        <td>FULL HARDPOINT</td>
+                        <td class="right">OPTIMIZED INTEGRATION</td>
+                    </tr>
+                    <tr>
+                        <td>Material science</td>
+                        <td>Aero body paneling</td>
+                        <td>Polymer / Alloy</td>
+                        <td>PRE-PREG CARBON</td>
+                        <td class="right">CRITICAL WEIGHT SAVINGS</td>
+                    </tr>
+                    <tr>
+                        <td>Total Downforce // 240KPH</td>
+                        <td>COMPLETE KIT_V4.0</td>
+                        <td>150 KG</td>
+                        <td class="red">1,450 KG</td>
+                        <td class="right red">+1,300 KG Net GAIN</td>
+                    </tr>
+                    <tr>
+                        <td>Primary Weight savings</td>
+                        <td>Panel swaps (Net loss)</td>
+                        <td>45 KG</td>
+                        <td>12 KG</td>
+                        <td class="right">-33 KG Net LOSS</td>
+                    </tr>
+                    <tr>
+                        <td>Front Axle load // 200KPH</td>
+                        <td>Front Splitter + Canards</td>
+                        <td>+35 KG</td>
+                        <td class="red">+120 KG</td>
+                        <td class="right red">+85 KG Net GAIN</td>
+                    </tr>
+                    <tr>
+                        <td>Rear Axle load // 200KPH</td>
+                        <td>Rear Wing (Active // Max Attack)</td>
+                        <td>+115 KG</td>
+                        <td class="red">+480 KG</td>
+                        <td class="right red">+365 KG Net GAIN</td>
+                    </tr>
+                    <tr>
+                        <td>Adjustability</td>
+                        <td>ACTIVE WING CONFIGURATION</td>
+                        <td>FIXED</td>
+                        <td>TELEMETRY_LINKED</td>
+                        <td class="right">REALTIME_OPTIMIZATION</td>
+                    </tr>
+                    <tr>
+                        <td>Installation hardness</td>
+                        <td>Complete Division Swap</td>
+                        <td>STOCK</td>
+                        <td>PROFESSIONAL_CALIBRATION</td>
+                        <td class="right">CODOT Hardpoint ONLY</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Magnetic CTA Section // Leverage interaction for conversions -->
+    <section class="enquire-section reveal">
+        <h3>Ready to dominate the apex?</h3>
+        <p>Book a consultation with our engineers to configure your custom CODOT Aero Package.</p>
+        <!-- The button pulls towards the mouse within this section -->
+        <a href="dashboard.html" class="magnetic-btn hover-target" id="magneticBtn">CONFIGURE NOW</a>
+    </section>
+
+    <!-- Universal Seamless Ad Integration -->
+    <section class="ad-space">
+        <div>
+            <span class="ad-sponsor">OFFICIAL TRACK PARTNER</span>
+            <h3 class="ad-title">PIRELLI P-ZERO™ TROFEO</h3>
+        </div>
+        <a href="equip.html" class="ad-btn hover-target">Equip Now</a>
+    </section>
+
+    <!-- Universal Footer // CODOT Agency Flex -->
+    <footer>
+        <a href="../index.html" class="codot-badge hover-target">
+            Engineered By <span>CODOT Agency</span>
+        </a>
+    </footer>
+
+    <!-- ============================================================
+         AERODYNAMICS DIVISION PHYSICS & INTERACTION ENGINE
+         ============================================================ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. RPM PRELOADER ENGINE (0-100 Startup sequence) ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
+
+            // Fakes a technical boot-up sequence, jumping randomly for effect
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 20) + 1; 
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        // Slides the entire screen up once booting is complete
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 50);
+
+            // --- 2. GLOBAL MOUSE TRACKING (Physics engine baseline) ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // --- 3. HIGH-PERFORMANCE CURSOR & PARALLAX loop ---
+            // requestAnimationFrame batching ensures zero layout thrashing or CPU choke on potato PCs.
+            const cursor = document.getElementById('cursor');
+            const heroBg = document.getElementById('heroBg');
+
+            function renderLoop() {
+                // Moving the cursor via translate3d pushes it to the GPU hardware accelerat ion, ensuring 60FPS.
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                
+                // Parallax calculations (Background shifts subtly with mouse movement for depth)
+                let heroX = (window.innerWidth / 2 - mouseX) * 0.02; // Slower/subtler movement
+                let heroY = (window.innerHeight / 2 - mouseY) * 0.02;
+                heroBg.style.transform = `translate3d(${heroX}px, ${heroY}px, 0)`;
+
+                requestAnimationFrame(renderLoop);
+            }
+            requestAnimationFrame(renderLoop); // Initialize engine
+
+            // Add magnetic glow effect on generic hover targets
+            const hoverTargets = document.querySelectorAll('.hover-target, a');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; // Expand cursor
+                    cursor.style.height = '60px';
+                    cursor.style.background = 'rgba(255,0,60,0.2)'; // Faint red glow
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                    cursor.style.background = 'transparent';
+                });
+            });
+
+            // --- 4. WIND TUNNEL LAB TELEMETRY LAB Simulation ---
+            const chartFill = document.getElementById('chartFill');
+            const cdValue = document.getElementById('cdValue');
+            const dfValue = document.getElementById('dfValue');
+            
+            // Re-usable random function to fake active data streams
+            function simulateTelemetry() {
+                // Randomly fills the pseudo chart width
+                let chartWidth = Math.floor(Math.random() * 80) + 20; 
+                chartFill.style.width = chartWidth + "%";
+
+                // Fakes minor data fluctuations for Cd and Downforce
+                let fakeCd = (0.278 + (Math.random() * 0.004) - 0.002).toFixed(3);
+                let fakeDf = (1450 + Math.floor(Math.random() * 50) - 25).toLocaleString('en-US') + " KG";
+
+                cdValue.innerText = fakeCd;
+                dfValue.innerText = fakeDf;
+            }
+            // Stream data every 1 second
+            setInterval(simulateTelemetry, 1000);
+
+            // --- 5. INTERACTIVE AERO BEFORE/AFTER SLIDER ---
+            const compRange = document.getElementById('compRange');
+            const compSlider = document.getElementById('compSlider');
+            const compData = document.getElementById('compData');
+
+            // Listens to the range input (input layer) and manipulates the slider (visual layer)
+            compRange.addEventListener('input', (e) => {
+                let val = e.target.value;
+                // Sets the width of the overlay (after image)
+                compSlider.style.width = val + "%";
+
+                // Manipulates text data based on slider percentage for impact
+                if (val > 80) {
+                    compData.innerText = "+1,450 KG DOWNFORCE // COMPLETE KIT // MAX ATTACK";
+                    compData.parentElement.style.color = "var(--corsa-red)";
+                } else if (val > 50) {
+                    compData.innerText = "+980 KG DOWNFORCE // WING OPTIMIZED // STABLE";
+                    compData.parentElement.style.color = "var(--text)";
+                } else if (val > 20) {
+                    compData.innerText = "+340 KG DOWNFORCE // SPLITTER LINKED // GAIN";
+                    compData.parentElement.style.color = "var(--text)";
+                } else {
+                    compData.innerText = "+20 KG DOWNFORCE // MINIMAL EFFECT";
+                    compData.parentElement.style.color = "var(--text)";
+                }
+            });
+
+            // --- 6. OPTIMIZED 3D GYRO TILT CARDS (Component Showcase) ---
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                let rect;
+                // Performance Optimization: Cache the bounding box ONLY on mouseenter so we don't calculate it 60x/sec.
+                card.addEventListener('mouseenter', () => {
+                    rect = card.getBoundingClientRect(); 
+                });
+                
+                card.addEventListener('mousemove', (e) => {
+                    if (!rect) return; // Wait for cache
+                    const x = e.clientX - rect.left; // x position within element
+                    const y = e.clientY - rect.top;  // y position within element
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Rotates card based on proximity to edge (Max 15 degrees)
+                    const rotateX = ((y - centerY) / centerY) * -15; 
+                    const rotateY = ((x - centerX) / centerX) * 15;
+
+                    // perspective(1500px) must be added *inside* the transform for consistent view.
+                    // scale3d(1.02) pops the card forward, creating depth.
+                    card.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    // Smoothly snaps back to absolute center
+                    card.style.transform = `perspective(1500px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    rect = null; // Clear cache
+                });
+            });
+
+            // --- 7. BATCHED SCROLL REVEAL ENGINE ---
+            const reveals = document.querySelectorAll(".reveal");
+            // Uses IntersectionObserver for highly efficient visibility checks (won't choke older CPUs).
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        // revealObserver.unobserve(entry.target); // Optional: Only reveal once
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }); // Reveals when 10% on screen
+
+            reveals.forEach(reveal => revealObserver.observe(reveal));
+
+            // Initial trigger for elements already above fold
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    if (reveal.getBoundingClientRect().top < window.innerHeight) {
+                        reveal.classList.add("active");
+                    }
+                });
+            }, 100);
+
+            // --- 8. MAGNETIC PHYSICS BUTTON (CTA Section) ---
+            const magBtn = document.getElementById('magneticBtn');
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => {
+                magRect = magBtn.getBoundingClientRect(); // Cache it
+            });
+
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                // Calculates the magnetic boundary box
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                // Pulls the button towards the mouse by 30% of the calculated distance
+                // Use translate3d to leverage GPU hardware acceleration.
+                magBtn.style.transform = `translate3d(${x * 0.3}px, ${y * 0.3}px, 0)`;
+            });
+            
+            magBtn.addEventListener('mouseleave', () => {
+                // Snap back smoothly to center
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
+        });
+    </script>
+</body>
+</html>
