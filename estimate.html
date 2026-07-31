@@ -16,6 +16,7 @@
             --accent-glow: rgba(0, 229, 255, 0.4);
             --border-color: rgba(255, 255, 255, 0.05);
             --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -156,6 +157,19 @@
         }
         .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
         textarea.form-control { resize: vertical; min-height: 100px; }
+        
+        /* Custom Select Styling */
+        select.form-control {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%2300e5ff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            cursor: pointer;
+        }
+        select.form-control option {
+            background-color: var(--surface-color);
+            color: var(--text-main);
+        }
 
         /* Custom Slider Range */
         input[type=range] {
@@ -202,10 +216,11 @@
             text-align: center; margin: 3rem 0 2rem 0; padding: 2rem 0;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .price-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .price-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s ease; }
         .live-price {
             font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700;
             color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); line-height: 1.1; margin-top: 0.5rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
         .btn-submit {
@@ -272,7 +287,7 @@
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
-            <a href="estimate.html">Instant Quote</a>
+            <a href="estimate.html" class="active">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
             <a href="dashboard.html">Dashboard</a> 
             <a href="apply.html" class="nav-btn">Apply Now</a>
@@ -290,79 +305,16 @@
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
-            <a href="estimate.html">Instant Quote</a>
+            <a href="estimate.html" class="active">Instant Quote</a>
             <a href="buyout.html">The Buyout</a>
             <a href="dashboard.html">Dashboard</a> 
             <a href="apply.html" class="nav-btn">Apply Now</a>
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // --- DYNAMIC HIGHLIGHTER ENGINE ---
-            let currentPath = window.location.pathname.split("/").pop();
-            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
-
-            const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
-            
-            allNavLinks.forEach(link => {
-                link.classList.remove("active"); 
-                if (link.getAttribute("href") === currentPath) {
-                    link.classList.add("active"); 
-                }
-            });
-
-            // --- MOBILE TOGGLE ENGINE ---
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileOverlay = document.getElementById('mobileOverlay');
-            const body = document.body;
-
-            mobileToggle.addEventListener('click', () => {
-                mobileToggle.classList.toggle('active');
-                mobileOverlay.classList.toggle('active');
-                
-                if (mobileOverlay.classList.contains('active')) {
-                    body.style.overflow = 'hidden';
-                } else {
-                    body.style.overflow = 'auto';
-                }
-            });
-
-            // --- INSTANT QUOTE CALCULATOR LOGIC (INR) ---
-            const pagesSlider = document.getElementById('pagesSlider');
-            const pagesOutput = document.getElementById('pagesOutput');
-            const toggles = document.querySelectorAll('.feature-toggle');
-            const livePrice = document.getElementById('livePrice');
-
-            const BASE_PRICE = 0; 
-            const PRICE_PER_PAGE = 750; 
-
-            function calculateQuote() {
-                let pages = parseInt(pagesSlider.value);
-                pagesOutput.innerText = pages + (pages === 20 ? "+" : "");
-
-                let total = BASE_PRICE + (pages * PRICE_PER_PAGE);
-
-                toggles.forEach(toggle => {
-                    if (toggle.checked) {
-                        total += parseInt(toggle.getAttribute('data-price'));
-                    }
-                });
-
-                // Format with Indian Numbering System
-                livePrice.innerText = "₹" + total.toLocaleString('en-IN');
-            }
-
-            pagesSlider.addEventListener('input', calculateQuote);
-            toggles.forEach(toggle => toggle.addEventListener('change', calculateQuote));
-
-            calculateQuote();
-        });
-    </script>
-
     <header class="page-header">
         <h1>Instant Quote<span class="dot">.</span></h1>
-        <p>Configure your project architecture below. Our engine calculates your build cost in real-time.</p>
+        <p>Configure your project architecture below. Our engine calculates your build cost in real-time based on your current audience traffic.</p>
     </header>
 
     <section class="section">
@@ -378,6 +330,15 @@
                         <label for="email">Email Address</label>
                         <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="trafficSelect">Approximate Monthly Viewership</label>
+                    <select id="trafficSelect" class="form-control">
+                        <option value="low">Under 10,000 Views / Mo (Standard Build Pricing)</option>
+                        <option value="mid">10,000 - 50,000 Views / Mo (Qualifies for Free Build)</option>
+                        <option value="high">50,000+ Views / Mo (Qualifies for Elite Free Build)</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -424,11 +385,11 @@
                 
                 <div class="form-group">
                     <label for="description">Additional Details (Optional)</label>
-                    <textarea id="description" class="form-control" placeholder="Any specific requirements or inspirations?"></textarea>
+                    <textarea id="description" class="form-control" placeholder="Any specific requirements or your current website URL?"></textarea>
                 </div>
 
                 <div class="price-display-wrapper">
-                    <div class="price-label">Estimated Build Cost</div>
+                    <div class="price-label" id="priceLabel">Estimated Build Cost</div>
                     <div class="live-price" id="livePrice">₹0</div>
                 </div>
 
@@ -441,7 +402,7 @@
             <h3>Architecture Submitted!</h3>
             <p style="color: var(--text-muted);">Please save your secure tracking ticket below. Use it to monitor your project status.</p>
             <div class="ticket-id" id="displayTicketID">CO-XXXXXX</div>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly to verify your traffic metrics.</p>
         </div>
     </section>
 
@@ -471,6 +432,76 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // --- NAVIGATION ENGINE ---
+        let currentPath = window.location.pathname.split("/").pop();
+        if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+        const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
+        allNavLinks.forEach(link => {
+            link.classList.remove("active"); 
+            if (link.getAttribute("href") === currentPath) {
+                link.classList.add("active"); 
+            }
+        });
+
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        mobileToggle.addEventListener('click', () => {
+            mobileToggle.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileOverlay.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // --- INSTANT QUOTE CALCULATOR LOGIC ---
+        const pagesSlider = document.getElementById('pagesSlider');
+        const pagesOutput = document.getElementById('pagesOutput');
+        const toggles = document.querySelectorAll('.feature-toggle');
+        const livePrice = document.getElementById('livePrice');
+        const priceLabel = document.getElementById('priceLabel');
+        const trafficSelect = document.getElementById('trafficSelect');
+
+        const BASE_PRICE = 0; 
+        const PRICE_PER_PAGE = 750; 
+
+        function calculateQuote() {
+            let pages = parseInt(pagesSlider.value);
+            pagesOutput.innerText = pages + (pages === 20 ? "+" : "");
+
+            const trafficValue = trafficSelect.value;
+            
+            // Check if user qualifies for the Free Build Ad-Supported Model
+            if (trafficValue === 'mid' || trafficValue === 'high') {
+                priceLabel.innerText = "Estimated Build Cost (Ad-Supported Tier)";
+                priceLabel.style.color = "var(--success)";
+                
+                livePrice.innerText = "₹0 (FREE)";
+                livePrice.style.color = "var(--success)";
+                livePrice.style.textShadow = "0 0 20px var(--success-glow)";
+            } else {
+                // Standard Pricing Logic for Low Traffic
+                let total = BASE_PRICE + (pages * PRICE_PER_PAGE);
+
+                toggles.forEach(toggle => {
+                    if (toggle.checked) {
+                        total += parseInt(toggle.getAttribute('data-price'));
+                    }
+                });
+
+                priceLabel.innerText = "Estimated Build Cost (Standard Tier)";
+                priceLabel.style.color = "var(--text-muted)";
+
+                livePrice.innerText = "₹" + total.toLocaleString('en-IN');
+                livePrice.style.color = "var(--accent)";
+                livePrice.style.textShadow = "0 0 20px var(--accent-glow)";
+            }
+        }
+
+        pagesSlider.addEventListener('input', calculateQuote);
+        toggles.forEach(toggle => toggle.addEventListener('change', calculateQuote));
+        trafficSelect.addEventListener('change', calculateQuote);
+
+        calculateQuote();
+
+        // --- FORM SUBMISSION ENGINE ---
         const form = document.getElementById('applicationForm');
         const submitBtn = document.getElementById('submitBtn');
         const formWrapper = document.getElementById('formWrapper');
@@ -492,8 +523,8 @@
             const pages = document.getElementById('pagesSlider').value;
             const description = document.getElementById('description').value;
             const calculatedPrice = document.getElementById('livePrice').innerText;
+            const trafficText = trafficSelect.options[trafficSelect.selectedIndex].text;
             
-            const toggles = document.querySelectorAll('.feature-toggle');
             const selectedFeatures = [];
             toggles.forEach(toggle => {
                 if (toggle.checked) selectedFeatures.push(toggle.value);
@@ -502,11 +533,12 @@
             const ticketID = generateTicketID();
 
             try {
-                // 1. Log the lead in Firebase (Your existing database setup)
+                // 1. Log the lead in Firebase
                 await addDoc(collection(db, "applications"), {
                     ticketID: ticketID,
                     name: name,
                     email: email,
+                    trafficTier: trafficText,
                     pagesRequested: pages,
                     features: selectedFeatures,
                     estimatedPrice: calculatedPrice,
@@ -516,7 +548,7 @@
                 });
 
                 // 2. Format the project specs for the Discord notification
-                const projectSpecs = `Scale: ${pages} Pages | Features: ${selectedFeatures.length > 0 ? selectedFeatures.join(', ') : 'None'} | Notes: ${description || 'N/A'}`;
+                const projectSpecs = `Traffic: ${trafficText} | Scale: ${pages} Pages | Features: ${selectedFeatures.length > 0 ? selectedFeatures.join(', ') : 'None'} | Notes: ${description || 'N/A'}`;
 
                 // 3. Fire the payload to your Node Server (which then pings Discord)
                 await fetch('/api/lead', {
