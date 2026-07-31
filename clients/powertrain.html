@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOCE | Powertrain // Violent Combustion</title>
+    <!-- Ultra-Aggressive Motorsport Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           VELOCE RACING THEME ENGINE // POWERTRAIN DIVISION SPECIFIC
+           ============================================================ */
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --surface-accent: #111111;
+            --text: #ffffff;
+            --mut: #666666;
+            --mut-dark: #333333;
+            --corsa-red: #ff003c; 
+            --corsa-red-glow: rgba(255, 0, 60, 0.4);
+            --torque-blue: #00e5ff; /* Added blue for Dyno Torque curves */
+            --ad-bg: #111111;
+            --border-mut: rgba(255, 255, 255, 0.05);
+            --ease: cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- GLOBAL RESET & OPTIMIZATIONS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .brand, .data-label { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 400; text-transform: uppercase; }
+        
+        a { text-decoration: none; color: inherit; cursor: none; display: inline-block; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        button { border: none; background: transparent; cursor: none; outline: none; }
+
+        /* --- ECU PRELOADER // ENGINE BOOT SEQUENCE --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s var(--ease);
+            will-change: transform;
+        }
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: var(--corsa-red); }
+        .data-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 3px; color: var(--mut); margin-bottom: 0.5rem; text-align: center;}
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1.5rem; overflow: hidden; position: relative; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- HIGH-PERFORMANCE CUSTOM CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+            will-change: transform;
+        }
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+            transition: background 0.2s;
+        }
+
+        /* ============================================================
+           UNIVERSAL NAVIGATION
+           ============================================================ */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            mix-blend-mode: difference;
+        }
+        .brand { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-links { display: flex; gap: 3rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-links a.active { color: var(--corsa-red); }
+
+        /* ============================================================
+           POWERTRAIN HERO // Heat & Glow
+           ============================================================ */
+        .hero {
+            height: 100vh; position: relative; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 5%; overflow: hidden;
+            background: radial-gradient(circle at center, #1a0505 0%, var(--bg) 80%);
+        }
+        .hero-bg {
+            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%;
+            /* Hot engine / exhaust manifold aesthetic */
+            background: url('https://images.unsplash.com/photo-1506544777-62cd39634b8c?q=80&w=2500&auto=format&fit=crop') center/cover;
+            z-index: 1; filter: grayscale(80%) contrast(1.5) brightness(0.5); opacity: 0.4;
+            will-change: transform;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, var(--bg) 95%); z-index: 2;
+        }
+        .hero-content { position: relative; z-index: 3; pointer-events: none; }
+        .hero h1 {
+            font-size: clamp(4rem, 12vw, 11rem); line-height: 0.85; letter-spacing: -5px;
+            margin-bottom: 1.5rem; color: transparent; -webkit-text-stroke: 2px rgba(255, 60, 60, 0.4);
+        }
+        .hero h1 span { color: var(--text); -webkit-text-stroke: 0; display: block;}
+        .hero p {
+            font-size: 1.3rem; max-width: 600px; color: var(--mut); margin-left: 0.5rem;
+            border-left: 3px solid var(--corsa-red); padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           LIVE DYNO GRAPH SIMULATOR // HTML5 Canvas
+           ============================================================ */
+        .dyno-section {
+            padding: 10rem 5%; background: var(--surface); border-top: 1px solid var(--border-mut);
+        }
+        .dyno-grid {
+            display: grid; grid-template-columns: 1fr 1.5fr; gap: 5rem; max-width: 1400px; margin: 0 auto; align-items: center;
+        }
+        .dyno-info h2 { font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: -2px; line-height: 1.1; margin-bottom: 2rem;}
+        .dyno-info h2 span { color: var(--corsa-red); }
+        .dyno-info p { color: var(--mut); font-size: 1.1rem; max-width: 450px; margin-bottom: 2rem;}
+        
+        .dyno-stats { display: flex; gap: 3rem; margin-top: 2rem; border-top: 1px solid #222; padding-top: 2rem;}
+        .stat-block h4 { font-size: 2.5rem; color: #fff; margin-bottom: 0.2rem; }
+        .stat-block .red { color: var(--corsa-red); }
+        .stat-block .blue { color: var(--torque-blue); }
+        .stat-block label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 2px; color: var(--mut); }
+
+        .dyno-visual {
+            background: #000; border: 1px solid #222; border-radius: 8px;
+            padding: 2rem; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+        /* The grid lines behind the graph */
+        .dyno-grid-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px; pointer-events: none;
+        }
+        canvas { width: 100%; height: 350px; display: block; position: relative; z-index: 2; }
+        
+        .rpm-axis {
+            display: flex; justify-content: space-between; margin-top: 1rem;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--mut);
+        }
+
+        /* ============================================================
+           FORGED ARSENAL // Component Breakdown
+           ============================================================ */
+        .gallery-section { padding: 10rem 5%; background: var(--bg); }
+        .gallery-header { max-width: 1200px; margin: 0 auto 8rem auto; text-align: center; }
+        .gallery-header h2 { font-size: 4rem; letter-spacing: -2px; margin-bottom: 1rem; }
+        .gallery-header p { color: var(--mut); font-size: 1.2rem; max-width: 650px; margin: 0 auto; }
+
+        .grid-3d {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem;
+            perspective: 1500px; max-width: 1400px; margin: 0 auto;
+        }
+        .tilt-card {
+            background: var(--surface); height: 550px; border: 1px solid var(--border-mut);
+            border-radius: 12px; overflow: hidden; position: relative;
+            transform-style: preserve-3d; transition: transform 0.2s var(--ease); will-change: transform;
+            display: block;
+        }
+        .tilt-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; filter: grayscale(100%) contrast(1.2); opacity: 0.6;
+            transition: filter 0.4s ease, opacity 0.4s ease, transform 0.2s var(--ease);
+            transform: translateZ(-100px) scale(1.15); 
+            will-change: transform;
+        }
+        .tilt-card:hover .tilt-img { filter: grayscale(0%) contrast(1.1); opacity: 1; transform: translateZ(-50px) scale(1.1); }
+
+        /* Fake Component Textures */
+        .img-block { background-image: url('https://images.unsplash.com/photo-1598084991519-c90a18eb79bd?q=80&w=1000&auto=format&fit=crop'); }
+        .img-turbo { background-image: url('https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1000&auto=format&fit=crop'); }
+        .img-exhaust { background-image: url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1000&auto=format&fit=crop'); }
+        .img-ecu { background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'); }
+
+        .tilt-content {
+            position: absolute; bottom: 3rem; left: 3rem; right: 3rem; transform: translateZ(100px); 
+            pointer-events: none;
+        }
+        .tilt-content h3 { font-size: 2.2rem; margin-bottom: 0.8rem; letter-spacing: -1px; color: var(--text); text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .tilt-content p { color: var(--corsa-red); font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 0.75rem; margin-bottom: 1.5rem; }
+        .spec-list { display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border-mut); padding-top: 1.5rem;}
+        .spec-item { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--mut); display: flex; justify-content: space-between; }
+        .spec-item span { color: #fff; }
+
+        /* ============================================================
+           INTERACTIVE BOOST MAP SELECTOR (Screen Shake effect)
+           ============================================================ */
+        .boost-section { 
+            padding: 10rem 5%; background: #000; border-top: 1px solid var(--border-mut); 
+            position: relative; overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        /* Glow overlay when boost hits max */
+        .boost-glow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(255,0,60,0.15) 0%, transparent 70%);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .boost-header { max-width: 1200px; margin: 0 auto 6rem auto; text-align: center; position: relative; z-index: 2;}
+        .boost-header h2 { font-size: clamp(3rem, 7vw, 5.5rem); letter-spacing: -3px; margin-bottom: 1.5rem; line-height: 1;}
+        .boost-header p { color: var(--mut); font-size: 1.2rem; max-width: 650px; margin: 0 auto; }
+
+        .boost-container {
+            width: 100%; max-width: 800px; margin: 0 auto; position: relative; z-index: 2;
+            text-align: center;
+        }
+        /* Screen shake animation class triggered via JS */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both infinite; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .map-display { font-family: 'Space Grotesk', sans-serif; font-size: 4rem; color: #fff; margin-bottom: 1rem; }
+        .psi-display { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; color: var(--corsa-red); margin-bottom: 4rem;}
+        
+        /* Custom Range Slider for Map Selection */
+        input[type=range].boost-slider {
+            -webkit-appearance: none; width: 100%; background: transparent; cursor: none;
+        }
+        input[type=range].boost-slider:focus { outline: none; }
+        input[type=range].boost-slider::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #333; border-radius: 2px;
+        }
+        input[type=range].boost-slider::-webkit-slider-thumb {
+            height: 30px; width: 30px; border-radius: 50%; background: var(--corsa-red);
+            -webkit-appearance: none; margin-top: -13px; border: 4px solid #000;
+            box-shadow: 0 0 20px rgba(255,0,60,0.5); transition: transform 0.1s;
+        }
+        input[type=range].boost-slider:active::-webkit-slider-thumb { transform: scale(1.2); }
+        
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 1.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--mut); }
+
+        /* ============================================================
+           TECHNICAL SPECIFICATIONS TABLE
+           ============================================================ */
+        .spec-section { padding: 10rem 5%; background: var(--surface); }
+        .spec-table-container { max-width: 1000px; margin: 0 auto; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+        .spec-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--mut); }
+        
+        .spec-table th, .spec-table td { padding: 1.5rem 2rem; text-align: left; border-bottom: 1px solid #111; }
+        .spec-table th { background-color: #000; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;}
+        .spec-table tr:hover td { background-color: rgba(255,255,255,0.02); color: #fff; }
+        .spec-table .red { color: var(--corsa-red); font-weight: 700; }
+        .spec-table th.right, .spec-table td.right { text-align: right; }
+
+        /* ============================================================
+           MAGNETIC CTA // ENQUIRE BUTTON
+           ============================================================ */
+        .enquire-section {
+            padding: 8rem 5%; background: #000; text-align: center; border-top: 1px solid var(--border-mut); border-bottom: 1px solid var(--border-mut);
+        }
+        .enquire-section h3 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -1px; }
+        .enquire-section p { color: var(--mut); margin-bottom: 4rem; font-size: 1.1rem; }
+        
+        .magnetic-btn {
+            padding: 1.2rem 4rem; border: 2px solid var(--corsa-red); background: transparent;
+            color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 1rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 3px;
+            transition: all 0.3s var(--ease); will-change: transform;
+        }
+        .magnetic-btn:hover { background: var(--corsa-red); color: #fff; box-shadow: 0 10px 30px var(--corsa-red-glow); }
+
+        /* ============================================================
+           SEAMLESS AD INTEGRATION 
+           ============================================================ */
+        .ad-space {
+            padding: 4rem 5%; background: var(--ad-bg); border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ad-sponsor { font-size: 0.7rem; color: var(--mut); letter-spacing: 4px; display: block; margin-bottom: 0.5rem; text-transform: uppercase;}
+        .ad-title { font-size: 2rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;}
+        .ad-btn { padding: 1rem 2rem; border: 1px solid var(--text); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        .ad-btn:hover { background: var(--text); color: #000; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        footer { padding: 6rem 5%; text-align: center; background: #000;}
+        .codot-badge {
+            background: #111; border: 1px solid #333; padding: 1rem 2.5rem; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; color: #888;
+            transition: all 0.3s ease;
+        }
+        .codot-badge span { color: #00e5ff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; text-shadow: 0 0 10px rgba(0,229,255,0.3); }
+        .codot-badge:hover { background: #00e5ff; color: #000; box-shadow: 0 0 30px rgba(0,229,255,0.4); border-color: #00e5ff; }
+        .codot-badge:hover span { color: #000; text-shadow: none; }
+
+        /* ============================================================
+           SCROLL REVEAL ENGINE
+           ============================================================ */
+        .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ============================================================
+           RESPONSIVE RE-TUNING
+           ============================================================ */
+        @media (max-width: 992px) {
+            .nav-links { display: none; } 
+            .dyno-grid { grid-template-columns: 1fr; gap: 4rem; text-align: center;}
+            .dyno-info p { margin: 0 auto 2rem auto; }
+            .dyno-stats { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; -webkit-text-stroke: 1px rgba(255, 60, 60, 0.4); }
+            .gallery-header h2, .boost-header h2 { font-size: 2.8rem; }
+            .grid-3d { gap: 2rem; }
+            .tilt-card { height: 450px; }
+            .tilt-content { bottom: 2rem; left: 2rem; right: 2rem; }
+            .tilt-content h3 { font-size: 2rem; }
+            .spec-table th, .spec-table td { padding: 1rem; font-size: 0.8rem; }
+            .magnetic-btn { width: 100%; padding: 1.2rem; }
+            .ad-space { flex-direction: column; text-align: center; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ECU Boot Sequence -->
+    <div id="preloader">
+        <div class="data-label">BOOTING_STANDALONE_ECU // MAP_3_LOADED //</div>
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- GPU-Accelerated Custom Inverted Crosshair Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Universal Navigation // Power active state -->
+    <nav>
+        <a href="../index.html" class="brand hover-target">VELOCE.</a>
+        <div class="nav-links">
+            <a href="webpg111.html" class="hover-target">Core</a>
+            <a href="aerokits.html" class="hover-target">Aero</a>
+            <a href="powertrain.html" class="hover-target active">Power</a>
+            <a href="gallery.html" class="hover-target">Gallery</a>
+        </div>
+    </nav>
+
+    <!-- Parallax Hero Section // Hot Engine Vibe -->
+    <header class="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="reveal"><span>Forged</span> In Fire<span style="color:var(--corsa-red);">.</span></h1>
+            <p class="reveal" style="transition-delay: 0.2s;">Billet blocks, WRC-derived anti-lag, and telemetry-mapped fuel curves. Pure, violent horsepower engineered for the ragged edge.</p>
+        </div>
+    </header>
+
+    <!-- Live Dyno Graph Simulator // Interactive Canvas -->
+    <section class="dyno-section reveal" id="dynoTrigger">
+        <div class="dyno-grid">
+            <div class="dyno-info">
+                <h2>Verified on the <span>Hub Dyno</span>.</h2>
+                <p>We don't do estimated crank numbers. Every Veloce powertrain package is bolted to a hub dyno, tuned on flex-fuel, and pushed to the absolute thermal limit before delivery.</p>
+                <div class="dyno-stats">
+                    <div class="stat-block">
+                        <label>WHEEL HORSEPOWER</label>
+                        <h4 class="red" id="hpReadout">0</h4>
+                    </div>
+                    <div class="stat-block">
+                        <label>WHEEL TORQUE (NM)</label>
+                        <h4 class="blue" id="tqReadout">0</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dyno-visual hover-target">
+                <div class="data-label" style="position:absolute;top:20px;left:20px;z-index:10;">VELOCE_TWIN_TURBO // RUN_04</div>
+                <div class="dyno-grid-bg"></div>
+                <!-- HTML5 Canvas for live drawing -->
+                <canvas id="dynoCanvas"></canvas>
+                <div class="rpm-axis">
+                    <span>2000</span>
+                    <span>3500</span>
+                    <span>5000</span>
+                    <span>6500</span>
+                    <span>8000 (REDLINE)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Component Gallery Header -->
+    <section class="gallery-section reveal">
+        <div class="gallery-header">
+            <div class="data-label">//_ENGINE_ARCHITECTURE_//</div>
+            <h2>Unsprung Mass is the Enemy<span style="color:var(--corsa-red);">.</span></h2>
+            <p>If it doesn't make the car faster, it doesn't belong in the engine bay. Period.</p>
+        </div>
+
+        <!-- 3D Gyro Tilt Grid Re-used // Sexy interaction -->
+        <div class="grid-3d">
+            
+            <!-- Billet Engine Block -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-block"></div>
+                <div class="tilt-content">
+                    <p>CORE FOUNDATION</p>
+                    <h3>Billet Block</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Material // <span>CNC Machined T6-Alloy</span></div>
+                        <div class="spec-item">Internals // <span class="red">Forged H-Beam Rods</span></div>
+                        <div class="spec-item">Tolerances // <span>Micron-Level Precision</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Twin Precision Turbos -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-turbo"></div>
+                <div class="tilt-content">
+                    <p>ATMOSPHERIC PRESSURE</p>
+                    <h3>Twin Turbos</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Geometry // <span>Dual Ball-Bearing</span></div>
+                        <div class="spec-item">Compressor // <span class="red">Billet 68mm Wheels</span></div>
+                        <div class="spec-item">Spool threshold // <span>2,800 RPM</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standalone ECU -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-ecu"></div>
+                <div class="tilt-content">
+                    <p>THE CENTRAL NERVOUS SYSTEM</p>
+                    <h3>Veloce ECU</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">System // <span>Full Standalone Engine Mgmt</span></div>
+                        <div class="spec-item">Features // <span class="red">WRC-Style Anti-Lag</span></div>
+                        <div class="spec-item">Fueling // <span>Flex-Fuel Auto Interpolation</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Titanium Exhaust System -->
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-exhaust"></div>
+                <div class="tilt-content">
+                    <p>WASTEGATE FLUTTER</p>
+                    <h3>Titanium Exhaust</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">Construction // <span>Argon-Purged Pie Cuts</span></div>
+                        <div class="spec-item">Weight savings // <span class="red">-22 KG vs Stock</span></div>
+                        <div class="spec-item">Resonance // <span>Straight Pipe Aggression</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Boost Map Selector // Triggers screen shake -->
+    <section class="boost-section reveal" id="boostSection">
+        <div class="boost-glow" id="boostGlow"></div>
+        <div class="boost-header">
+            <h2>Select Your <span>Poison</span>.</h2>
+            <p>Cycle through the ECU telemetry maps. Warning: Map 3 is not street legal and utilizes severe anti-lag strategies.</p>
+        </div>
+
+        <div class="boost-container" id="boostShakeBox">
+            <div class="map-display" id="mapDisplay">MAP 1: STREET</div>
+            <div class="psi-display" id="psiDisplay">14.0 PSI // PUMP GAS</div>
+            
+            <!-- HTML5 Range Input -->
+            <input type="range" min="1" max="3" value="1" class="boost-slider hover-target" id="boostSlider">
+            
+            <div class="slider-labels">
+                <span>STREET</span>
+                <span>TRACK</span>
+                <span style="color:var(--corsa-red);">TIME ATTACK</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications Table -->
+    <section class="spec-section reveal">
+        <div class="data-label" style="text-align:center;margin-bottom:3rem;">//_POWERTRAIN_TELEMETRY_DATA_//</div>
+        <div class="spec-table-container hover-target">
+            <table class="spec-table mono">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Component</th>
+                        <th>STOCK (BASE)</th>
+                        <th>VELOCE STAGE 3</th>
+                        <th class="right">DELTA (GAIN)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Maximum Output</td>
+                        <td>Total System HP</td>
+                        <td>510 WHP</td>
+                        <td class="red">1,120 WHP</td>
+                        <td class="right red">+610 WHP</td>
+                    </tr>
+                    <tr>
+                        <td>Peak Torque</td>
+                        <td>Total System NM</td>
+                        <td>650 NM</td>
+                        <td class="red">1,340 NM</td>
+                        <td class="right red">+690 NM</td>
+                    </tr>
+                    <tr>
+                        <td>Boost Pressure</td>
+                        <td>Twin Turbos</td>
+                        <td>12.5 PSI</td>
+                        <td class="red">34.0 PSI</td>
+                        <td class="right">MAPPED TO MAP 3</td>
+                    </tr>
+                    <tr>
+                        <td>Redline Limit</td>
+                        <td>Valvetrain Stability</td>
+                        <td>7,200 RPM</td>
+                        <td>8,800 RPM</td>
+                        <td class="right">TITANIUM RETAINERS</td>
+                    </tr>
+                    <tr>
+                        <td>0-100 KPH</td>
+                        <td>Launch Control Active</td>
+                        <td>3.4 SEC</td>
+                        <td class="red">2.1 SEC</td>
+                        <td class="right red">-1.3 SECONDS</td>
+                    </tr>
+                    <tr>
+                        <td>Transmission</td>
+                        <td>Clutch Pack Upgrade</td>
+                        <td>OEM Plates</td>
+                        <td>BILLET BASKET + KEVLAR</td>
+                        <td class="right">NO SLIP TO 1500NM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Magnetic CTA Section -->
+    <section class="enquire-section reveal">
+        <h3>Time to build the engine?</h3>
+        <p>Book a consultation with our engine builders to spec your Veloce Powertrain.</p>
+        <a href="dashboard.html" class="magnetic-btn hover-target" id="magneticBtn">START BUILD</a>
+    </section>
+
+    <!-- Universal Seamless Ad Integration -->
+    <section class="ad-space">
+        <div>
+            <span class="ad-sponsor">OFFICIAL LUBRICANT PARTNER</span>
+            <h3 class="ad-title">MOTUL 300V RACING OIL</h3>
+        </div>
+        <a href="equip.html" class="ad-btn hover-target">Procure Now</a>
+    </section>
+
+    <!-- Universal Footer -->
+    <footer>
+        <a href="../index.html" class="codot-badge hover-target">
+            Engineered By <span>CODOT Agency</span>
+        </a>
+    </footer>
+
+    <!-- ============================================================
+         POWERTRAIN DIVISION PHYSICS & JAVASCRIPT ENGINE
+         ============================================================ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. ECU PRELOADER ENGINE ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
+
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 20) + 1; 
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
+                        // Start the dyno graph only after boot finishes
+                        setTimeout(startDynoGraph, 500); 
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 50);
+
+            // --- 2. GLOBAL MOUSE TRACKING ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // --- 3. GPU-ACCELERATED CURSOR & PARALLAX ---
+            const cursor = document.getElementById('cursor');
+            const heroBg = document.getElementById('heroBg');
+
+            function renderLoop() {
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                
+                let heroX = (window.innerWidth / 2 - mouseX) * 0.02; 
+                let heroY = (window.innerHeight / 2 - mouseY) * 0.02;
+                heroBg.style.transform = `translate3d(${heroX}px, ${heroY}px, 0)`;
+
+                requestAnimationFrame(renderLoop);
+            }
+            requestAnimationFrame(renderLoop); 
+
+            // Cursor Hover States
+            const hoverTargets = document.querySelectorAll('.hover-target, a, button');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; 
+                    cursor.style.height = '60px';
+                    cursor.style.background = 'rgba(255,0,60,0.1)'; 
+                    cursor.style.borderColor = 'rgba(255,0,60,0.5)';
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                    cursor.style.background = 'transparent';
+                    cursor.style.borderColor = 'var(--corsa-red)';
+                });
+            });
+
+            // --- 4. LIVE HTML5 CANVAS DYNO GRAPH ---
+            const canvas = document.getElementById('dynoCanvas');
+            const ctx = canvas.getContext('2d');
+            const hpReadout = document.getElementById('hpReadout');
+            const tqReadout = document.getElementById('tqReadout');
+            let dynoStarted = false;
+
+            // Resize canvas to fit container properly
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth - 64; // Account for padding
+                canvas.height = 350;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function startDynoGraph() {
+                if (dynoStarted) return;
+                dynoStarted = true;
+
+                let progress = 0; // X-axis progress (0 to canvas.width)
+                const totalHp = 1120;
+                const totalTq = 1340;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                function drawFrame() {
+                    if (progress > canvas.width) return; // Stop when graph is drawn
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Calculate simulated HP/TQ curves based on progress (fake math for visual effect)
+                    let percent = progress / canvas.width;
+                    
+                    // Torque Curve (Peaks early in middle, flattens slightly)
+                    let tqY = canvas.height - (Math.sin(percent * Math.PI) * (canvas.height * 0.7) + (percent * canvas.height * 0.2));
+                    // HP Curve (Builds late, peaks at end)
+                    let hpY = canvas.height - (Math.pow(percent, 2) * canvas.height * 0.85);
+
+                    // Draw HP Line (Red)
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#ff003c';
+                    ctx.moveTo(0, canvas.height);
+                    for (let x = 0; x <= progress; x += 5) {
+                        let p = x / canvas.width;
+                        let y = canvas.height - (Math.pow(p, 2) * canvas.height * 0.85);
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    // Draw TQ Line (Blue)
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#00e5ff';
+                    ctx.moveTo(0, canvas.height);
+                    for (let x = 0; x <= progress; x += 5) {
+                        let p = x / canvas.width;
+                        let y = canvas.height - (Math.sin(p * Math.PI) * (canvas.height * 0.7) + (p * canvas.height * 0.2));
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    // Update Readouts dynamically as it draws
+                    hpReadout.innerText = Math.floor(totalHp * Math.pow(percent, 2));
+                    tqReadout.innerText = Math.floor(totalTq * (Math.sin(percent * Math.PI) * 0.8 + percent * 0.2));
+
+                    progress += 4; // Drawing speed
+                    requestAnimationFrame(drawFrame);
+                }
+                drawFrame();
+            }
+
+            // Trigger dyno graph when scrolled into view
+            const dynoObserver = new IntersectionObserver((entries) => {
+                if(entries[0].isIntersecting) {
+                    // Delay slightly for effect
+                    setTimeout(startDynoGraph, 300);
+                }
+            }, { threshold: 0.5 });
+            dynoObserver.observe(document.getElementById('dynoTrigger'));
+
+            // --- 5. 3D GYRO TILT CARDS ---
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                let rect;
+                card.addEventListener('mouseenter', () => {
+                    rect = card.getBoundingClientRect(); 
+                });
+                
+                card.addEventListener('mousemove', (e) => {
+                    if (!rect) return; 
+                    const x = e.clientX - rect.left; 
+                    const y = e.clientY - rect.top;  
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -15; 
+                    const rotateY = ((x - centerX) / centerX) * 15;
+
+                    card.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1500px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    rect = null; 
+                });
+            });
+
+            // --- 6. INTERACTIVE BOOST MAP SELECTOR (Screen Shake effect) ---
+            const boostSlider = document.getElementById('boostSlider');
+            const mapDisplay = document.getElementById('mapDisplay');
+            const psiDisplay = document.getElementById('psiDisplay');
+            const boostGlow = document.getElementById('boostGlow');
+            const shakeBox = document.getElementById('boostShakeBox');
+            const boostSection = document.getElementById('boostSection');
+
+            boostSlider.addEventListener('input', (e) => {
+                let val = e.target.value;
+                
+                // Reset classes
+                shakeBox.classList.remove('shake');
+                
+                if (val == 1) {
+                    mapDisplay.innerText = "MAP 1: STREET";
+                    mapDisplay.style.color = "#fff";
+                    psiDisplay.innerText = "14.0 PSI // PUMP GAS // DAILY";
+                    psiDisplay.style.color = "var(--mut)";
+                    boostGlow.style.opacity = "0";
+                } else if (val == 2) {
+                    mapDisplay.innerText = "MAP 2: TRACK";
+                    mapDisplay.style.color = "#fff";
+                    psiDisplay.innerText = "22.5 PSI // E85 BLEND // HOT MAP";
+                    psiDisplay.style.color = "var(--corsa-red)";
+                    boostGlow.style.opacity = "0.4";
+                } else if (val == 3) {
+                    mapDisplay.innerText = "MAP 3: TIME ATTACK";
+                    mapDisplay.style.color = "var(--corsa-red)";
+                    psiDisplay.innerText = "34.0 PSI // IGNITION CUT ANTI-LAG // DANGER";
+                    psiDisplay.style.color = "var(--corsa-red)";
+                    boostGlow.style.opacity = "1";
+                    
+                    // Trigger violent screen shake for max boost
+                    shakeBox.classList.add('shake');
+                }
+            });
+
+            // --- 7. BATCHED SCROLL REVEAL ENGINE ---
+            const reveals = document.querySelectorAll(".reveal");
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }); 
+
+            reveals.forEach(reveal => revealObserver.observe(reveal));
+
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    if (reveal.getBoundingClientRect().top < window.innerHeight) {
+                        reveal.classList.add("active");
+                    }
+                });
+            }, 100);
+
+            // --- 8. MAGNETIC PHYSICS BUTTON ---
+            const magBtn = document.getElementById('magneticBtn');
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => {
+                magRect = magBtn.getBoundingClientRect(); 
+            });
+
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                magBtn.style.transform = `translate3d(${x * 0.3}px, ${y * 0.3}px, 0)`;
+            });
+            
+            magBtn.addEventListener('mouseleave', () => {
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
+        });
+    </script>
+</body>
+</html>
