@@ -12,7 +12,7 @@
             --surface: #0a0a0a;
             --text: #ffffff;
             --mut: #666666;
-            --corsa-red: #ff003c; /* Aggressive Motorsport Red */
+            --corsa-red: #ff003c;
             --ad-bg: #111111;
         }
 
@@ -38,12 +38,14 @@
         .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1rem; overflow: hidden; }
         .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
 
-        /* --- CUSTOM CROSSHAIR CURSOR --- */
+        /* --- GPU-ACCELERATED CUSTOM CURSOR --- */
         .cursor {
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
             border: 2px solid var(--corsa-red); border-radius: 50%;
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            pointer-events: none; z-index: 9999;
+            /* DO NOT transition transform here, it causes lag. Only transition width/color */
             transition: width 0.2s, height 0.2s, background 0.2s; mix-blend-mode: difference;
+            will-change: transform;
         }
         .cursor::after {
             content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
@@ -89,8 +91,9 @@
         .marquee-text {
             font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 900;
             color: var(--bg); text-transform: uppercase; animation: scroll 20s linear infinite;
+            will-change: transform;
         }
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes scroll { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-50%,0,0); } }
 
         /* --- 3D TILT GALLERY --- */
         .gallery { padding: 10rem 5%; }
@@ -101,12 +104,12 @@
         .tilt-card {
             background: var(--surface); height: 500px; border: 1px solid #222;
             border-radius: 12px; overflow: hidden; position: relative;
-            transform-style: preserve-3d; transition: transform 0.1s; will-change: transform;
+            transform-style: preserve-3d; transition: transform 0.2s ease-out; will-change: transform;
         }
         .tilt-img {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center; filter: grayscale(80%);
-            transition: filter 0.3s; transform: translateZ(-50px) scale(1.1); /* Pushes image back for depth */
+            transition: filter 0.3s; transform: translateZ(-50px) scale(1.1); 
         }
         .img-1 { background-image: url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=1000&auto=format&fit=crop'); }
         .img-2 { background-image: url('https://images.unsplash.com/photo-1611821064430-0d402202611e?q=80&w=1000&auto=format&fit=crop'); }
@@ -115,7 +118,7 @@
         .tilt-card:hover .tilt-img { filter: grayscale(0%); }
         
         .tilt-content {
-            position: absolute; bottom: 2rem; left: 2rem; transform: translateZ(50px); /* Pops text out */
+            position: absolute; bottom: 2rem; left: 2rem; transform: translateZ(50px);
             pointer-events: none;
         }
         .tilt-content h3 { font-size: 2.5rem; margin-bottom: 0.5rem; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
@@ -130,7 +133,7 @@
             border: 2px solid var(--corsa-red); color: var(--text); font-family: 'Space Grotesk', sans-serif;
             font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
             display: flex; justify-content: center; align-items: center;
-            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background 0.3s; will-change: transform;
+            transition: transform 0.2s ease-out, background 0.3s; will-change: transform;
         }
         .magnetic-btn:hover { background: var(--corsa-red); color: #fff; }
 
@@ -172,7 +175,7 @@
         <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
     </div>
 
-    <!-- Custom Physics Cursor -->
+    <!-- GPU-Accelerated Cursor -->
     <div class="cursor" id="cursor"></div>
 
     <nav>
@@ -248,7 +251,7 @@
         </a>
     </footer>
 
-    <!-- 🔥 THE PHYSICS ENGINE (VANILLA JS) 🔥 -->
+    <!-- 🔥 HIGH-PERFORMANCE JS ENGINE 🔥 -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             
@@ -259,27 +262,47 @@
             const preloader = document.getElementById('preloader');
 
             let timer = setInterval(() => {
-                count += Math.floor(Math.random() * 15) + 1; // Random fast jump
+                count += Math.floor(Math.random() * 15) + 1; 
                 if (count >= 100) {
                     count = 100;
                     clearInterval(timer);
                     setTimeout(() => {
-                        preloader.style.transform = "translateY(-100vh)";
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
                     }, 400);
                 }
                 counterElement.innerText = count;
                 fillElement.style.width = count + "%";
             }, 50);
 
-            // --- 2. CUSTOM CROSSHAIR CURSOR ---
-            const cursor = document.getElementById('cursor');
-            const hoverTargets = document.querySelectorAll('.hover-target');
-
+            // --- 2. GLOBAL MOUSE TRACKING (rAF BATCHING) ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let isHovering = false;
+            
             window.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
+                mouseX = e.clientX;
+                mouseY = e.clientY;
             });
 
+            // --- 3. GPU-ACCELERATED CURSOR & PARALLAX ---
+            const cursor = document.getElementById('cursor');
+            const heroBg = document.getElementById('heroBg');
+
+            function renderLoop() {
+                // Moving cursor via translate3d pushes it to the GPU, preventing layout thrashing
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                
+                // Parallax calculations
+                let heroX = (window.innerWidth / 2 - mouseX) * 0.02;
+                let heroY = (window.innerHeight / 2 - mouseY) * 0.02;
+                heroBg.style.transform = `translate3d(${heroX}px, ${heroY}px, 0)`;
+
+                requestAnimationFrame(renderLoop);
+            }
+            requestAnimationFrame(renderLoop); // Start the engine
+
+            // Cursor Hover States
+            const hoverTargets = document.querySelectorAll('.hover-target');
             hoverTargets.forEach(target => {
                 target.addEventListener('mouseenter', () => {
                     cursor.style.width = '50px';
@@ -293,53 +316,54 @@
                 });
             });
 
-            // --- 3. MOUSE TRACKING PARALLAX (HERO) ---
-            const heroBg = document.getElementById('heroBg');
-            document.addEventListener('mousemove', (e) => {
-                let x = (window.innerWidth / 2 - e.pageX) * 0.02; // Strength of movement
-                let y = (window.innerHeight / 2 - e.pageY) * 0.02;
-                heroBg.style.transform = `translate(${x}px, ${y}px)`;
-            });
-
-            // --- 4. 3D GYRO TILT CARDS ---
+            // --- 4. OPTIMIZED 3D GYRO TILT CARDS ---
             const cards = document.querySelectorAll('.tilt-card');
             cards.forEach(card => {
+                let rect;
+                // CACHE the bounding box on mouseenter so we don't calculate it 60x a second!
+                card.addEventListener('mouseenter', () => {
+                    rect = card.getBoundingClientRect(); 
+                });
+                
                 card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left; // x position within the element
-                    const y = e.clientY - rect.top;  // y position within the element
+                    if (!rect) return;
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
                     
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
                     
-                    // Calculate rotation (max 15 degrees)
                     const rotateX = ((y - centerY) / centerY) * -15; 
                     const rotateY = ((x - centerX) / centerX) * 15;
 
-                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
                 });
 
                 card.addEventListener('mouseleave', () => {
-                    // Snap back to zero
-                    card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    rect = null; // Clear cache
                 });
             });
 
-            // --- 5. MAGNETIC BUTTON PHYSICS ---
+            // --- 5. OPTIMIZED MAGNETIC BUTTON ---
             const magBtn = document.getElementById('magBtn');
-            magBtn.addEventListener('mousemove', (e) => {
-                const rect = magBtn.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                
-                // Pulls the button towards the mouse by 30% of the distance
-                magBtn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-            });
-            magBtn.addEventListener('mouseleave', () => {
-                // Snap back to center
-                magBtn.style.transform = `translate(0px, 0px)`;
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => {
+                magRect = magBtn.getBoundingClientRect(); // Cache it
             });
 
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                magBtn.style.transform = `translate3d(${x * 0.3}px, ${y * 0.3}px, 0)`;
+            });
+            
+            magBtn.addEventListener('mouseleave', () => {
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
         });
     </script>
 </body>
