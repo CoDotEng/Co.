@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How It Works | CODOT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* --- CORE CSS --- */
         :root {
@@ -28,6 +28,7 @@
         }
 
         h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'IBM Plex Mono', monospace; }
         a { text-decoration: none; color: var(--text-main); transition: color 0.3s ease; }
 
         /* =========================================
@@ -131,6 +132,7 @@
         /* --- SECTIONS & GRIDS --- */
         .section { padding: 6rem 5%; max-width: 1200px; margin: 0 auto; }
         .section-title { font-size: 2.5rem; margin-bottom: 3rem; text-align: center; }
+        .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 4rem; font-size: 1.1rem; margin-top: -2rem;}
 
         /* --- TIMELINE/PROCESS LAYOUT --- */
         .process-step {
@@ -160,6 +162,56 @@
         .step-content h3 { font-size: 1.8rem; margin-bottom: 1rem; }
         .step-content p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem; }
         .highlight { color: var(--text-main); font-weight: 600; }
+
+        /* --- NETWORK THRESHOLDS GRID --- */
+        .network-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .network-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+        .network-card:hover {
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+        .network-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .network-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+        }
+        .network-header h4 { font-size: 1.3rem; letter-spacing: -0.5px; }
+        .network-badge {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        .network-metric {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .network-metric span {
+            font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'Inter', sans-serif;
+        }
+        .network-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;}
 
         /* --- ADVANTAGE GRID --- */
         .advantage-grid {
@@ -213,6 +265,7 @@
         @media (max-width: 768px) {
             .process-step { flex-direction: column; gap: 1rem; padding: 2rem; }
             .step-number { font-size: 3rem; }
+            .page-header { padding-top: 8rem; }
         }
     </style>
 </head>
@@ -223,7 +276,7 @@
         
         <div class="desktop-nav">
             <a href="index.html">Home</a>
-            <a href="model.html">How It Works</a>
+            <a href="model.html" class="active">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
@@ -241,7 +294,7 @@
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="mobile-nav-links">
             <a href="index.html">Home</a>
-            <a href="model.html">How It Works</a>
+            <a href="model.html" class="active">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
             <a href="diagnostics.html">The Lab</a>
@@ -254,7 +307,7 @@
 
     <header class="page-header">
         <h1 class="reveal">Radical Transparency<span class="dot">.</span></h1>
-        <p class="reveal">We believe small businesses shouldn't have to risk lakhs of rupees for a website that might not convert. Here is exactly how our partnership model works.</p>
+        <p class="reveal">We front the development costs for high-traffic businesses. If you have the audience, we have the code. Here is exactly how our partnership model works.</p>
     </header>
 
     <section class="section">
@@ -263,8 +316,8 @@
         <div class="process-step reveal">
             <div class="step-number">01</div>
             <div class="step-content">
-                <h3>The Free Build</h3>
-                <p>After your application is accepted, our team gets to work. We design, code, and optimize a custom website for your brand. <span class="highlight">We do not use slow templates or clunky builders.</span> Every site is hard-coded for maximum speed and performance.</p>
+                <h3>The Traffic Audit</h3>
+                <p>Because we cover 100% of the upfront development costs, <span class="highlight">we only partner with domains that meet strict ad-network traffic thresholds.</span> When you apply, our engineers will run a full audit on your monthly active users, domain authority, and niche viability.</p>
                 <p><strong>Your Cost:</strong> ₹0</p>
             </div>
         </div>
@@ -272,26 +325,64 @@
         <div class="process-step reveal">
             <div class="step-number">02</div>
             <div class="step-content">
-                <h3>The Review & Approval</h3>
-                <p>Within a few weeks, we send you a live staging link to view your new site. You can click around, test the speed, and see it on mobile. If it doesn't align with your vision, you walk away. No hard feelings, no invoices.</p>
-                <p><strong>Your Risk:</strong> Zero.</p>
+                <h3>The Free Build</h3>
+                <p>Once qualified, our team gets to work. We design, code, and optimize a custom website for your brand. <span class="highlight">We do not use slow templates or clunky builders.</span> Every site is hard-coded from scratch for maximum speed, SEO penetration, and ad-rendering efficiency.</p>
+                <p><strong>Your Cost:</strong> ₹0</p>
             </div>
         </div>
 
         <div class="process-step reveal">
             <div class="step-number">03</div>
             <div class="step-content">
-                <h3>Domain & Activation</h3>
-                <p>When you give the green light, we push the site live. <span class="highlight">You retain full ownership of your brand.</span> You simply purchase your own domain name (e.g., yourbusiness.in) and any necessary backend services (like email hosting). We handle the technical connection.</p>
-                <p><strong>Your Cost:</strong> Standard domain registrar fees (usually ₹800 - ₹1,500/year).</p>
+                <h3>The Approval & Launch</h3>
+                <p>Within a few weeks, we send you a live staging link. You test the speed and verify the UI. If you give the green light, we push it to production. <span class="highlight">You retain full ownership of your brand and domain.</span> You simply cover your domain registrar fees, and we handle the technical infrastructure.</p>
+                <p><strong>Your Risk:</strong> Zero.</p>
             </div>
         </div>
 
         <div class="process-step reveal">
             <div class="step-number">04</div>
             <div class="step-content">
-                <h3>The Ad-Supported Partnership</h3>
-                <p>Instead of charging you ₹50,000+ for the website and ₹3,000/mo for maintenance, <span class="highlight">we host and maintain the site for free forever.</span> In exchange, CODOT integrates highly curated, non-intrusive ad spaces into the layout. We collect the ad revenue to cover our development and hosting costs. When your business grows and gets traffic, we both win.</p>
+                <h3>Ad-Monetized Hosting</h3>
+                <p>Instead of charging you ₹50,000+ for the build and ₹3,000/mo for maintenance, <span class="highlight">we host and maintain the site for free forever.</span> In exchange, CODOT securely integrates highly curated programmatic ad spaces into the layout. We collect the ad revenue to cover our labor and server costs. When your traffic scales, our revenue scales.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW SECTION: AD NETWORK THRESHOLDS -->
+    <section class="section" style="background-color: var(--surface-color);">
+        <h2 class="section-title reveal">Monetization Thresholds.</h2>
+        <p class="section-subtitle reveal">To qualify for a 100% free build, your current or projected traffic must meet the minimum volume required by our programmatic ad partners.</p>
+
+        <div class="network-grid">
+            <!-- Google Ads -->
+            <div class="network-card reveal">
+                <div class="network-header">
+                    <h4>Google AdSense</h4>
+                    <span class="network-badge">Baseline Tier</span>
+                </div>
+                <span class="network-metric mono">10,000+ <span>Views / Mo</span></span>
+                <p class="network-desc">The industry standard. While Google has no strict hard limit, we require a minimum baseline of organic traffic and a clean policy record to ensure the domain is monetizable before we commit development resources.</p>
+            </div>
+
+            <!-- Mediavine -->
+            <div class="network-card reveal" style="transition-delay: 0.1s;">
+                <div class="network-header">
+                    <h4>Mediavine</h4>
+                    <span class="network-badge">Premium Tier</span>
+                </div>
+                <span class="network-metric mono">50,000+ <span>Sessions / Mo</span></span>
+                <p class="network-desc">A highly exclusive network tailored for lifestyle, finance, tech, and travel niches. Requires high-quality, original long-form content and a primarily US/UK/CA demographic to unlock premium CPM rates.</p>
+            </div>
+
+            <!-- Raptive -->
+            <div class="network-card reveal" style="transition-delay: 0.2s;">
+                <div class="network-header">
+                    <h4>Raptive</h4>
+                    <span class="network-badge">Elite Tier</span>
+                </div>
+                <span class="network-metric mono">100,000+ <span>Views / Mo</span></span>
+                <p class="network-desc">Formerly AdThrive. Reserved for massive, established publishers. Generates the highest possible ad revenue yields on the internet. If you meet this threshold, your site will be built on our fastest dedicated servers.</p>
             </div>
         </div>
     </section>
@@ -334,13 +425,12 @@
             let currentPath = window.location.pathname.split("/").pop();
             if (currentPath === "" || currentPath === "/") currentPath = "index.html";
 
-            // Grab all navigation links in both desktop and mobile menus
             const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
             
             allNavLinks.forEach(link => {
-                link.classList.remove("active"); // Strip defaults
+                link.classList.remove("active");
                 if (link.getAttribute("href") === currentPath) {
-                    link.classList.add("active"); // Inject active class for current page
+                    link.classList.add("active");
                 }
             });
 
@@ -353,7 +443,6 @@
                 mobileToggle.classList.toggle('active');
                 mobileOverlay.classList.toggle('active');
                 
-                // Prevent background scrolling when menu is open
                 if (mobileOverlay.classList.contains('active')) {
                     body.style.overflow = 'hidden';
                 } else {
@@ -374,7 +463,7 @@
                 }
             }
             window.addEventListener("scroll", reveal);
-            reveal(); // Trigger once on load
+            reveal(); 
         });
     </script>
 </body>
