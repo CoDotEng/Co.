@@ -149,27 +149,24 @@
             color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase;
         }
         
-        .form-control {
+        .form-control, select.form-control {
             width: 100%; padding: 1.2rem;
             background-color: var(--bg-color); color: var(--text-main);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
             font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s ease;
+            appearance: none; /* For custom select arrows */
         }
-        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
-        textarea.form-control { resize: vertical; min-height: 100px; }
-        
-        /* Custom Select Styling */
         select.form-control {
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%2300e5ff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
-            background-position: right 1rem center;
+            background-position: right 1.2rem top 50%;
+            background-size: 0.65rem auto;
             cursor: pointer;
         }
-        select.form-control option {
-            background-color: var(--surface-color);
-            color: var(--text-main);
-        }
+        select.form-control option { background-color: var(--surface-color); color: #fff; }
+
+        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
 
         /* Custom Slider Range */
         input[type=range] {
@@ -215,12 +212,18 @@
         .price-display-wrapper {
             text-align: center; margin: 3rem 0 2rem 0; padding: 2rem 0;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.4s ease;
         }
-        .price-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s ease; }
+        .price-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem;}
         .live-price {
             font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700;
-            color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); line-height: 1.1; margin-top: 0.5rem;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); line-height: 1.1; 
+            transition: color 0.4s ease, text-shadow 0.4s ease;
+        }
+        .free-badge {
+            display: block; font-family: 'Inter', sans-serif; font-size: 1rem; 
+            text-transform: uppercase; letter-spacing: 2px; color: var(--success);
+            text-shadow: none; margin-top: 0.5rem; font-weight: 600;
         }
 
         .btn-submit {
@@ -232,6 +235,21 @@
         }
         .btn-submit:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
         .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- THE EMPOWERMENT BOX --- */
+        .empowerment-box {
+            background: rgba(0, 229, 255, 0.02);
+            border: 1px dashed rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 2.5rem;
+            margin-top: 4rem;
+            text-align: left;
+        }
+        .empowerment-box h3 { color: var(--text-main); font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: -0.5px;}
+        .empowerment-box p { color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.7;}
+        .empowerment-box ul { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; padding-left: 1.5rem; line-height: 1.8;}
+        .empowerment-box li { margin-bottom: 0.8rem; }
+        .empowerment-box strong { color: var(--accent); }
 
         /* --- SUCCESS MESSAGE --- */
         .success-box {
@@ -273,6 +291,7 @@
         @media (max-width: 768px) {
             .form-container { padding: 2rem; }
             .form-row { grid-template-columns: 1fr; gap: 1rem; }
+            .empowerment-box { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -314,7 +333,7 @@
 
     <header class="page-header">
         <h1>Instant Quote<span class="dot">.</span></h1>
-        <p>Configure your project architecture below. Our engine calculates your build cost in real-time based on your current audience traffic.</p>
+        <p>Configure your project architecture below. Our engine calculates your build cost in real-time based on your traffic thresholds.</p>
     </header>
 
     <section class="section">
@@ -332,12 +351,15 @@
                     </div>
                 </div>
 
+                <!-- NEW: Traffic Dropdown -->
                 <div class="form-group">
-                    <label for="trafficSelect">Approximate Monthly Viewership</label>
-                    <select id="trafficSelect" class="form-control">
-                        <option value="low">Under 10,000 Views / Mo (Standard Build Pricing)</option>
-                        <option value="mid">10,000 - 50,000 Views / Mo (Qualifies for Free Build)</option>
-                        <option value="high">50,000+ Views / Mo (Qualifies for Elite Free Build)</option>
+                    <label for="trafficSelect">Approx. Monthly Views</label>
+                    <select id="trafficSelect" class="form-control" required>
+                        <option value="0" selected>Just starting out (Under 1,000)</option>
+                        <option value="1000">Growing (1,000 - 5,000)</option>
+                        <option value="5000">Gaining Traction (5,000 - 10,000)</option>
+                        <option value="10000">Established (10,000 - 50,000)</option>
+                        <option value="50000">High Volume (50,000+)</option>
                     </select>
                 </div>
 
@@ -385,16 +407,28 @@
                 
                 <div class="form-group">
                     <label for="description">Additional Details (Optional)</label>
-                    <textarea id="description" class="form-control" placeholder="Any specific requirements or your current website URL?"></textarea>
+                    <textarea id="description" class="form-control" placeholder="Any specific requirements or inspirations?"></textarea>
                 </div>
 
                 <div class="price-display-wrapper">
-                    <div class="price-label" id="priceLabel">Estimated Build Cost</div>
+                    <div class="price-label">Estimated Build Cost</div>
                     <div class="live-price" id="livePrice">₹0</div>
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Quote Request</button>
             </form>
+
+            <!-- EMPOWERMENT BOX (The Surprise Paragraph) -->
+            <div class="empowerment-box">
+                <h3>Wait. What if I don't have 10k views yet?</h3>
+                <p>We know 10,000 monthly views is a high bar for a new business. We believe in backing raw potential. If you fall short of the traffic threshold, you can still unlock a <strong>100% free build</strong> if your business meets just <em>one</em> of our Catalyst Conditions:</p>
+                <ul>
+                    <li><strong>The Audience Route:</strong> 10,000+ highly engaged followers on a single social platform (Instagram, X, YouTube).</li>
+                    <li><strong>The Capital Route:</strong> Verified proof of recent seed funding, angel investment, or incubation.</li>
+                    <li><strong>The High-Ticket Route:</strong> Operating in a premium, high-margin industry (e.g., Luxury Real Estate, Exotic Automotive, Enterprise B2B SaaS).</li>
+                </ul>
+                <p>If you meet any of these conditions, simply mention it in the <strong>Additional Details</strong> box above, and our engineers will manually override the traffic requirement.</p>
+            </div>
         </div>
 
         <div class="success-box" id="successBox">
@@ -402,7 +436,7 @@
             <h3>Architecture Submitted!</h3>
             <p style="color: var(--text-muted);">Please save your secure tracking ticket below. Use it to monitor your project status.</p>
             <div class="ticket-id" id="displayTicketID">CO-XXXXXX</div>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly to verify your traffic metrics.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Our engineers will be in touch via email shortly.</p>
         </div>
     </section>
 
@@ -432,52 +466,51 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- NAVIGATION ENGINE ---
-        let currentPath = window.location.pathname.split("/").pop();
-        if (currentPath === "" || currentPath === "/") currentPath = "index.html";
-        const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
-        allNavLinks.forEach(link => {
-            link.classList.remove("active"); 
-            if (link.getAttribute("href") === currentPath) {
-                link.classList.add("active"); 
-            }
-        });
-
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        mobileToggle.addEventListener('click', () => {
-            mobileToggle.classList.toggle('active');
-            mobileOverlay.classList.toggle('active');
-            document.body.style.overflow = mobileOverlay.classList.contains('active') ? 'hidden' : 'auto';
-        });
-
-        // --- INSTANT QUOTE CALCULATOR LOGIC ---
-        const pagesSlider = document.getElementById('pagesSlider');
-        const pagesOutput = document.getElementById('pagesOutput');
-        const toggles = document.querySelectorAll('.feature-toggle');
-        const livePrice = document.getElementById('livePrice');
-        const priceLabel = document.getElementById('priceLabel');
-        const trafficSelect = document.getElementById('trafficSelect');
-
-        const BASE_PRICE = 0; 
-        const PRICE_PER_PAGE = 750; 
-
-        function calculateQuote() {
-            let pages = parseInt(pagesSlider.value);
-            pagesOutput.innerText = pages + (pages === 20 ? "+" : "");
-
-            const trafficValue = trafficSelect.value;
+        document.addEventListener("DOMContentLoaded", () => {
             
-            // Check if user qualifies for the Free Build Ad-Supported Model
-            if (trafficValue === 'mid' || trafficValue === 'high') {
-                priceLabel.innerText = "Estimated Build Cost (Ad-Supported Tier)";
-                priceLabel.style.color = "var(--success)";
+            // --- DYNAMIC HIGHLIGHTER ENGINE ---
+            let currentPath = window.location.pathname.split("/").pop();
+            if (currentPath === "" || currentPath === "/") currentPath = "index.html";
+
+            const allNavLinks = document.querySelectorAll(".desktop-nav a, .mobile-nav-links a");
+            allNavLinks.forEach(link => {
+                link.classList.remove("active"); 
+                if (link.getAttribute("href") === currentPath) {
+                    link.classList.add("active"); 
+                }
+            });
+
+            // --- MOBILE TOGGLE ENGINE ---
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const body = document.body;
+
+            mobileToggle.addEventListener('click', () => {
+                mobileToggle.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+                if (mobileOverlay.classList.contains('active')) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = 'auto';
+                }
+            });
+
+            // --- INSTANT QUOTE CALCULATOR LOGIC ---
+            const pagesSlider = document.getElementById('pagesSlider');
+            const pagesOutput = document.getElementById('pagesOutput');
+            const toggles = document.querySelectorAll('.feature-toggle');
+            const livePrice = document.getElementById('livePrice');
+            const trafficSelect = document.getElementById('trafficSelect');
+
+            const BASE_PRICE = 0; 
+            const PRICE_PER_PAGE = 750; 
+            const TRAFFIC_THRESHOLD = 10000;
+
+            function calculateQuote() {
+                let pages = parseInt(pagesSlider.value);
+                pagesOutput.innerText = pages + (pages === 20 ? "+" : "");
                 
-                livePrice.innerText = "₹0 (FREE)";
-                livePrice.style.color = "var(--success)";
-                livePrice.style.textShadow = "0 0 20px var(--success-glow)";
-            } else {
-                // Standard Pricing Logic for Low Traffic
+                let views = parseInt(trafficSelect.value);
                 let total = BASE_PRICE + (pages * PRICE_PER_PAGE);
 
                 toggles.forEach(toggle => {
@@ -486,93 +519,97 @@
                     }
                 });
 
-                priceLabel.innerText = "Estimated Build Cost (Standard Tier)";
-                priceLabel.style.color = "var(--text-muted)";
-
-                livePrice.innerText = "₹" + total.toLocaleString('en-IN');
-                livePrice.style.color = "var(--accent)";
-                livePrice.style.textShadow = "0 0 20px var(--accent-glow)";
+                // Threshold Check
+                if (views >= TRAFFIC_THRESHOLD) {
+                    // Turn it green and show ₹0
+                    livePrice.style.color = "var(--success)";
+                    livePrice.style.textShadow = "0 0 20px var(--success-glow)";
+                    livePrice.innerHTML = '₹0 <span class="free-badge">Ad-Supported Tier Unlocked</span>';
+                } else {
+                    // Standard pricing
+                    livePrice.style.color = "var(--accent)";
+                    livePrice.style.textShadow = "0 0 20px var(--accent-glow)";
+                    livePrice.innerText = "₹" + total.toLocaleString('en-IN');
+                }
             }
-        }
 
-        pagesSlider.addEventListener('input', calculateQuote);
-        toggles.forEach(toggle => toggle.addEventListener('change', calculateQuote));
-        trafficSelect.addEventListener('change', calculateQuote);
+            pagesSlider.addEventListener('input', calculateQuote);
+            toggles.forEach(toggle => toggle.addEventListener('change', calculateQuote));
+            trafficSelect.addEventListener('change', calculateQuote);
 
-        calculateQuote();
+            calculateQuote(); // Init on load
 
-        // --- FORM SUBMISSION ENGINE ---
-        const form = document.getElementById('applicationForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const formWrapper = document.getElementById('formWrapper');
-        const successBox = document.getElementById('successBox');
-        const displayTicketID = document.getElementById('displayTicketID');
+            // --- FIREBASE SUBMISSION LOGIC ---
+            const form = document.getElementById('applicationForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const formWrapper = document.getElementById('formWrapper');
+            const successBox = document.getElementById('successBox');
+            const displayTicketID = document.getElementById('displayTicketID');
 
-        function generateTicketID() {
-            return 'CO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
+            function generateTicketID() {
+                return 'CO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Encrypting Payload...";
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Encrypting Payload...";
 
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const pages = document.getElementById('pagesSlider').value;
-            const description = document.getElementById('description').value;
-            const calculatedPrice = document.getElementById('livePrice').innerText;
-            const trafficText = trafficSelect.options[trafficSelect.selectedIndex].text;
-            
-            const selectedFeatures = [];
-            toggles.forEach(toggle => {
-                if (toggle.checked) selectedFeatures.push(toggle.value);
-            });
-
-            const ticketID = generateTicketID();
-
-            try {
-                // 1. Log the lead in Firebase
-                await addDoc(collection(db, "applications"), {
-                    ticketID: ticketID,
-                    name: name,
-                    email: email,
-                    trafficTier: trafficText,
-                    pagesRequested: pages,
-                    features: selectedFeatures,
-                    estimatedPrice: calculatedPrice,
-                    description: description,
-                    status: "1. Architecture Under Review",
-                    timestamp: serverTimestamp()
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const pages = document.getElementById('pagesSlider').value;
+                const views = document.getElementById('trafficSelect').value;
+                const description = document.getElementById('description').value;
+                
+                // Get purely text version of price if it has the HTML span inside
+                let calculatedPrice = livePrice.innerText.split('\n')[0].trim();
+                
+                const selectedFeatures = [];
+                toggles.forEach(toggle => {
+                    if (toggle.checked) selectedFeatures.push(toggle.value);
                 });
 
-                // 2. Format the project specs for the Discord notification
-                const projectSpecs = `Traffic: ${trafficText} | Scale: ${pages} Pages | Features: ${selectedFeatures.length > 0 ? selectedFeatures.join(', ') : 'None'} | Notes: ${description || 'N/A'}`;
+                const ticketID = generateTicketID();
 
-                // 3. Fire the payload to your Node Server (which then pings Discord)
-                await fetch('/api/lead', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                try {
+                    await addDoc(collection(db, "applications"), {
+                        ticketID: ticketID,
                         name: name,
                         email: email,
-                        projectType: projectSpecs,
-                        budget: calculatedPrice
-                    })
-                });
+                        monthlyViews: views,
+                        pagesRequested: pages,
+                        features: selectedFeatures,
+                        estimatedPrice: calculatedPrice,
+                        description: description,
+                        status: "1. Architecture Under Review",
+                        timestamp: serverTimestamp()
+                    });
 
-                // 4. Update the UI to show the success ticket
-                formWrapper.style.display = "none";
-                successBox.style.display = "block";
-                displayTicketID.innerText = ticketID;
+                    const projectSpecs = `Traffic: ${views}+ | Scale: ${pages} Pages | Features: ${selectedFeatures.length > 0 ? selectedFeatures.join(', ') : 'None'} | Notes: ${description || 'N/A'}`;
 
-            } catch (error) {
-                console.error("Error adding document or triggering webhook: ", error);
-                alert("Database transmission failed. Please try again.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Quote Request";
-            }
+                    await fetch('/api/lead', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            projectType: projectSpecs,
+                            budget: calculatedPrice
+                        })
+                    });
+
+                    formWrapper.style.display = "none";
+                    successBox.style.display = "block";
+                    displayTicketID.innerText = ticketID;
+
+                } catch (error) {
+                    console.error("Error adding document or triggering webhook: ", error);
+                    alert("Database transmission failed. Please try again.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Quote Request";
+                }
+            });
         });
     </script>
 </body>
