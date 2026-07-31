@@ -250,6 +250,115 @@
             text-shadow: 0 0 10px var(--accent-glow);
         }
 
+        /* --- NEW PORTFOLIO SHOWCASE STYLES --- */
+        .showcase-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .showcase-card {
+            background: linear-gradient(145deg, #111 0%, #050505 100%);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .showcase-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(0, 229, 255, 0.05), transparent 50%);
+            pointer-events: none;
+        }
+
+        .showcase-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 229, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0, 229, 255, 0.05);
+        }
+
+        .showcase-visual {
+            height: 300px;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .showcase-visual span {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+
+        .showcase-content {
+            padding: 3rem 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .showcase-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            background: rgba(0, 229, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .showcase-card h3 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .showcase-card p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            line-height: 1.7;
+        }
+
+        .showcase-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            color: #000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .showcase-link:hover {
+            background: #fff;
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
         /* --- CTA SECTION --- */
         .cta-section {
             text-align: center;
@@ -277,6 +386,17 @@
             opacity: 1;
             transform: translateY(0);
         }
+        
+        /* Grid background effect for the showcase visual */
+        .grid-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: center center;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -287,7 +407,7 @@
         
         <!-- PC Links -->
         <div class="desktop-nav">
-            <a href="index.html">Home</a>
+            <a href="index.html" class="active">Home</a>
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
@@ -307,7 +427,7 @@
     <!-- MOBILE FULLSCREEN OVERLAY -->
     <div class="mobile-overlay" id="mobileOverlay">
         <div class="mobile-nav-links">
-            <a href="index.html">Home</a>
+            <a href="index.html" class="active">Home</a>
             <a href="model.html">How It Works</a>
             <a href="work.html">Work</a>
             <a href="about.html">About</a>
@@ -350,17 +470,30 @@
         </div>
     </section>
 
-    <!-- PROOF / WORK SECTION -->
+    <!-- 🔥 UPDATED PROOF / WORK SECTION 🔥 -->
     <section id="work" class="section">
         <h2 class="section-title reveal">Built for Speed.</h2>
         <p class="section-subtitle reveal">See what an ad-supported, premium website looks like.</p>
         
-        <div class="grid-3" style="grid-template-columns: 1fr; max-width: 800px;">
-            <!-- Project Highlight: Gravity Research -->
-            <div class="card reveal" style="text-align: center; padding: 4rem 2rem;">
-                <h3 style="font-size: 2rem;">Gravity Research</h3>
-                <p style="max-width: 500px; margin: 0 auto 2rem auto;">A modern, responsive landing environment built to present research insights. 100/100 Lighthouse performance score. Launched under the CODOT Partnership Model.</p>
-                <a href="https://gravityinsights.github.io/GRAVITY_RESEARCH/index.html" target="_blank" class="card-link" style="font-size: 1.1rem;">View Live Site &rarr;</a>
+        <div class="showcase-container reveal">
+            <div class="showcase-card">
+                <!-- Visual Placeholder Area -->
+                <div class="showcase-visual">
+                    <div class="grid-bg"></div>
+                    <span>[ PROJECT_111_VISUAL_RENDER ]</span>
+                </div>
+                
+                <!-- Content Area -->
+                <div class="showcase-content">
+                    <div class="showcase-meta">
+                        <span class="meta-tag">WebGL</span>
+                        <span class="meta-tag">GSAP</span>
+                        <span class="meta-tag">100/100 Perf</span>
+                    </div>
+                    <h3>Project 111</h3>
+                    <p>An immersive, high-performance digital environment. Built to push the limits of browser rendering while maintaining perfect Core Web Vitals. Launched under the CODOT Partnership Model.</p>
+                    <a href="webpg111.html" class="showcase-link">Enter Environment &rarr;</a>
+                </div>
             </div>
         </div>
     </section>
