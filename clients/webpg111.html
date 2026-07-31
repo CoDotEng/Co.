@@ -3,340 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMINA | Architectural Excellence</title>
-    <!-- Ultra-Premium Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+    <title>VELOCE | Advanced Aerodynamics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- HIGH-END THEME VARIABLES --- */
+        /* --- VELOCE RACING THEME --- */
         :root {
-            --bg-base: #f4f4f0;
-            --text-dark: #111111;
-            --text-mut: #888888;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.2);
-            --ad-bg: #e8e8e3;
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --text: #ffffff;
+            --mut: #666666;
+            --corsa-red: #ff003c; /* Aggressive Motorsport Red */
+            --ad-bg: #111111;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hiding default cursor for custom one */ }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
         html { scroll-behavior: smooth; }
-        
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-dark);
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, .serif { font-family: 'Cormorant Garamond', serif; font-weight: 400; }
-
+        h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
         a { text-decoration: none; color: inherit; cursor: none; }
 
-        /* --- CUSTOM CURSOR --- */
-        .cursor-dot, .cursor-outline {
-            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-            border-radius: 50%; z-index: 9999; pointer-events: none;
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
         }
-        .cursor-dot { width: 8px; height: 8px; background-color: var(--gold); }
-        .cursor-outline {
-            width: 40px; height: 40px; border: 1px solid var(--text-dark);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: 8rem; font-weight: 900; color: var(--corsa-red); }
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1rem; overflow: hidden; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- CUSTOM CROSSHAIR CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            transition: width 0.2s, height 0.2s, background 0.2s; mix-blend-mode: difference;
         }
-        
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+        }
+
         /* --- NAVIGATION --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2.5rem 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
-            mix-blend-mode: difference; color: #fff;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            mix-blend-mode: difference;
         }
-        .brand { font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; }
-        .nav-links { display: flex; gap: 4rem; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
-        .nav-links a { position: relative; padding-bottom: 5px; }
-        .nav-links a::after {
-            content: ''; position: absolute; width: 0; height: 1px; bottom: 0; left: 0;
-            background-color: #fff; transition: width 0.4s ease;
-        }
-        .nav-links a:hover::after { width: 100%; }
+        .brand { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-links { display: flex; gap: 3rem; font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; }
 
-        /* --- HERO SECTION --- */
+        /* --- KINETIC HERO SECTION --- */
         .hero {
-            height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+            height: 100vh; position: relative; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 5%; overflow: hidden;
         }
         .hero-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 120%; /* Extra height for parallax */
-            background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2500&auto=format&fit=crop') center/cover;
-            z-index: 1; opacity: 0.9;
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            background: url('https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?q=80&w=2500&auto=format&fit=crop') center/cover;
+            z-index: 1; filter: grayscale(100%) contrast(1.2); opacity: 0.4;
+            will-change: transform;
         }
-        .hero-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)); z-index: 2;
+        .hero-content { position: relative; z-index: 2; pointer-events: none; }
+        .hero h1 {
+            font-size: clamp(4rem, 12vw, 12rem); line-height: 0.85; letter-spacing: -4px;
+            margin-bottom: 1rem; color: transparent; -webkit-text-stroke: 2px #fff;
         }
-        .hero-content {
-            position: relative; z-index: 3; text-align: center; color: #fff; margin-top: 10vh;
-        }
-        .hero-content h1 {
-            font-size: clamp(4rem, 10vw, 9rem); line-height: 0.9; text-transform: uppercase; letter-spacing: -2px;
-            margin-bottom: 1.5rem; text-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .hero-content p {
-            font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 200;
+        .hero h1 span { color: var(--text); -webkit-text-stroke: 0; }
+        .hero p {
+            font-size: 1.2rem; max-width: 500px; color: var(--mut); margin-left: 0.5rem;
+            border-left: 3px solid var(--corsa-red); padding-left: 1rem;
         }
 
-        /* --- MANIFESTO (ABOUT) --- */
-        .manifesto {
-            padding: 15rem 10%; display: flex; justify-content: center; align-items: center; text-align: center;
+        /* --- INFINITE MARQUEE --- */
+        .marquee-container {
+            width: 100%; overflow: hidden; background: var(--corsa-red); padding: 1.5rem 0;
+            white-space: nowrap; display: flex; align-items: center; border-top: 1px solid #fff; border-bottom: 1px solid #fff;
         }
-        .manifesto h2 {
-            font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.2; max-width: 1200px; color: var(--text-dark);
+        .marquee-text {
+            font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 900;
+            color: var(--bg); text-transform: uppercase; animation: scroll 20s linear infinite;
         }
-        .manifesto span { color: var(--gold); font-style: italic; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* --- LUXURY AD INTEGRATION --- */
-        .ad-banner {
-            background-color: var(--ad-bg); padding: 4rem 10%; display: flex; justify-content: space-between; align-items: center;
-            border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;
-        }
-        .ad-meta { display: flex; flex-direction: column; gap: 0.5rem; }
-        .ad-label { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-mut); }
-        .ad-sponsor { font-size: 1.5rem; letter-spacing: 2px; }
-        .ad-copy { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; max-width: 600px; color: var(--text-dark); }
-        .ad-btn {
-            padding: 1rem 2.5rem; border: 1px solid var(--text-dark); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px;
-            transition: all 0.4s ease;
-        }
-        .ad-btn:hover { background: var(--text-dark); color: var(--bg-base); }
-
-        /* --- PROJECT GALLERY --- */
+        /* --- 3D TILT GALLERY --- */
         .gallery { padding: 10rem 5%; }
-        .gallery-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8rem; border-bottom: 1px solid #ccc; padding-bottom: 2rem; }
-        .gallery-header h2 { font-size: 4rem; }
+        .section-title { font-size: 4rem; margin-bottom: 5rem; letter-spacing: -2px; }
         
-        .project-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rem; gap: 5%; }
-        .project-row:nth-child(even) { flex-direction: row-reverse; }
+        .grid-3d { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 3rem; perspective: 1000px; }
         
-        .project-img-wrapper {
-            width: 55%; height: 70vh; overflow: hidden; position: relative;
+        .tilt-card {
+            background: var(--surface); height: 500px; border: 1px solid #222;
+            border-radius: 12px; overflow: hidden; position: relative;
+            transform-style: preserve-3d; transition: transform 0.1s; will-change: transform;
         }
-        .project-img {
-            width: 100%; height: 130%; /* Extra height for parallax effect */
-            background-position: center; background-size: cover;
-            transition: transform 0.1s linear;
+        .tilt-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; filter: grayscale(80%);
+            transition: filter 0.3s; transform: translateZ(-50px) scale(1.1); /* Pushes image back for depth */
         }
-        .img-a { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2000&auto=format&fit=crop'); }
-        .img-b { background-image: url('https://images.unsplash.com/photo-1618221118493-9cfa1a1c00da?q=80&w=2000&auto=format&fit=crop'); }
-        .img-c { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2000&auto=format&fit=crop'); }
+        .img-1 { background-image: url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=1000&auto=format&fit=crop'); }
+        .img-2 { background-image: url('https://images.unsplash.com/photo-1611821064430-0d402202611e?q=80&w=1000&auto=format&fit=crop'); }
+        .img-3 { background-image: url('https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1000&auto=format&fit=crop'); }
 
-        .project-info { width: 40%; }
-        .project-num { font-size: 1rem; color: var(--text-mut); letter-spacing: 2px; margin-bottom: 1rem; display: block; }
-        .project-info h3 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; }
-        .project-info p { color: var(--text-mut); margin-bottom: 2.5rem; font-size: 0.95rem; max-width: 400px; }
-        .view-btn { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--text-dark); padding-bottom: 5px; }
-
-        /* --- FOOTER --- */
-        footer {
-            background-color: var(--text-dark); color: #fff; padding: 8rem 5% 3rem 5%; text-align: center;
+        .tilt-card:hover .tilt-img { filter: grayscale(0%); }
+        
+        .tilt-content {
+            position: absolute; bottom: 2rem; left: 2rem; transform: translateZ(50px); /* Pops text out */
+            pointer-events: none;
         }
-        .footer-giant { font-size: clamp(5rem, 15vw, 15rem); line-height: 0.8; margin-bottom: 5rem; opacity: 0.05; }
-        
-        .footer-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3rem; }
-        
-        /* 🔥 THE CODOT FLEX BADGE 🔥 */
+        .tilt-content h3 { font-size: 2.5rem; margin-bottom: 0.5rem; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .tilt-content p { color: var(--corsa-red); font-weight: 600; letter-spacing: 2px; }
+
+        /* --- MAGNETIC BUTTON SECTION --- */
+        .magnetic-section {
+            height: 60vh; display: flex; justify-content: center; align-items: center; background: #000;
+        }
+        .magnetic-btn {
+            width: 250px; height: 250px; border-radius: 50%; background: transparent;
+            border: 2px solid var(--corsa-red); color: var(--text); font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background 0.3s; will-change: transform;
+        }
+        .magnetic-btn:hover { background: var(--corsa-red); color: #fff; }
+
+        /* --- NATIVE AD INTEGRATION --- */
+        .ad-space {
+            padding: 4rem 5%; background: var(--ad-bg); border-top: 1px solid #222; border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ad-sponsor { font-size: 0.7rem; color: var(--mut); letter-spacing: 4px; display: block; margin-bottom: 0.5rem; }
+        .ad-title { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+        .ad-btn { padding: 1rem 2rem; border: 1px solid var(--text); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
+        .ad-btn:hover { background: var(--text); color: #000; }
+
+        /* --- FOOTER & CODOT BADGE --- */
+        footer { padding: 6rem 5%; text-align: center; }
         .codot-badge {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem 2rem; border-radius: 50px; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
-            display: inline-flex; align-items: center; gap: 12px; color: #888; transition: all 0.4s ease;
+            background: #111; border: 1px solid #333; padding: 1rem 2.5rem; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; color: #888;
+            transition: all 0.3s ease;
         }
-        .codot-badge span { color: #00e5ff; font-weight: 600; text-shadow: 0 0 10px rgba(0,229,255,0.4); }
-        .codot-badge:hover { background: rgba(0,229,255,0.05); border-color: rgba(0,229,255,0.3); transform: translateY(-3px); }
-
-        /* --- ANIMATIONS --- */
-        .reveal { opacity: 0; transform: translateY(60px); transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        .codot-badge span { color: #00e5ff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; }
+        .codot-badge:hover { background: #00e5ff; color: #000; box-shadow: 0 0 30px rgba(0,229,255,0.4); border-color: #00e5ff; }
+        .codot-badge:hover span { color: #000; text-shadow: none; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .project-row { flex-direction: column !important; margin-bottom: 6rem; gap: 2rem; }
-            .project-img-wrapper { width: 100%; height: 50vh; }
-            .project-info { width: 100%; }
-            .ad-banner { flex-direction: column; text-align: center; gap: 2rem; }
-            .footer-bottom { flex-direction: column; gap: 3rem; }
+            .hero h1 { font-size: 4.5rem; }
+            .tilt-card { height: 400px; }
+            .ad-space { flex-direction: column; text-align: center; gap: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Custom Cursor -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-outline" id="cursorOutline"></div>
+    <!-- 0 to 100 Preloader -->
+    <div id="preloader">
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- Custom Physics Cursor -->
+    <div class="cursor" id="cursor"></div>
 
     <nav>
-        <div class="brand serif">Lumina</div>
+        <div class="brand">VELOCE.</div>
         <div class="nav-links">
-            <a href="#" class="hover-target">Studio</a>
-            <a href="#" class="hover-target">Projects</a>
-            <a href="#" class="hover-target">Vision</a>
-            <a href="#" class="hover-target">Contact</a>
+            <a href="#" class="hover-target">Aero Kits</a>
+            <a href="#" class="hover-target">Powertrain</a>
+            <a href="#" class="hover-target">Gallery</a>
         </div>
     </nav>
 
+    <!-- Parallax Hero -->
     <header class="hero">
         <div class="hero-bg" id="heroBg"></div>
-        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="reveal">Sculpting<br>Light & Form</h1>
-            <p class="reveal" style="transition-delay: 0.2s;">Award-Winning Minimalist Architecture</p>
+            <h1>UNSPRUNG<br><span>MASS.</span></h1>
+            <p>Forged carbon fiber and precision telemetry. Engineered to conquer the apex.</p>
         </div>
     </header>
 
-    <section class="manifesto">
-        <h2 class="reveal">We don't just build structures. We engineer <span>emotional resonance</span> through the absolute mastery of space, shadow, and material.</h2>
+    <!-- Infinite Scrolling Text -->
+    <section class="marquee-container">
+        <div class="marquee-text">
+            TRACK PROVEN &nbsp;//&nbsp; WIND TUNNEL TESTED &nbsp;//&nbsp; RAW DOWNFORCE &nbsp;//&nbsp; TRACK PROVEN &nbsp;//&nbsp; WIND TUNNEL TESTED &nbsp;//&nbsp; RAW DOWNFORCE &nbsp;//&nbsp;
+        </div>
     </section>
 
-    <!-- PREMIUM AD SPACE -->
-    <div class="ad-banner reveal">
-        <div class="ad-meta">
-            <span class="ad-label">Bespoke Partner</span>
-            <span class="ad-sponsor serif">AURELIUS</span>
-        </div>
-        <div class="ad-copy">
-            "Elevate your interior acoustics with hand-crafted Danish soundscaping panels."
-        </div>
-        <a href="#" class="ad-btn hover-target">Discover More</a>
-    </div>
-
+    <!-- 3D Gyro Tilt Gallery -->
     <section class="gallery">
-        <div class="gallery-header reveal">
-            <h2 class="serif">Selected Archives</h2>
-            <a href="#" class="view-btn hover-target">View All Works</a>
+        <h2 class="section-title">THE ARSENAL.</h2>
+        <div class="grid-3d">
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-1"></div>
+                <div class="tilt-content">
+                    <h3>CHASSIS</h3>
+                    <p>CARBON MONOCOQUE</p>
+                </div>
+            </div>
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-2"></div>
+                <div class="tilt-content">
+                    <h3>AERO</h3>
+                    <p>ACTIVE WING KITS</p>
+                </div>
+            </div>
+            <div class="tilt-card hover-target">
+                <div class="tilt-img img-3"></div>
+                <div class="tilt-content">
+                    <h3>POWER</h3>
+                    <p>TWIN-TURBO V8</p>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="project-row">
-            <div class="project-img-wrapper reveal">
-                <div class="project-img img-a parallax-img"></div>
-            </div>
-            <div class="project-info reveal">
-                <span class="project-num">01 // 2025</span>
-                <h3>The Oslo<br>Sanctuary</h3>
-                <p>A brutalist concrete framework softened by massive glass panes and warm Baltic timber, overlooking the fjords.</p>
-                <a href="#" class="view-btn hover-target">Explore Project</a>
-            </div>
-        </div>
+    <!-- Magnetic Physics Button -->
+    <section class="magnetic-section">
+        <a href="#" class="magnetic-btn hover-target" id="magBtn">BUILD YOURS</a>
+    </section>
 
-        <div class="project-row">
-            <div class="project-img-wrapper reveal">
-                <div class="project-img img-b parallax-img"></div>
-            </div>
-            <div class="project-info reveal">
-                <span class="project-num">02 // 2024</span>
-                <h3>Apex Tower</h3>
-                <p>Corporate headquarters redefined. A 40-story vertical forest integrating sustainable biophilic design into the urban core.</p>
-                <a href="#" class="view-btn hover-target">Explore Project</a>
-            </div>
+    <!-- Seamless Ad Integration -->
+    <section class="ad-space hover-target">
+        <div>
+            <span class="ad-sponsor">OFFICIAL TRACK PARTNER</span>
+            <h3 class="ad-title">PIRELLI P-ZERO™ TROFEO</h3>
         </div>
-
-        <div class="project-row">
-            <div class="project-img-wrapper reveal">
-                <div class="project-img img-c parallax-img"></div>
-            </div>
-            <div class="project-info reveal">
-                <span class="project-num">03 // 2026</span>
-                <h3>Kyoto Pavilion</h3>
-                <p>A cultural exhibition space blending traditional Japanese joinery techniques with modern structural steel.</p>
-                <a href="#" class="view-btn hover-target">Explore Project</a>
-            </div>
-        </div>
+        <a href="#" class="ad-btn">Equip Now</a>
     </section>
 
     <footer>
-        <div class="footer-giant serif">LUMINA</div>
-        <div class="footer-bottom">
-            <span style="font-size: 0.75rem; letter-spacing: 2px;">© 2026 LUMINA ARCHITECTS. ALL RIGHTS RESERVED.</span>
-            
-            <!-- 🔥 THE CODOT AGENCY BACKLINK 🔥 -->
-            <a href="../index.html" class="codot-badge hover-target">
-                Engineered By <span>CODOT</span>
-            </a>
-        </div>
+        <a href="../index.html" class="codot-badge hover-target">
+            Engineered By <span>CODOT</span>
+        </a>
     </footer>
 
+    <!-- 🔥 THE PHYSICS ENGINE (VANILLA JS) 🔥 -->
     <script>
-        // --- CUSTOM CURSOR ENGINE ---
-        const dot = document.getElementById("cursorDot");
-        const outline = document.getElementById("cursorOutline");
-        const hoverTargets = document.querySelectorAll(".hover-target, a");
-
-        window.addEventListener("mousemove", (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-
-            dot.style.left = `${posX}px`;
-            dot.style.top = `${posY}px`;
-            
-            // Add a slight delay to the outline for that smooth dragging feel
-            outline.animate({
-                left: `${posX}px`,
-                top: `${posY}px`
-            }, { duration: 500, fill: "forwards" });
-        });
-
-        // Expand cursor on hover
-        hoverTargets.forEach(target => {
-            target.addEventListener("mouseenter", () => {
-                outline.style.width = "60px";
-                outline.style.height = "60px";
-                outline.style.backgroundColor = "rgba(212, 175, 55, 0.1)"; // Faint gold
-            });
-            target.addEventListener("mouseleave", () => {
-                outline.style.width = "40px";
-                outline.style.height = "40px";
-                outline.style.backgroundColor = "transparent";
-            });
-        });
-
-        // --- SMOOTH SCROLL REVEAL & PARALLAX ---
         document.addEventListener("DOMContentLoaded", () => {
-            const reveals = document.querySelectorAll(".reveal");
-            const parallaxImgs = document.querySelectorAll(".parallax-img");
-            const heroBg = document.getElementById("heroBg");
+            
+            // --- 1. RPM PRELOADER ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
 
-            // Scroll Reveal Observer
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("active");
-                    }
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 15) + 1; // Random fast jump
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        preloader.style.transform = "translateY(-100vh)";
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 50);
+
+            // --- 2. CUSTOM CROSSHAIR CURSOR ---
+            const cursor = document.getElementById('cursor');
+            const hoverTargets = document.querySelectorAll('.hover-target');
+
+            window.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '50px';
+                    cursor.style.height = '50px';
+                    cursor.style.background = 'rgba(255,0,60,0.2)';
                 });
-            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-
-            reveals.forEach(reveal => revealObserver.observe(reveal));
-
-            // Initial trigger for elements above fold
-            setTimeout(() => {
-                reveals.forEach(reveal => {
-                    if (reveal.getBoundingClientRect().top < window.innerHeight) {
-                        reveal.classList.add("active");
-                    }
-                });
-            }, 100);
-
-            // True Parallax Scroll Event
-            window.addEventListener("scroll", () => {
-                let scrolled = window.pageYOffset;
-
-                // Hero Image Parallax (Moves slower than scroll)
-                heroBg.style.transform = `translateY(${scrolled * 0.4}px)`;
-
-                // Project Images Parallax (Moves image inside wrapper)
-                parallaxImgs.forEach(img => {
-                    let rect = img.parentElement.getBoundingClientRect();
-                    // Only animate if it's currently on screen to save performance
-                    if(rect.top < window.innerHeight && rect.bottom > 0) {
-                        let distance = (window.innerHeight - rect.top) * 0.15;
-                        img.style.transform = `translateY(-${distance}px)`;
-                    }
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                    cursor.style.background = 'transparent';
                 });
             });
+
+            // --- 3. MOUSE TRACKING PARALLAX (HERO) ---
+            const heroBg = document.getElementById('heroBg');
+            document.addEventListener('mousemove', (e) => {
+                let x = (window.innerWidth / 2 - e.pageX) * 0.02; // Strength of movement
+                let y = (window.innerHeight / 2 - e.pageY) * 0.02;
+                heroBg.style.transform = `translate(${x}px, ${y}px)`;
+            });
+
+            // --- 4. 3D GYRO TILT CARDS ---
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // x position within the element
+                    const y = e.clientY - rect.top;  // y position within the element
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Calculate rotation (max 15 degrees)
+                    const rotateX = ((y - centerY) / centerY) * -15; 
+                    const rotateY = ((x - centerX) / centerX) * 15;
+
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    // Snap back to zero
+                    card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+
+            // --- 5. MAGNETIC BUTTON PHYSICS ---
+            const magBtn = document.getElementById('magBtn');
+            magBtn.addEventListener('mousemove', (e) => {
+                const rect = magBtn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                // Pulls the button towards the mouse by 30% of the distance
+                magBtn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            magBtn.addEventListener('mouseleave', () => {
+                // Snap back to center
+                magBtn.style.transform = `translate(0px, 0px)`;
+            });
+
         });
     </script>
 </body>
