@@ -326,7 +326,8 @@
     <footer>
         <div class="footer-brand">Lumina</div>
         
-        <!-- THE CODOT FLEX -->
+        <!-- 🔥 FIX: PATH ROUTING -->
+        <!-- Since this file is in /clients/, we use ../ to go UP one level back to the root folder -->
         <a href="../index.html" class="codot-badge">
             Powered by <span>CODOT</span> Ad-Supported Engine
         </a>
@@ -341,12 +342,10 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add("active");
-                        // Optional: Stop observing once revealed
-                        // observer.unobserve(entry.target); 
                     }
                 });
             }, {
-                threshold: 0.15, // Triggers when 15% of the element is visible
+                threshold: 0.15,
                 rootMargin: "0px 0px -50px 0px" 
             });
 
@@ -354,7 +353,6 @@
                 revealOnScroll.observe(reveal);
             });
             
-            // Trigger immediately for elements already in view on load
             setTimeout(() => {
                 reveals.forEach(reveal => {
                     if (reveal.getBoundingClientRect().top < window.innerHeight) {
