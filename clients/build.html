@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOCE | Configurator // Initialize Build</title>
+    <!-- Ultra-Aggressive Motorsport Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           VELOCE RACING THEME ENGINE // CONFIGURATOR SPECIFIC
+           ============================================================ */
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --surface-accent: #111111;
+            --text: #ffffff;
+            --mut: #666666;
+            --mut-dark: #222222;
+            --corsa-red: #ff003c; 
+            --corsa-red-glow: rgba(255, 0, 60, 0.4);
+            --torque-blue: #00e5ff;
+            --border-mut: rgba(255, 255, 255, 0.08);
+            --ease: cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- GLOBAL RESET & OPTIMIZATIONS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--mut-dark); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--corsa-red); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .brand, .data-label { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 400; text-transform: uppercase; }
+        a { text-decoration: none; color: inherit; display: inline-block; }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s var(--ease); will-change: transform;
+        }
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: var(--corsa-red); }
+        .data-label { font-size: 0.75rem; letter-spacing: 3px; color: var(--mut); margin-bottom: 0.5rem; text-align: center;}
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1.5rem; overflow: hidden; position: relative; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- HIGH-PERFORMANCE CUSTOM CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+            will-change: transform;
+        }
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+            transition: background 0.2s;
+        }
+
+        /* ============================================================
+           UNIVERSAL NAVIGATION
+           ============================================================ */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2rem; position: fixed; width: 100%; top: 0; z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+        }
+        .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-status { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--corsa-red); letter-spacing: 2px; border: 1px solid var(--corsa-red); padding: 0.4rem 1rem; border-radius: 50px;}
+        .close-btn { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: #fff; transition: color 0.3s; }
+        .close-btn:hover { color: var(--corsa-red); }
+
+        /* ============================================================
+           SPLIT SCREEN CONFIGURATOR LAYOUT
+           ============================================================ */
+        .config-layout {
+            display: flex; width: 100vw; height: 100vh; overflow: hidden;
+        }
+
+        /* --- LEFT SIDE: THE VISUALIZER (Sticky) --- */
+        .visual-panel {
+            width: 55%; height: 100vh; position: relative; background: #000;
+            border-right: 1px solid var(--border-mut);
+        }
+        .visual-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            transition: background-image 0.5s var(--ease), filter 0.5s ease;
+        }
+        /* The default base car image */
+        .car-base { background-image: url('https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?q=80&w=2500&auto=format&fit=crop'); filter: grayscale(80%) brightness(0.6); }
+        .car-stage2 { background-image: url('https://images.unsplash.com/photo-1611821064430-0d402202611e?q=80&w=2500&auto=format&fit=crop'); filter: grayscale(50%) brightness(0.8); }
+        .car-stage3 { background-image: url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=2500&auto=format&fit=crop'); filter: grayscale(0%) contrast(1.2) brightness(0.9); }
+        
+        /* Grid and Scanning overlays to make it look like a CAD program */
+        .grid-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; pointer-events: none; z-index: 2;
+        }
+        .scanline {
+            position: absolute; top: 0; left: 0; width: 100%; height: 10%; background: linear-gradient(to bottom, transparent, rgba(0, 229, 255, 0.1), transparent);
+            z-index: 3; animation: scan 6s linear infinite; pointer-events: none; opacity: 0.5;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* LIVE TELEMETRY HUD (The numbers that change) */
+        .hud {
+            position: absolute; bottom: 3rem; left: 3rem; right: 3rem; z-index: 10;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 2rem; border: 1px solid var(--border-mut); border-radius: 8px;
+        }
+        .hud-stat { display: flex; flex-direction: column; }
+        .hud-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--mut); letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .hud-value { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; display: flex; align-items: baseline; gap: 5px;}
+        .hud-unit { font-size: 0.8rem; color: var(--mut); }
+        .val-red { color: var(--corsa-red); }
+
+        /* --- RIGHT SIDE: THE CONFIGURATOR PANEL (Scrollable) --- */
+        .config-panel {
+            width: 45%; height: 100vh; overflow-y: auto; background: var(--surface);
+            padding: 8rem 4rem 4rem 4rem; position: relative;
+        }
+        
+        .section-title { font-size: 1.8rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .section-desc { font-size: 0.9rem; color: var(--mut); margin-bottom: 3rem; line-height: 1.6; }
+        .step-marker { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--corsa-red); letter-spacing: 2px; margin-bottom: 1rem; display: block;}
+
+        .config-group { margin-bottom: 6rem; border-bottom: 1px solid var(--border-mut); padding-bottom: 4rem;}
+        .config-group:last-child { border-bottom: none; }
+
+        /* Custom Radio Buttons / Option Cards */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        
+        .option-label {
+            display: block; position: relative; cursor: none;
+        }
+        .option-card {
+            background: var(--bg); border: 1px solid var(--mut-dark); padding: 1.5rem;
+            border-radius: 6px; transition: all 0.3s var(--ease); display: flex; justify-content: space-between; align-items: center;
+        }
+        .option-info h4 { font-size: 1.2rem; margin-bottom: 0.2rem; transition: color 0.3s;}
+        .option-info p { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--mut); }
+        .option-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; font-weight: 700; color: #fff; }
+        
+        /* Hide default radio */
+        .option-label input[type="radio"] { position: absolute; opacity: 0; }
+        
+        /* Selected State Styling */
+        .option-label input[type="radio"]:checked + .option-card {
+            border-color: var(--corsa-red); background: rgba(255, 0, 60, 0.05);
+        }
+        .option-label input[type="radio"]:checked + .option-card .option-info h4 { color: var(--corsa-red); }
+        .option-label:hover .option-card { border-color: #555; }
+        
+        /* Spec Deltas in cards */
+        .spec-delta { display: flex; gap: 1rem; margin-top: 0.8rem; }
+        .delta-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; background: #111; padding: 0.2rem 0.5rem; border-radius: 3px; color: var(--mut); border: 1px solid #222;}
+        .option-label input[type="radio"]:checked + .option-card .delta-badge { color: var(--corsa-red); border-color: rgba(255,0,60,0.3);}
+
+        /* --- FINAL SUMMARY & CHECKOUT --- */
+        .summary-box {
+            background: #050505; border: 1px solid var(--mut-dark); padding: 2.5rem; border-radius: 8px; font-family: 'IBM Plex Mono', monospace;
+        }
+        .summary-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--mut); margin-bottom: 1rem; border-bottom: 1px dashed #222; padding-bottom: 0.5rem;}
+        .summary-row span.val { color: #fff; font-weight: 700; }
+        .total-row { display: flex; justify-content: space-between; font-size: 1.2rem; color: #fff; margin-top: 2rem; font-family: 'Space Grotesk', sans-serif; }
+        .total-row span.val { color: var(--corsa-red); font-weight: 900;}
+
+        /* Magnetic Submit Button */
+        .submit-wrapper { display: flex; justify-content: center; margin-top: 4rem; margin-bottom: 4rem;}
+        .magnetic-btn {
+            width: 100%; padding: 1.5rem; border: 2px solid var(--corsa-red); background: var(--corsa-red);
+            color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 1rem;
+            font-weight: 900; text-transform: uppercase; letter-spacing: 4px; text-align: center;
+            transition: all 0.3s var(--ease); will-change: transform;
+        }
+        .magnetic-btn:hover { background: #fff; color: var(--corsa-red); border-color: #fff; box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+
+        /* ============================================================
+           RESPONSIVE LAYOUT
+           ============================================================ */
+        @media (max-width: 992px) {
+            .config-layout { flex-direction: column; overflow-y: auto; }
+            /* On mobile, stack them. Make visual sticky at top */
+            .visual-panel { width: 100%; height: 60vh; position: sticky; top: 0; z-index: 50; border-right: none; border-bottom: 1px solid var(--border-mut); }
+            .config-panel { width: 100%; height: auto; padding: 4rem 2rem; overflow: visible; }
+            .hud { bottom: 1rem; left: 1rem; right: 1rem; grid-template-columns: repeat(2, 1fr); padding: 1rem; gap: 1rem; }
+            .hud-value { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SYSTEM BOOT SEQUENCE -->
+    <div id="preloader">
+        <div class="data-label">INITIALIZING_BUILD_ENVIRONMENT // TELEMETRY_LINKED</div>
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- GPU-Accelerated Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Minimal Configurator Nav -->
+    <nav>
+        <div class="brand">VELOCE.</div>
+        <div class="nav-status">LINK_ACTIVE // SECURE</div>
+        <a href="webpg111.html" class="close-btn hover-target">EXIT BUILD_</a>
+    </nav>
+
+    <main class="config-layout">
+        
+        <!-- LEFT: LIVE VISUALIZER & TELEMETRY -->
+        <div class="visual-panel">
+            <!-- Background image dynamically changes via JS -->
+            <div class="visual-bg car-base" id="carVisual"></div>
+            <div class="grid-overlay"></div>
+            <div class="scanline"></div>
+            
+            <div class="data-label" style="position:absolute; top: 6rem; left: 2rem; z-index: 10; text-align:left;">
+                PLATFORM: PROJECT APEX<br>
+                CHASSIS_ID: V-847291
+            </div>
+
+            <!-- THE HUD: Data updates live -->
+            <div class="hud">
+                <div class="hud-stat">
+                    <span class="hud-label">POWER_OUTPUT</span>
+                    <div class="hud-value"><span id="hudHp">510</span><span class="hud-unit">WHP</span></div>
+                </div>
+                <div class="hud-stat">
+                    <span class="hud-label">PEAK_TORQUE</span>
+                    <div class="hud-value"><span id="hudTq">650</span><span class="hud-unit">NM</span></div>
+                </div>
+                <div class="hud-stat">
+                    <span class="hud-label">DOWNFORCE</span>
+                    <div class="hud-value val-red"><span id="hudDf">150</span><span class="hud-unit">KG</span></div>
+                </div>
+                <div class="hud-stat">
+                    <span class="hud-label">UNSPRUNG_MASS</span>
+                    <div class="hud-value"><span id="hudWt">1420</span><span class="hud-unit">KG</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: SCROLLABLE CONFIGURATION FORM -->
+        <div class="config-panel" id="configPanel">
+            
+            <form id="buildForm">
+                
+                <!-- STEP 1: POWERTRAIN -->
+                <div class="config-group">
+                    <span class="step-marker">// PHASE 01</span>
+                    <h2 class="section-title">POWERTRAIN MAPPING</h2>
+                    <p class="section-desc">Select engine architecture. Upgrading to Stage 2 or 3 introduces forged internals and twin-turbo induction.</p>
+                    
+                    <div class="options-grid">
+                        
+                        <label class="option-label hover-target">
+                            <!-- JS hooks into data attributes for live math -->
+                            <input type="radio" name="powertrain" value="Base" data-hp="510" data-tq="650" data-wt="0" data-price="0" checked>
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Factory Spec</h4>
+                                    <p>Naturally Aspirated V8 // OEM ECU</p>
+                                    <div class="spec-delta"><span class="delta-badge">BASE HP</span></div>
+                                </div>
+                                <div class="option-price">INCLUDED</div>
+                            </div>
+                        </label>
+
+                        <label class="option-label hover-target">
+                            <input type="radio" name="powertrain" value="Stage2" data-hp="850" data-tq="920" data-wt="15" data-price="24500">
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Stage 2: Forced Induction</h4>
+                                    <p>Single Mid-Mount Turbo // Veloce ECU Map 2</p>
+                                    <div class="spec-delta"><span class="delta-badge">+340 WHP</span><span class="delta-badge">+270 NM</span></div>
+                                </div>
+                                <div class="option-price">+$24,500</div>
+                            </div>
+                        </label>
+
+                        <label class="option-label hover-target">
+                            <input type="radio" name="powertrain" value="Stage3" data-hp="1120" data-tq="1340" data-wt="22" data-price="48000">
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Stage 3: Billet Twin-Turbo</h4>
+                                    <p>Forged Internals // Anti-Lag // Titanium Exhaust</p>
+                                    <div class="spec-delta"><span class="delta-badge">+610 WHP</span><span class="delta-badge">+690 NM</span></div>
+                                </div>
+                                <div class="option-price">+$48,000</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 2: AERODYNAMICS -->
+                <div class="config-group">
+                    <span class="step-marker">// PHASE 02</span>
+                    <h2 class="section-title">AERODYNAMIC PACKAGES</h2>
+                    <p class="section-desc">CFD-validated downforce kits. Stage 3 requires removal of factory crash bars for chassis hard-mounting.</p>
+                    
+                    <div class="options-grid">
+                        
+                        <label class="option-label hover-target">
+                            <input type="radio" name="aero" value="Base" data-df="150" data-wt="0" data-price="0" data-vis="car-base" checked>
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Factory Bodywork</h4>
+                                    <p>Active OEM spoiler // Standard Polyurethane</p>
+                                    <div class="spec-delta"><span class="delta-badge">BASE DF</span></div>
+                                </div>
+                                <div class="option-price">INCLUDED</div>
+                            </div>
+                        </label>
+
+                        <label class="option-label hover-target">
+                            <!-- data-vis attribute tells the JS to change the background image -->
+                            <input type="radio" name="aero" value="Track" data-df="680" data-wt="-12" data-price="12000" data-vis="car-stage2">
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Track Kit</h4>
+                                    <p>Fixed Carbon Rear Wing // Extended Splitter</p>
+                                    <div class="spec-delta"><span class="delta-badge">+530 KG DF</span><span class="delta-badge">-12 KG WT</span></div>
+                                </div>
+                                <div class="option-price">+$12,000</div>
+                            </div>
+                        </label>
+
+                        <label class="option-label hover-target">
+                            <input type="radio" name="aero" value="TimeAttack" data-df="1450" data-wt="-38" data-price="35000" data-vis="car-stage3">
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Time Attack Spec</h4>
+                                    <p>Full Dry Carbon Widebody // Flat Floor // Active Wing</p>
+                                    <div class="spec-delta"><span class="delta-badge">+1300 KG DF</span><span class="delta-badge">-38 KG WT</span></div>
+                                </div>
+                                <div class="option-price">+$35,000</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 3: HANDLING -->
+                <div class="config-group">
+                    <span class="step-marker">// PHASE 03</span>
+                    <h2 class="section-title">UNSPRUNG MASS</h2>
+                    <p class="section-desc">Rotational weight reduction is critical for acceleration and braking telemetry.</p>
+                    
+                    <div class="options-grid">
+                        
+                        <label class="option-label hover-target">
+                            <input type="radio" name="handling" value="Base" data-wt="0" data-price="0" checked>
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>OEM Forged Wheels</h4>
+                                    <p>Standard Steel Rotors // 20" Alloys</p>
+                                </div>
+                                <div class="option-price">INCLUDED</div>
+                            </div>
+                        </label>
+
+                        <label class="option-label hover-target">
+                            <input type="radio" name="handling" value="Carbon" data-wt="-45" data-price="18500">
+                            <div class="option-card">
+                                <div class="option-info">
+                                    <h4>Carbon-Ceramic Package</h4>
+                                    <p>Carbon-Ceramic Brakes // Magnesium Monoblock Wheels</p>
+                                    <div class="spec-delta"><span class="delta-badge">-45 KG ROTATIONAL MASS</span></div>
+                                </div>
+                                <div class="option-price">+$18,500</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- FINAL SUMMARY RECEIPT -->
+                <div class="config-group" style="margin-bottom: 2rem;">
+                    <span class="step-marker">// SECURE ENCRYPTION</span>
+                    <h2 class="section-title">BUILD MANIFEST</h2>
+                    
+                    <div class="summary-box">
+                        <div class="summary-row"><span>POWERTRAIN MAPPING</span><span class="val" id="sumPower">Base</span></div>
+                        <div class="summary-row"><span>AERODYNAMIC PKG</span><span class="val" id="sumAero">Base</span></div>
+                        <div class="summary-row"><span>UNSPRUNG MASS</span><span class="val" id="sumHandling">Base</span></div>
+                        
+                        <div class="total-row">
+                            <span>TOTAL UPGRADE COST</span>
+                            <span class="val" id="sumTotal">$0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAGNETIC SUBMIT -->
+                <div class="submit-wrapper">
+                    <button type="button" class="magnetic-btn hover-target" id="magneticBtn">TRANSMIT TO ENGINEERING</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         CONFIGURATOR PHYSICS & LOGIC ENGINE
+         ============================================================ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. PRELOADER ENGINE ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
+
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 20) + 1; 
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 40);
+
+            // --- 2. GLOBAL MOUSE & CURSOR TRACKING ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            const cursor = document.getElementById('cursor');
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function renderCursor() {
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(renderCursor);
+            }
+            requestAnimationFrame(renderCursor); 
+
+            // Cursor Hover Interactions
+            const hoverTargets = document.querySelectorAll('.hover-target');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; 
+                    cursor.style.height = '60px';
+                    cursor.style.background = 'rgba(255,0,60,0.1)'; 
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                    cursor.style.background = 'transparent';
+                });
+            });
+
+            // --- 3. LIVE CONFIGURATOR TELEMETRY ENGINE ---
+            // State objects to track current math
+            const state = {
+                hp: 510, tq: 650, df: 150, wt: 1420, price: 0
+            };
+            const BASE_WEIGHT = 1420; // Kg
+
+            // DOM Elements for HUD
+            const hudHp = document.getElementById('hudHp');
+            const hudTq = document.getElementById('hudTq');
+            const hudDf = document.getElementById('hudDf');
+            const hudWt = document.getElementById('hudWt');
+            
+            // DOM Elements for Summary
+            const sumPower = document.getElementById('sumPower');
+            const sumAero = document.getElementById('sumAero');
+            const sumHandling = document.getElementById('sumHandling');
+            const sumTotal = document.getElementById('sumTotal');
+
+            // The Visual Car Image
+            const carVisual = document.getElementById('carVisual');
+
+            // --- LERP NUMBER COUNTER (The satisfying spin-up animation) ---
+            // Animates a DOM element from a start number to an end number over a duration
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    // Use easeOut cubic for a natural slowing down effect
+                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    
+                    let currentVal = Math.floor(easeProgress * (end - start) + start);
+                    
+                    // Format currency for the total, regular numbers for the rest
+                    if (obj === sumTotal) {
+                        obj.innerText = "$" + currentVal.toLocaleString();
+                    } else {
+                        obj.innerText = currentVal.toLocaleString();
+                    }
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // --- THE CALCULATOR FUNCTION ---
+            // Fires every time a radio button is clicked
+            function updateTelemetry() {
+                // Get active inputs
+                const powerInput = document.querySelector('input[name="powertrain"]:checked');
+                const aeroInput = document.querySelector('input[name="aero"]:checked');
+                const handlingInput = document.querySelector('input[name="handling"]:checked');
+
+                // Extract data from attributes
+                const newHp = parseInt(powerInput.getAttribute('data-hp'));
+                const newTq = parseInt(powerInput.getAttribute('data-tq'));
+                const newDf = parseInt(aeroInput.getAttribute('data-df'));
+                
+                // Weight is additive/subtractive across categories
+                const powerWt = parseInt(powerInput.getAttribute('data-wt'));
+                const aeroWt = parseInt(aeroInput.getAttribute('data-wt'));
+                const handleWt = parseInt(handlingInput.getAttribute('data-wt'));
+                const newWt = BASE_WEIGHT + powerWt + aeroWt + handleWt;
+
+                // Price is additive
+                const newPrice = parseInt(powerInput.getAttribute('data-price')) + 
+                                 parseInt(aeroInput.getAttribute('data-price')) + 
+                                 parseInt(handlingInput.getAttribute('data-price'));
+
+                // Change Car Visual based on Aero selection
+                const visualClass = aeroInput.getAttribute('data-vis');
+                carVisual.className = "visual-bg " + visualClass;
+
+                // Update Summary Text
+                sumPower.innerText = powerInput.value;
+                sumAero.innerText = aeroInput.value;
+                sumHandling.innerText = handlingInput.value;
+
+                // Animate Numbers from old state to new state
+                animateValue(hudHp, state.hp, newHp, 800);
+                animateValue(hudTq, state.tq, newTq, 800);
+                animateValue(hudDf, state.df, newDf, 800);
+                animateValue(hudWt, state.wt, newWt, 800);
+                animateValue(sumTotal, state.price, newPrice, 1000);
+
+                // Add flash effect to HUD when numbers change
+                const hudValues = document.querySelectorAll('.hud-value');
+                hudValues.forEach(val => {
+                    val.style.color = "var(--corsa-red)";
+                    setTimeout(() => val.style.color = "#fff", 300);
+                });
+
+                // Update State for next calculation
+                state.hp = newHp;
+                state.tq = newTq;
+                state.df = newDf;
+                state.wt = newWt;
+                state.price = newPrice;
+            }
+
+            // Attach Event Listeners to all radio buttons
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', updateTelemetry);
+            });
+
+            // --- 4. MAGNETIC BUTTON PHYSICS ---
+            const magBtn = document.getElementById('magneticBtn');
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => {
+                magRect = magBtn.getBoundingClientRect(); 
+            });
+
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                magBtn.style.transform = `translate3d(${x * 0.2}px, ${y * 0.2}px, 0)`;
+            });
+            
+            magBtn.addEventListener('mouseleave', () => {
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
+            
+            magBtn.addEventListener('click', () => {
+                magBtn.innerText = "TRANSMITTING...";
+                setTimeout(() => {
+                    magBtn.innerText = "ENGINEERING DEPT NOTIFIED";
+                    magBtn.style.background = "#fff";
+                    magBtn.style.color = "#000";
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
