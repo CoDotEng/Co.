@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOCE | Gallery // The Archive</title>
+    <!-- Ultra-Aggressive Motorsport Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           VELOCE RACING THEME ENGINE // GALLERY DIVISION SPECIFIC
+           ============================================================ */
+        :root {
+            --bg: #030303;
+            --surface: #0a0a0a;
+            --surface-accent: #111111;
+            --text: #ffffff;
+            --mut: #666666;
+            --mut-dark: #333333;
+            --corsa-red: #ff003c; 
+            --corsa-red-glow: rgba(255, 0, 60, 0.4);
+            --ad-bg: #111111;
+            --border-mut: rgba(255, 255, 255, 0.05);
+            --ease: cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- GLOBAL RESET & OPTIMIZATIONS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
+        /* Custom Scrollbar for a premium feel */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--mut-dark); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--corsa-red); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg); color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .brand, .data-label { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; }
+        .mono { font-family: 'IBM Plex Mono', monospace; font-weight: 400; text-transform: uppercase; }
+        
+        a { text-decoration: none; color: inherit; cursor: none; display: inline-block; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; object-fit: cover; }
+        button { border: none; background: transparent; cursor: none; outline: none; }
+
+        /* --- ECU PRELOADER // ENGINE BOOT SEQUENCE --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg); z-index: 10000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.8s var(--ease);
+            will-change: transform;
+        }
+        .counter { font-family: 'Space Grotesk', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: var(--corsa-red); }
+        .data-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 3px; color: var(--mut); margin-bottom: 0.5rem; text-align: center;}
+        .loading-bar { width: 300px; height: 2px; background: #222; margin-top: 1.5rem; overflow: hidden; position: relative; }
+        .loading-fill { height: 100%; width: 0%; background: var(--corsa-red); }
+
+        /* --- HIGH-PERFORMANCE CUSTOM CURSOR --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 2px solid var(--corsa-red); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+            will-change: transform;
+        }
+        .cursor::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--corsa-red); border-radius: 50%; transform: translate(-50%, -50%);
+            transition: background 0.2s;
+        }
+        .cursor.view-mode { width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-color: #fff; }
+        .cursor.view-mode::after { content: 'VIEW'; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #fff; background: transparent; width: auto; height: auto; letter-spacing: 2px;}
+
+        /* ============================================================
+           UNIVERSAL NAVIGATION
+           ============================================================ */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            mix-blend-mode: difference;
+        }
+        .brand { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+        .nav-links { display: flex; gap: 3rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-links a.active { color: var(--corsa-red); }
+
+        /* ============================================================
+           GALLERY HERO // Monochromatic Focus
+           ============================================================ */
+        .hero {
+            height: 70vh; position: relative; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 5% 5%; overflow: hidden;
+            background: var(--bg); border-bottom: 1px solid var(--border-mut);
+        }
+        .hero-content { position: relative; z-index: 3; pointer-events: none; }
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 8rem); line-height: 0.9; letter-spacing: -3px;
+            margin-bottom: 1rem; color: var(--text); 
+        }
+        .hero p {
+            font-size: 1.1rem; max-width: 500px; color: var(--mut); margin-left: 0.5rem;
+            border-left: 3px solid var(--corsa-red); padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           HORIZONTAL SCROLL SECTION // Cinematic Featured Builds
+           ============================================================ */
+        /* The wrapper defines how long the scroll effect lasts (300vh = 3 screens of scrolling) */
+        .hs-wrapper { height: 300vh; position: relative; }
+        
+        /* The container sticks to the screen while we scroll down the wrapper */
+        .hs-container { 
+            position: sticky; top: 0; height: 100vh; width: 100%; 
+            overflow: hidden; background: #000; display: flex; align-items: center;
+        }
+        
+        /* The actual content that translates on the X axis */
+        .hs-content { 
+            display: flex; gap: 5vw; padding: 0 10vw; height: 70vh; 
+            will-change: transform; /* Crucial for 60fps LERP scrolling */
+        }
+        
+        .hs-item {
+            min-width: 60vw; height: 100%; position: relative; border-radius: 4px; overflow: hidden;
+        }
+        .hs-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; filter: grayscale(80%) brightness(0.6);
+            transition: filter 0.5s ease;
+        }
+        .hs-item:hover .hs-img { filter: grayscale(0%) brightness(1); }
+        
+        /* Image placeholders for Horizontal Scroll */
+        .hs-1 { background-image: url('https://images.unsplash.com/photo-1614200187524-dc4b892acf16?q=80&w=2000&auto=format&fit=crop'); }
+        .hs-2 { background-image: url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=2000&auto=format&fit=crop'); }
+        .hs-3 { background-image: url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=2000&auto=format&fit=crop'); }
+        
+        .hs-text {
+            position: absolute; bottom: 3rem; left: 3rem; pointer-events: none;
+        }
+        .hs-text h2 { font-size: 4rem; letter-spacing: -2px; margin-bottom: 0.5rem; text-shadow: 0 10px 20px rgba(0,0,0,0.8);}
+        .hs-text p { font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--corsa-red); font-weight: 700;}
+        .hs-indicator { position: absolute; top: 3rem; right: 3rem; font-family: 'IBM Plex Mono', monospace; color: var(--mut); letter-spacing: 2px;}
+
+        /* ============================================================
+           MASONRY ARCHIVE GRID // Filtering System
+           ============================================================ */
+        .archive-section { padding: 8rem 5%; background: var(--bg); min-height: 100vh;}
+        
+        .filter-nav {
+            display: flex; gap: 2rem; margin-bottom: 4rem; border-bottom: 1px solid var(--border-mut); padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--mut); transition: color 0.3s;
+        }
+        .filter-btn.active { color: var(--text); border-bottom: 2px solid var(--corsa-red); }
+        .filter-btn:hover { color: var(--text); }
+
+        /* CSS Grid Masonry Layout */
+        .grid-masonry {
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 350px; gap: 1rem;
+        }
+        .grid-item {
+            position: relative; overflow: hidden; border-radius: 4px; background: var(--surface);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .grid-item.hide { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; }
+        
+        /* Grid Spans for editorial layout */
+        .item-wide { grid-column: span 2; }
+        .item-tall { grid-row: span 2; }
+        .item-large { grid-column: span 2; grid-row: span 2; }
+
+        .grid-img {
+            width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%);
+            transition: transform 0.6s var(--ease), filter 0.4s ease;
+        }
+        .grid-item:hover .grid-img { transform: scale(1.05); filter: grayscale(0%); }
+        
+        .grid-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 2rem;
+        }
+        .grid-item:hover .grid-overlay { opacity: 1; }
+        
+        .grid-overlay h4 { font-size: 1.5rem; letter-spacing: -1px; margin-bottom: 0.2rem; }
+        .grid-overlay span { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--corsa-red); }
+
+        /* ============================================================
+           CINEMATIC LIGHTBOX // Modal View
+           ============================================================ */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10000;
+            display: flex; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s var(--ease); backdrop-filter: blur(10px);
+        }
+        .lightbox.active { opacity: 1; pointer-events: all; }
+        
+        .lightbox-close {
+            position: absolute; top: 2rem; right: 3rem; font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem; color: #fff; letter-spacing: 2px; z-index: 10001; text-transform: uppercase;
+        }
+        .lightbox-close:hover { color: var(--corsa-red); }
+
+        .lightbox-content {
+            width: 75%; height: 100%; padding: 4rem; display: flex; align-items: center; justify-content: center;
+        }
+        .lightbox-img {
+            max-width: 100%; max-height: 100%; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.95); transition: transform 0.6s var(--ease);
+        }
+        .lightbox.active .lightbox-img { transform: scale(1); }
+
+        /* Side Telemetry panel in Lightbox */
+        .lightbox-data {
+            width: 25%; height: 100%; background: #080808; border-left: 1px solid #1a1a1a;
+            padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center;
+        }
+        .lb-title { font-size: 2.5rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .lb-category { font-family: 'IBM Plex Mono', monospace; color: var(--corsa-red); font-size: 0.8rem; margin-bottom: 3rem; display: block;}
+        
+        .lb-spec-group { margin-bottom: 2rem; border-bottom: 1px solid #1a1a1a; padding-bottom: 1rem;}
+        .lb-spec-group label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--mut); letter-spacing: 2px; display: block; margin-bottom: 0.5rem;}
+        .lb-spec-group p { font-size: 1rem; font-weight: 600; }
+
+        /* ============================================================
+           MAGNETIC CTA // ENQUIRE BUTTON
+           ============================================================ */
+        .enquire-section {
+            padding: 8rem 5%; background: #000; text-align: center; border-top: 1px solid var(--border-mut); border-bottom: 1px solid var(--border-mut);
+        }
+        .enquire-section h3 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -1px; }
+        .enquire-section p { color: var(--mut); margin-bottom: 4rem; font-size: 1.1rem; }
+        
+        .magnetic-btn {
+            padding: 1.2rem 4rem; border: 2px solid var(--corsa-red); background: transparent;
+            color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 1rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 3px;
+            transition: all 0.3s var(--ease); will-change: transform;
+        }
+        .magnetic-btn:hover { background: var(--corsa-red); color: #fff; box-shadow: 0 10px 30px var(--corsa-red-glow); }
+
+        /* ============================================================
+           SEAMLESS AD INTEGRATION 
+           ============================================================ */
+        .ad-space {
+            padding: 4rem 5%; background: var(--ad-bg); border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .ad-sponsor { font-size: 0.7rem; color: var(--mut); letter-spacing: 4px; display: block; margin-bottom: 0.5rem; text-transform: uppercase;}
+        .ad-title { font-size: 2rem; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;}
+        .ad-btn { padding: 1rem 2rem; border: 1px solid var(--text); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+        .ad-btn:hover { background: var(--text); color: #000; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        footer { padding: 6rem 5%; text-align: center; background: #000;}
+        .codot-badge {
+            background: #111; border: 1px solid #333; padding: 1rem 2.5rem; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 2px; display: inline-flex; align-items: center; gap: 10px; color: #888;
+            transition: all 0.3s ease;
+        }
+        .codot-badge span { color: #00e5ff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; text-shadow: 0 0 10px rgba(0,229,255,0.3); }
+        .codot-badge:hover { background: #00e5ff; color: #000; box-shadow: 0 0 30px rgba(0,229,255,0.4); border-color: #00e5ff; }
+        .codot-badge:hover span { color: #000; text-shadow: none; }
+
+        /* ============================================================
+           SCROLL REVEAL ENGINE
+           ============================================================ */
+        .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); will-change: opacity, transform; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ============================================================
+           RESPONSIVE RE-TUNING
+           ============================================================ */
+        @media (max-width: 992px) {
+            .nav-links { display: none; } 
+            .grid-masonry { grid-template-columns: repeat(2, 1fr); }
+            .hs-item { min-width: 85vw; }
+            .lightbox { flex-direction: column; overflow-y: auto;}
+            .lightbox-content { width: 100%; height: 60%; padding: 2rem; margin-top: 4rem;}
+            .lightbox-data { width: 100%; height: auto; border-left: none; border-top: 1px solid #1a1a1a; padding: 2rem;}
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 4rem; }
+            .grid-masonry { grid-template-columns: 1fr; }
+            .item-wide, .item-large { grid-column: span 1; }
+            .magnetic-btn { width: 100%; padding: 1.2rem; }
+            .ad-space { flex-direction: column; text-align: center; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ECU Boot Sequence -->
+    <div id="preloader">
+        <div class="data-label">ACCESSING_SECURE_ARCHIVE // VERIFYING //</div>
+        <div class="counter" id="counter">0</div>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+    </div>
+
+    <!-- GPU-Accelerated Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Universal Navigation // Gallery active state -->
+    <nav>
+        <a href="../index.html" class="brand hover-target">VELOCE.</a>
+        <div class="nav-links">
+            <a href="webpg111.html" class="hover-target">Core</a>
+            <a href="aerokits.html" class="hover-target">Aero</a>
+            <a href="powertrain.html" class="hover-target">Power</a>
+            <a href="gallery.html" class="hover-target active">Gallery</a>
+        </div>
+    </nav>
+
+    <!-- Gallery Hero -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="data-label" style="text-align: left; margin-bottom: 1rem;">//_CLASSIFIED_BUILDS</div>
+            <h1 class="reveal">THE ARCHIVE<span style="color:var(--corsa-red);">.</span></h1>
+            <p class="reveal" style="transition-delay: 0.2s;">Visual telemetry of Veloce engineering. A curated selection of track-proven builds, aerodynamic test mules, and completed client commissions.</p>
+        </div>
+    </header>
+
+    <!-- HORIZONTAL SCROLL SECTION // Cinematic Showcase -->
+    <section class="hs-wrapper" id="hsWrapper">
+        <div class="hs-container">
+            <div class="hs-content" id="hsContent">
+                
+                <!-- Build 01 -->
+                <div class="hs-item gallery-trigger" data-title="PROJECT OMEGA" data-cat="TIME ATTACK" data-hp="1,120 WHP" data-aero="+1,450 KG" data-img="https://images.unsplash.com/photo-1614200187524-dc4b892acf16?q=80&w=2000&auto=format&fit=crop">
+                    <div class="hs-img hs-1"></div>
+                    <span class="hs-indicator">01 / 03</span>
+                    <div class="hs-text">
+                        <h2>PROJECT OMEGA</h2>
+                        <p>FULL CARBON WIDEBODY // TIME ATTACK SPEC</p>
+                    </div>
+                </div>
+
+                <!-- Build 02 -->
+                <div class="hs-item gallery-trigger" data-title="TEST MULE 04" data-cat="AERODYNAMICS" data-hp="N/A // WIND TUNNEL" data-aero="+980 KG" data-img="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=2000&auto=format&fit=crop">
+                    <div class="hs-img hs-2"></div>
+                    <span class="hs-indicator">02 / 03</span>
+                    <div class="hs-text">
+                        <h2>TEST MULE 04</h2>
+                        <p>CFD VALIDATION PROTOTYPE // BARE CARBON</p>
+                    </div>
+                </div>
+
+                <!-- Build 03 -->
+                <div class="hs-item gallery-trigger" data-title="TOKYO RUNNER" data-cat="STREET POWERTRAIN" data-hp="850 WHP" data-aero="STOCK" data-img="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=2000&auto=format&fit=crop">
+                    <div class="hs-img hs-3"></div>
+                    <span class="hs-indicator">03 / 03</span>
+                    <div class="hs-text">
+                        <h2>TOKYO RUNNER</h2>
+                        <p>STAGE 2 POWERTRAIN // TITANIUM EXHAUST</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- MASONRY GRID ARCHIVE -->
+    <section class="archive-section reveal">
+        <!-- Filter System -->
+        <div class="filter-nav">
+            <button class="filter-btn active hover-target" data-filter="all">ALL ARCHIVES</button>
+            <button class="filter-btn hover-target" data-filter="aero">AERODYNAMICS</button>
+            <button class="filter-btn hover-target" data-filter="power">POWERTRAIN</button>
+            <button class="filter-btn hover-target" data-filter="track">TRACK DAY</button>
+        </div>
+
+        <div class="grid-masonry" id="galleryGrid">
+            
+            <!-- Grid Item 1 -->
+            <div class="grid-item item-large aero track gallery-trigger" data-title="ACTIVE WING DEPLOYMENT" data-cat="AERODYNAMICS" data-hp="N/A" data-aero="+480 KG (REAR)" data-img="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Wing">
+                <div class="grid-overlay">
+                    <h4>ACTIVE WING DEPLOYMENT</h4>
+                    <span>TESTING SECTOR 3</span>
+                </div>
+            </div>
+
+            <!-- Grid Item 2 -->
+            <div class="grid-item power gallery-trigger" data-title="BILLET COMPRESSOR WHEEL" data-cat="POWERTRAIN" data-hp="34.0 PSI MAX" data-aero="N/A" data-img="https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Turbo">
+                <div class="grid-overlay">
+                    <h4>BILLET COMPRESSOR</h4>
+                    <span>STAGE 3 TURBOS</span>
+                </div>
+            </div>
+
+            <!-- Grid Item 3 -->
+            <div class="grid-item aero gallery-trigger" data-title="CARBON SPLITTER V2" data-cat="AERODYNAMICS" data-hp="N/A" data-aero="+120 KG (FRONT)" data-img="https://images.unsplash.com/photo-1621217036034-7c309f3e9c63?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1621217036034-7c309f3e9c63?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Front">
+                <div class="grid-overlay">
+                    <h4>CARBON SPLITTER V2</h4>
+                    <span>AERO DIVISION</span>
+                </div>
+            </div>
+
+            <!-- Grid Item 4 -->
+            <div class="grid-item item-wide track gallery-trigger" data-title="NÜRBURGRING SHAKEDOWN" data-cat="TRACK DAY" data-hp="920 WHP" data-aero="+1,100 KG" data-img="https://images.unsplash.com/photo-1611821064430-0d402202611e?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1611821064430-0d402202611e?q=80&w=1200&auto=format&fit=crop" class="grid-img" alt="Track">
+                <div class="grid-overlay">
+                    <h4>NÜRBURGRING SHAKEDOWN</h4>
+                    <span>PROJECT APEX</span>
+                </div>
+            </div>
+            
+            <!-- Grid Item 5 -->
+            <div class="grid-item item-tall power gallery-trigger" data-title="TITANIUM MANIFOLD" data-cat="POWERTRAIN" data-hp="HEAT CYCLED" data-aero="N/A" data-img="https://images.unsplash.com/photo-1506544777-62cd39634b8c?q=80&w=1000&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1506544777-62cd39634b8c?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Exhaust">
+                <div class="grid-overlay">
+                    <h4>TITANIUM MANIFOLD</h4>
+                    <span>WELD PORN</span>
+                </div>
+            </div>
+
+            <!-- Grid Item 6 -->
+            <div class="grid-item track power gallery-trigger" data-title="HUB DYNO CALIBRATION" data-cat="POWERTRAIN // TUNING" data-hp="1,120 WHP VERIFIED" data-aero="N/A" data-img="https://images.unsplash.com/photo-1598084991519-c90a18eb79bd?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1598084991519-c90a18eb79bd?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Dyno">
+                <div class="grid-overlay">
+                    <h4>HUB DYNO CALIBRATION</h4>
+                    <span>MAP 3 TESTING</span>
+                </div>
+            </div>
+
+            <!-- Grid Item 7 -->
+            <div class="grid-item aero track gallery-trigger" data-title="REAR DIFFUSER CFD" data-cat="AERODYNAMICS" data-hp="N/A" data-aero="VORTEX STABLE" data-img="https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?q=80&w=1500&auto=format&fit=crop">
+                <img src="https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?q=80&w=800&auto=format&fit=crop" class="grid-img" alt="Diffuser">
+                <div class="grid-overlay">
+                    <h4>DIFFUSER GEOMETRY</h4>
+                    <span>TRACK SIDE</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CINEMATIC LIGHTBOX MODAL -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close hover-target" id="closeLightbox">[ CLOSE_X ]</button>
+        <div class="lightbox-content">
+            <img src="" alt="High Res" class="lightbox-img" id="lbImg">
+        </div>
+        <div class="lightbox-data">
+            <h2 class="lb-title" id="lbTitle">PROJECT NAME</h2>
+            <span class="lb-category" id="lbCat">// CATEGORY</span>
+            
+            <div class="lb-spec-group">
+                <label>ENGINEERING STATUS</label>
+                <p>VALIDATED // SECURE</p>
+            </div>
+            <div class="lb-spec-group">
+                <label>POWERTRAIN OUTPUT</label>
+                <p class="mono" id="lbHp" style="color:var(--corsa-red);">1,120 WHP</p>
+            </div>
+            <div class="lb-spec-group" style="border:none;">
+                <label>AERODYNAMIC DELTA</label>
+                <p class="mono" id="lbAero">+1,450 KG</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Magnetic CTA Section -->
+    <section class="enquire-section reveal">
+        <h3>Ready for the grid?</h3>
+        <p>Your chassis. Our engineering. Access the configurator to begin.</p>
+        <a href="dashboard.html" class="magnetic-btn hover-target" id="magneticBtn">CONFIGURE YOURS</a>
+    </section>
+
+    <!-- Universal Seamless Ad Integration -->
+    <section class="ad-space">
+        <div>
+            <span class="ad-sponsor">OFFICIAL LUBRICANT PARTNER</span>
+            <h3 class="ad-title">MOTUL 300V RACING OIL</h3>
+        </div>
+        <a href="equip.html" class="ad-btn hover-target">Procure Now</a>
+    </section>
+
+    <!-- Universal Footer -->
+    <footer>
+        <a href="../index.html" class="codot-badge hover-target">
+            Engineered By <span>CODOT Agency</span>
+        </a>
+    </footer>
+
+    <!-- ============================================================
+         GALLERY DIVISION PHYSICS & JAVASCRIPT ENGINE
+         ============================================================ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. PRELOADER ENGINE ---
+            let count = 0;
+            const counterElement = document.getElementById('counter');
+            const fillElement = document.getElementById('loadingFill');
+            const preloader = document.getElementById('preloader');
+
+            let timer = setInterval(() => {
+                count += Math.floor(Math.random() * 20) + 1; 
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        preloader.style.transform = "translate3d(0, -100vh, 0)";
+                    }, 400);
+                }
+                counterElement.innerText = count;
+                fillElement.style.width = count + "%";
+            }, 50);
+
+            // --- 2. GLOBAL MOUSE TRACKING ---
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // --- 3. GPU-ACCELERATED CURSOR ---
+            const cursor = document.getElementById('cursor');
+
+            function renderCursor() {
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(renderCursor);
+            }
+            requestAnimationFrame(renderCursor); 
+
+            // Cursor Hover States
+            const hoverTargets = document.querySelectorAll('.hover-target');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; 
+                    cursor.style.height = '60px';
+                    cursor.style.background = 'rgba(255,0,60,0.1)'; 
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px';
+                    cursor.style.height = '20px';
+                    cursor.style.background = 'transparent';
+                    cursor.classList.remove('view-mode'); // Reset view mode if leaving gallery trigger
+                });
+            });
+
+            // Special Cursor for Gallery Images (Changes to "VIEW" mode)
+            const galleryTriggers = document.querySelectorAll('.gallery-trigger');
+            galleryTriggers.forEach(trigger => {
+                trigger.addEventListener('mouseenter', () => {
+                    cursor.classList.add('view-mode');
+                });
+                trigger.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('view-mode');
+                });
+            });
+
+            // --- 4. VANILLA JS HORIZONTAL SCROLL (PHYSICS/LERP ENGINE) ---
+            const hsWrapper = document.getElementById('hsWrapper');
+            const hsContent = document.getElementById('hsContent');
+            
+            // Linear Interpolation for buttery smooth scrolling
+            function lerp(start, end, factor) {
+                return start + (end - start) * factor;
+            }
+
+            let currentScrollX = 0;
+            let targetScrollX = 0;
+
+            function updateHorizontalScroll() {
+                // Get the bounding box of the wrapper
+                let rect = hsWrapper.getBoundingClientRect();
+                
+                // Check if the wrapper is currently pinned/visible on screen
+                if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+                    // Calculate how far down we've scrolled inside the wrapper
+                    let scrollDistance = Math.abs(rect.top);
+                    let maxScroll = rect.height - window.innerHeight;
+                    
+                    // Convert vertical scroll distance into a percentage (0 to 1)
+                    let scrollPercent = scrollDistance / maxScroll;
+                    
+                    // Calculate the max horizontal translation distance
+                    // (Total width of content minus the viewport width)
+                    let maxTranslate = hsContent.scrollWidth - window.innerWidth;
+                    
+                    // Set the target X position based on scroll percentage
+                    targetScrollX = -(maxTranslate * scrollPercent);
+                } else if (rect.top > 0) {
+                    targetScrollX = 0; // Above wrapper, stay at 0
+                } else if (rect.bottom < window.innerHeight) {
+                    targetScrollX = -(hsContent.scrollWidth - window.innerWidth); // Below wrapper, stay at max
+                }
+
+                // Apply LERP for smoothness (Ease factor of 0.1)
+                currentScrollX = lerp(currentScrollX, targetScrollX, 0.1);
+                
+                // Push to GPU
+                hsContent.style.transform = `translate3d(${currentScrollX}px, 0, 0)`;
+                
+                requestAnimationFrame(updateHorizontalScroll);
+            }
+            // Only initialize on desktop where horizontal scroll makes sense
+            if (window.innerWidth > 992) {
+                requestAnimationFrame(updateHorizontalScroll);
+            }
+
+            // --- 5. GALLERY MASONRY FILTERING ---
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const gridItems = document.querySelectorAll('.grid-item');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add to clicked
+                    btn.classList.add('active');
+
+                    let filterValue = btn.getAttribute('data-filter');
+
+                    gridItems.forEach(item => {
+                        if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                            item.classList.remove('hide');
+                        } else {
+                            item.classList.add('hide');
+                        }
+                    });
+                });
+            });
+
+            // --- 6. CINEMATIC LIGHTBOX ENGINE ---
+            const lightbox = document.getElementById('lightbox');
+            const closeLightboxBtn = document.getElementById('closeLightbox');
+            
+            // Lightbox Data Targets
+            const lbImg = document.getElementById('lbImg');
+            const lbTitle = document.getElementById('lbTitle');
+            const lbCat = document.getElementById('lbCat');
+            const lbHp = document.getElementById('lbHp');
+            const lbAero = document.getElementById('lbAero');
+
+            galleryTriggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    // Grab data attributes from the clicked element
+                    const imgSrc = trigger.getAttribute('data-img');
+                    const title = trigger.getAttribute('data-title');
+                    const cat = trigger.getAttribute('data-cat');
+                    const hp = trigger.getAttribute('data-hp');
+                    const aero = trigger.getAttribute('data-aero');
+
+                    // Inject data into Lightbox
+                    lbImg.src = imgSrc;
+                    lbTitle.innerText = title;
+                    lbCat.innerText = "// " + cat;
+                    lbHp.innerText = hp;
+                    lbAero.innerText = aero;
+
+                    // Open Lightbox
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Stop background scrolling
+                    
+                    // Reset cursor from VIEW mode to normal inside lightbox
+                    cursor.classList.remove('view-mode');
+                });
+            });
+
+            closeLightboxBtn.addEventListener('click', () => {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'auto'; // Restore scroll
+            });
+
+            // --- 7. BATCHED SCROLL REVEAL ENGINE ---
+            const reveals = document.querySelectorAll(".reveal");
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }); 
+
+            reveals.forEach(reveal => revealObserver.observe(reveal));
+
+            setTimeout(() => {
+                reveals.forEach(reveal => {
+                    if (reveal.getBoundingClientRect().top < window.innerHeight) {
+                        reveal.classList.add("active");
+                    }
+                });
+            }, 100);
+
+            // --- 8. MAGNETIC PHYSICS BUTTON ---
+            const magBtn = document.getElementById('magneticBtn');
+            let magRect;
+            
+            magBtn.addEventListener('mouseenter', () => {
+                magRect = magBtn.getBoundingClientRect(); 
+            });
+
+            magBtn.addEventListener('mousemove', (e) => {
+                if (!magRect) return;
+                const x = e.clientX - magRect.left - magRect.width / 2;
+                const y = e.clientY - magRect.top - magRect.height / 2;
+                magBtn.style.transform = `translate3d(${x * 0.3}px, ${y * 0.3}px, 0)`;
+            });
+            
+            magBtn.addEventListener('mouseleave', () => {
+                magBtn.style.transform = `translate3d(0, 0, 0)`;
+                magRect = null;
+            });
+        });
+    </script>
+</body>
+</html>
