@@ -135,7 +135,29 @@ app.post('/api/lead', (req, res) => {
     }
   });
 });
+// =====================================================================
+// 🔥 THE AI TERMINAL ENGINE (/api/chat) 🔥
+// =====================================================================
+app.post('/api/chat', async (req, res) => {
+  try {
+    const userMessage = req.body.message;
+    const userEmail = req.body.email || "Unknown Client";
 
+    console.log(`💬 Neural Net Ping from ${userEmail}: "${userMessage}"`);
+
+    // ---> THIS IS WHERE YOU PLUG IN OPENAI OR GEMINI LATER <---
+    // For now, we simulate a response so the frontend terminal works perfectly.
+    
+    const aiReply = `Secure transmission received. You said: "${userMessage}". \n\nThe CODOT server is fully online and routing your connection, but the core LLM brain is currently awaiting API integration.`;
+
+    // Send the clean JSON back to the dashboard
+    res.status(200).json({ reply: aiReply });
+
+  } catch (error) {
+    console.error("❌ Terminal Error:", error);
+    res.status(500).json({ error: "Backend neural net failure." });
+  }
+});
 app.listen(port, () => {
   console.log(`🟢 CODOT Neural Net online on port ${port}`);
 });
