@@ -151,7 +151,7 @@ app.post('/api/chat', async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing or undefined in Render.");
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `
       You are the "CODOT Central Intelligence", the elite, highly advanced AI assistant for an exclusive, high-performance web development agency named CODOT. 
