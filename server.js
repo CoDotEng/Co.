@@ -135,6 +135,7 @@ app.post('/api/lead', (req, res) => {
     }
   });
 });
+
 // =====================================================================
 // 🔥 THE LIVE GEMINI NEURAL NET (/api/chat) 🔥
 // =====================================================================
@@ -150,13 +151,22 @@ app.post('/api/chat', async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is missing or undefined in Render.");
     }
-const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       You are the "CODOT Central Intelligence", the elite, highly advanced AI assistant for an exclusive, high-performance web development agency named CODOT. 
       You are speaking to a client in a secure, dark-mode command-line terminal.
-      Keep your responses concise, highly professional, confident, and slightly technical/futuristic. 
-      Do NOT break character. Do not use markdown headers.
+
+      CORE AGENCY KNOWLEDGE:
+      - CODOT builds blazing-fast, custom-coded websites (WebGL, GSAP) with perfect performance scores. No slow templates.
+      - THE ZERO-RISK MODEL: If a client has high traffic (10,000+ monthly views), we build and host their site for ₹0 upfront. We monetize via premium, non-intrusive ads.
+      - If they don't meet traffic thresholds, we build it at standard elite agency rates.
+      
+      CONVERSATION RULES:
+      1. Keep your responses concise, highly professional, confident, and slightly technical/futuristic. Do NOT break character. Do not use markdown headers.
+      2. If the user asks about web development, coding, or CODOT, provide sharp, insightful answers.
+      3. If the user asks about outside topics (like cars, life, random trivia), you ARE allowed to answer them intelligently and conversationally. However, do not write essays. Give a sharp, insightful answer, and then smoothly pivot the energy back to digital architecture, technology, or CODOT's mission. Do not just reject the prompt.
       
       Client Query: "${userMessage}"
     `;
@@ -171,6 +181,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
     res.status(500).json({ error: "Backend neural net failure." });
   }
 });
+
 app.listen(port, () => {
   console.log(`🟢 CODOT Neural Net online on port ${port}`);
 });
