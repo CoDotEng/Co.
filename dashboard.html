@@ -599,29 +599,55 @@
                     await typeWriter("Transmitting payload to CODOT neural net...", responseDiv, 10);
                     
                     try {
-                        const renderURL = 'https://co-cca6.onrender.com/api/chat';
+                        // 1. Local Simulation (Instant Replies for common terms)
+                        const keywords = {
+                            "pricing": "Our minimum engagement starts at ₹0 upfront for qualified domains.",
+                            "contact": "Reach out to our lead engineers at priority@codot.agency.",
+                            "hello": "CODOT Intelligence active. State your query.",
+                            "hi": "CODOT Intelligence active. State your query."
+                        };
                         
-                        const response = await fetch(renderURL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                message: rawInput, 
-                                email: auth.currentUser ? auth.currentUser.email : 'Guest'
-                            })
-                        });
+                        let foundLocal = false;
+                        for (let key in keywords) {
+                            if (command.includes(key)) {
+                                responseDiv.innerHTML = ''; // clear transmitting msg
+                                await typeWriter(`[LOCAL CACHE] ${keywords[key]}`, responseDiv, 15);
+                                foundLocal = true;
+                                break;
+                            }
+                        }
 
-                        const data = await response.json();
-                        
-                        if (!response.ok) throw new Error(data.error || 'Server connection failed.');
+                        // 2. Network Call (Only if no local match is found)
+                        if (!foundLocal) {
+                            const renderURL = 'https://co-cca6.onrender.com/api/chat'; // Ensure this matches exactly
+                            
+                            const response = await fetch(renderURL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ 
+                                    message: rawInput, 
+                                    email: auth.currentUser ? auth.currentUser.email : 'Guest'
+                                })
+                            });
 
-                        // STRIP MARKDOWN BACKTICKS AND EXCESS SPACE BEFORE TYPING
-                        let cleanReply = data.reply.replace(/```/g, '').trim();
-                        await typeWriter(cleanReply, responseDiv, 15);
+                            // The Safeguard: Only parse JSON if the server actually sent JSON
+                            const contentType = response.headers.get("content-type");
+                            if (contentType && contentType.indexOf("application/json") !== -1) {
+                                const data = await response.json();
+                                if (!response.ok) throw new Error(data.error || 'Server connection failed.');
+
+                                responseDiv.innerHTML = ''; // clear transmitting msg
+                                let cleanReply = data.reply.replace(/```/g, '').trim();
+                                await typeWriter(cleanReply, responseDiv, 15);
+                            } else {
+                                throw new Error("Connection unstable: Received HTML instead of JSON.");
+                            }
+                        }
                         
                     } catch (error) {
                         console.error("Terminal Error:", error);
-                        responseDiv.className = 'error-msg';
-                        await typeWriter(`ERR: ${error.message} (Is the Render server asleep?)`, responseDiv, 10);
+                        responseDiv.style.color = "var(--warning)";
+                        await typeWriter(`[SYSTEM WARNING] Connection to neural net timed out or failed. Offline mode active. Please email support directly.`, responseDiv, 15);
                     } finally {
                         terminalInput.disabled = false;
                         terminalInput.focus();
