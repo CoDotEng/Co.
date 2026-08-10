@@ -4,7 +4,7 @@ import multer from 'multer';
 import { Readable } from 'stream';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
-
+import { GoogleGenerativeAI } from '@google/generative-ai';
 dotenv.config();
 
 const app = express();
@@ -136,25 +136,39 @@ app.post('/api/lead', (req, res) => {
   });
 });
 // =====================================================================
-// 🔥 THE AI TERMINAL ENGINE (/api/chat) 🔥
+// 🔥 THE LIVE GEMINI NEURAL NET (/api/chat) 🔥
 // =====================================================================
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
     const userEmail = req.body.email || "Unknown Client";
 
-    console.log(`💬 Neural Net Ping from ${userEmail}: "${userMessage}"`);
+    console.log(`🧠 Processing Neural Net Ping from ${userEmail}: "${userMessage}"`);
 
-    // ---> THIS IS WHERE YOU PLUG IN OPENAI OR GEMINI LATER <---
-    // For now, we simulate a response so the frontend terminal works perfectly.
-    
-    const aiReply = `Secure transmission received. You said: "${userMessage}". \n\nThe CODOT server is fully online and routing your connection, but the core LLM brain is currently awaiting API integration.`;
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is missing or undefined in Render.");
+    }
 
-    // Send the clean JSON back to the dashboard
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+      You are the "CODOT Central Intelligence", the elite, highly advanced AI assistant for an exclusive, high-performance web development agency named CODOT. 
+      You are speaking to a client in a secure, dark-mode command-line terminal.
+      Keep your responses concise, highly professional, confident, and slightly technical/futuristic. 
+      Do NOT break character. Do not use markdown headers.
+      
+      Client Query: "${userMessage}"
+    `;
+
+    const result = await model.generateContent(prompt);
+    const aiReply = result.response.text();
+
     res.status(200).json({ reply: aiReply });
 
   } catch (error) {
-    console.error("❌ Terminal Error:", error);
+    console.error("❌ Terminal API Error:", error);
     res.status(500).json({ error: "Backend neural net failure." });
   }
 });
