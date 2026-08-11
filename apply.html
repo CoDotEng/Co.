@@ -423,7 +423,10 @@
                 
                 if (authLoader) authLoader.style.display = "none";
                 
-                if (pendingCount >= 2) {
+                if (authLoader) authLoader.style.display = "none";
+                
+                // 🔥 GOD-MODE BYPASS FOR ADMIN EMAIL
+                if (pendingCount >= 2 && currentUserEmail !== "ayiraditya09@gmail.com") {
                     // System Lockout
                     if (formWrapper) {
                         formWrapper.style.display = "block";
