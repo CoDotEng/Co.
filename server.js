@@ -268,14 +268,19 @@ app.post('/api/audit', async (req, res) => {
 // 🔥 THE 14-DAY RETENTION LOOP (GMAIL NODE-CRON) 🔥
 // =====================================================================
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Forces SSL to bypass standard port blocks
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false // Prevents cloud SSL certificate clashes
   }
 });
 
-// Runs every day at 9:00 AM server time
+// Runs every minute for testing mode
 cron.schedule('* * * * *', async () => {
   if (!db || !process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
     console.log("⚠️ Skipping Retention Loop: Firebase Admin or Gmail keys missing.");
@@ -293,7 +298,8 @@ cron.schedule('* * * * *', async () => {
     }
 
     const now = new Date();
-    const FOURTEEN_DAYS_MS =0;
+    // 0 millisecond delay for rapid-fire testing
+    const FOURTEEN_DAYS_MS = 0;
 
     snapshot.forEach(async (doc) => {
       const data = doc.data();
@@ -302,7 +308,7 @@ cron.schedule('* * * * *', async () => {
       const dateAdded = data.dateAdded.toDate();
       const timeSinceAdded = now.getTime() - dateAdded.getTime();
 
-      // If 14 days have passed
+      // If test delay has passed (instantly)
       if (timeSinceAdded >= FOURTEEN_DAYS_MS) {
         const promoCode = 'CODOT-VIP-' + Math.random().toString(36).substring(2, 6).toUpperCase();
         
