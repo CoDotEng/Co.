@@ -6,13 +6,13 @@ import { google } from 'googleapis';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import admin from 'firebase-admin';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import cron from 'node-cron';
 
 dotenv.config();
 
 // =====================================================================
-// 🔥 1. INITIALIZE FIREBASE ADMIN & RESEND EMAIL CANNON
+// 🔥 1. INITIALIZE FIREBASE ADMIN
 // =====================================================================
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
@@ -29,7 +29,6 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 }
 
 const db = admin.apps.length ? admin.firestore() : null;
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -45,7 +44,6 @@ const uploadOptions = multer({
     files: 4 // Max 4 files
   },
   fileFilter: (req, file, cb) => {
-    // Optional: Block dangerous files like .exe or .sh
     const forbiddenMimes = ['application/x-msdownload', 'application/x-sh'];
     if (forbiddenMimes.includes(file.mimetype)) {
       return cb(new Error("Executable payloads are restricted."));
@@ -54,7 +52,6 @@ const uploadOptions = multer({
   }
 });
 
-// Middleware to catch upload errors gracefully without crashing the server
 const uploadMiddleware = uploadOptions.array('projectFile', 4);
 
 // The OAuth2 Engine
@@ -73,7 +70,6 @@ const MASTER_FOLDER_ID = process.env.DRIVE_MASTER_FOLDER_ID;
 
 app.post('/api/lead', (req, res) => {
   uploadMiddleware(req, res, async (err) => {
-    // 🛡️ SECURITY CATCH: If they try to bypass the frontend limits, the server drops it here
     if (err instanceof multer.MulterError) {
       console.error("❌ Payload rejected: Size or count limit exceeded.");
       return res.status(400).json({ success: false, error: "Limit exceeded: Max 4 files, 15MB each." });
@@ -192,7 +188,7 @@ app.post('/api/chat', async (req, res) => {
       throw new Error("GEMINI_API_KEY is missing or undefined in Render.");
     }
     
-    const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       You are the "CODOT Central Intelligence", the elite, highly advanced AI assistant for an exclusive, high-performance web development agency named CODOT. 
@@ -223,12 +219,66 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // =====================================================================
-// 🔥 THE 14-DAY RETENTION LOOP (CRON JOB) 🔥
+// 🔥 THE LIVE LIGHTHOUSE AUDIT ROUTE (/api/audit) 🔥
 // =====================================================================
+app.post('/api/audit', async (req, res) => {
+  try {
+    let targetUrl = req.body.url;
+    if (!targetUrl) {
+      return res.status(400).json({ error: "Missing target URL for telemetry." });
+    }
+
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
+    console.log(`🔍 Running Lighthouse telemetry on: ${targetUrl}`);
+
+    const apiEndpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(targetUrl)}&strategy=mobile`;
+    
+    const response = await fetch(apiEndpoint);
+    const data = await response.json();
+
+    if (!response.ok || !data.lighthouseResult) {
+      throw new Error("Telemetry acquisition failed. Invalid domain or target unreachable.");
+    }
+
+    const categories = data.lighthouseResult.categories;
+    const performance = Math.round((categories.performance?.score || 0) * 100);
+    const accessibility = Math.round((categories.accessibility?.score || 0) * 100);
+    const bestPractices = Math.round((categories['best-practices']?.score || 0) * 100);
+    const seo = Math.round((categories.seo?.score || 0) * 100);
+
+    const auditSummary = `TELEMETRY REPORT FOR: ${targetUrl}\n` +
+                         `- Performance Score: ${performance}/100\n` +
+                         `- Accessibility: ${accessibility}/100\n` +
+                         `- Best Practices: ${bestPractices}/100\n` +
+                         `- SEO Metadata: ${seo}/100\n\n` +
+                         `Analysis complete. Architecture grade: ${performance >= 90 ? 'ELITE (100/100 tier)' : 'OPTIMIZATION RECOMMENDED'}`;
+
+    res.status(200).json({ reply: auditSummary });
+
+  } catch (error) {
+    console.error("❌ Audit Error:", error);
+    res.status(500).json({ error: error.message || "Telemetry scan failed." });
+  }
+});
+
+// =====================================================================
+// 🔥 THE 14-DAY RETENTION LOOP (GMAIL NODE-CRON) 🔥
+// =====================================================================
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD
+  }
+});
+
 // Runs every day at 9:00 AM server time
 cron.schedule('0 9 * * *', async () => {
-  if (!db || !process.env.RESEND_API_KEY) {
-    console.log("⚠️ Skipping Retention Loop: Firebase Admin or Resend Key missing.");
+  if (!db || !process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.log("⚠️ Skipping Retention Loop: Firebase Admin or Gmail keys missing.");
     return;
   }
 
@@ -254,37 +304,35 @@ cron.schedule('0 9 * * *', async () => {
 
       // If 14 days have passed
       if (timeSinceAdded >= FOURTEEN_DAYS_MS) {
-        // Generate a random dynamic code
         const promoCode = 'CODOT-VIP-' + Math.random().toString(36).substring(2, 6).toUpperCase();
         
         console.log(`📧 Firing retention email to ${data.email} with code ${promoCode}`);
 
-        try {
-          await resend.emails.send({
-            from: 'CODOT Agency <hello@yourdomain.com>', 
-            to: data.email,
-            subject: 'Your Exclusive CODOT Architecture Code',
-            html: `
-              <div style="font-family: Arial, sans-serif; background-color: #030303; color: #ffffff; padding: 40px; border-top: 4px solid #00e5ff;">
-                <h2 style="color: #ffffff; margin-bottom: 20px;">CODOT.</h2>
-                <p style="color: #cccccc;">Incoming transmission for ${data.name},</p>
-                <p style="color: #cccccc; line-height: 1.6;">It has been exactly two weeks since you accessed the CODOT terminal. Our engineering team has authorized a single-use architecture deployment code specifically for your project.</p>
-                <p style="color: #cccccc; line-height: 1.6;">Use the secure code below within the next 48 hours to bypass standard setup fees on your custom WebGL infrastructure.</p>
-                
-                <div style="background-color: #111111; padding: 15px; margin: 30px 0; border: 1px solid #333333; text-align: center;">
-                  <span style="font-family: monospace; color: #00e5ff; font-size: 24px; font-weight: bold; letter-spacing: 2px;">${promoCode}</span>
-                </div>
-                
-                <p style="color: #cccccc;">Initialize your build in the <a href="https://yourwebsite.com/buyout.html" style="color: #00e5ff; text-decoration: none;">CODOT Buyout Portal</a>.</p>
-                <p style="color: #777777; font-size: 12px; margin-top: 40px;">// SYSTEM OFFLINE <br> Aditya, Lead Engineer @ CODOT</p>
+        const mailOptions = {
+          from: `"CODOT Agency" <${process.env.GMAIL_USER}>`,
+          to: data.email,
+          subject: 'Your Exclusive CODOT Architecture Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; background-color: #030303; color: #ffffff; padding: 40px; border-top: 4px solid #00e5ff;">
+              <h2 style="color: #ffffff; margin-bottom: 20px;">CODOT.</h2>
+              <p style="color: #cccccc;">Incoming transmission for ${data.name},</p>
+              <p style="color: #cccccc; line-height: 1.6;">It has been exactly two weeks since you accessed the CODOT terminal. Our engineering team has authorized a single-use architecture deployment code specifically for your project.</p>
+              <p style="color: #cccccc; line-height: 1.6;">Use the secure code below within the next 48 hours to bypass standard setup fees on your custom WebGL infrastructure.</p>
+              
+              <div style="background-color: #111111; padding: 15px; margin: 30px 0; border: 1px solid #333333; text-align: center;">
+                <span style="font-family: monospace; color: #00e5ff; font-size: 24px; font-weight: bold; letter-spacing: 2px;">${promoCode}</span>
               </div>
-            `
-          });
+              
+              <p style="color: #cccccc;">Initialize your build in the <a href="https://yourwebsite.com/buyout.html" style="color: #00e5ff; text-decoration: none;">CODOT Buyout Portal</a>.</p>
+              <p style="color: #777777; font-size: 12px; margin-top: 40px;">// SYSTEM OFFLINE <br> Aditya, Lead Engineer @ CODOT</p>
+            </div>
+          `
+        };
 
-          // Mark as sent so we don't spam them again
+        try {
+          await transporter.sendMail(mailOptions);
           await db.collection('subscribers').doc(doc.id).update({ followUpSent: true });
           console.log(`✅ Successfully sent and updated ${data.email}`);
-          
         } catch (emailError) {
           console.error(`❌ Failed to send email to ${data.email}:`, emailError);
         }
