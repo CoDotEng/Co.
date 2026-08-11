@@ -399,7 +399,8 @@
                 return;
             }
             
-            currentUserEmail = user.email;
+            // 🔥 Bulletproof cleaner to prevent case-sensitivity ghosting
+            currentUserEmail = user.email.toLowerCase().trim();
             if (emailField) { emailField.value = currentUserEmail; }
 
             try {
@@ -423,10 +424,10 @@
                 
                 if (authLoader) authLoader.style.display = "none";
                 
-                if (authLoader) authLoader.style.display = "none";
-                
-                // 🔥 GOD-MODE BYPASS FOR ADMIN EMAIL
-                if (pendingCount >= 2 && currentUserEmail !== "ayiraditya09@gmail.com") {
+                // 🔥 BULLETPROOF GOD-MODE BYPASS 
+                const isAdmin = (currentUserEmail === "ayiraditya09@gmail.com");
+
+                if (pendingCount >= 2 && !isAdmin) {
                     // System Lockout
                     if (formWrapper) {
                         formWrapper.style.display = "block";
@@ -439,7 +440,7 @@
                         `;
                     }
                 } else {
-                    // Passed security check
+                    // Passed security check (or Admin Bypass triggered)
                     if (formWrapper) formWrapper.style.display = "block";
                 }
             } catch (error) {
