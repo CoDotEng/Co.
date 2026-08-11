@@ -276,7 +276,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Runs every day at 9:00 AM server time
-cron.schedule('0 9 * * *', async () => {
+cron.schedule('* * * * *', async () => {
   if (!db || !process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
     console.log("⚠️ Skipping Retention Loop: Firebase Admin or Gmail keys missing.");
     return;
@@ -293,7 +293,7 @@ cron.schedule('0 9 * * *', async () => {
     }
 
     const now = new Date();
-    const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+    const FOURTEEN_DAYS_MS =0;
 
     snapshot.forEach(async (doc) => {
       const data = doc.data();
