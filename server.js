@@ -5,7 +5,31 @@ import { Readable } from 'stream';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import admin from 'firebase-admin';
+import { Resend } from 'resend';
+import cron from 'node-cron';
+
 dotenv.config();
+
+// =====================================================================
+// 🔥 1. INITIALIZE FIREBASE ADMIN & RESEND EMAIL CANNON
+// =====================================================================
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("🟢 Firebase Admin God-Mode initialized.");
+  } catch (error) {
+    console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT. Ensure it's valid JSON.", error);
+  }
+} else {
+  console.warn("⚠️ FIREBASE_SERVICE_ACCOUNT missing. Automated retention loop is disabled.");
+}
+
+const db = admin.apps.length ? admin.firestore() : null;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -127,6 +151,22 @@ app.post('/api/lead', (req, res) => {
         });
       }
 
+      // 4. Save to Firestore for the Retention Loop
+      if (db) {
+        try {
+          await db.collection('subscribers').add({
+            name: clientName,
+            email: clientEmail,
+            projectType: projectType,
+            dateAdded: admin.firestore.FieldValue.serverTimestamp(),
+            followUpSent: false
+          });
+          console.log(`✅ Lead added to Retention Database: ${clientEmail}`);
+        } catch (dbError) {
+          console.error("❌ Failed to save lead to database:", dbError);
+        }
+      }
+
       res.status(200).json({ success: true, folderUrl: newFolderLink });
 
     } catch (error) {
@@ -151,7 +191,8 @@ app.post('/api/chat', async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is missing or undefined in Render.");
     }
-const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+    
+    const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" }); 
 
     const prompt = `
       You are the "CODOT Central Intelligence", the elite, highly advanced AI assistant for an exclusive, high-performance web development agency named CODOT. 
@@ -178,6 +219,80 @@ const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
   } catch (error) {
     console.error("❌ Terminal API Error:", error);
     res.status(500).json({ error: "Backend neural net failure." });
+  }
+});
+
+// =====================================================================
+// 🔥 THE 14-DAY RETENTION LOOP (CRON JOB) 🔥
+// =====================================================================
+// Runs every day at 9:00 AM server time
+cron.schedule('0 9 * * *', async () => {
+  if (!db || !process.env.RESEND_API_KEY) {
+    console.log("⚠️ Skipping Retention Loop: Firebase Admin or Resend Key missing.");
+    return;
+  }
+
+  console.log("⏰ Running Daily 14-Day Retention Check...");
+  
+  try {
+    const snapshot = await db.collection('subscribers').where('followUpSent', '==', false).get();
+    
+    if (snapshot.empty) {
+      console.log("No pending follow-ups today.");
+      return;
+    }
+
+    const now = new Date();
+    const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+
+    snapshot.forEach(async (doc) => {
+      const data = doc.data();
+      if (!data.dateAdded) return;
+      
+      const dateAdded = data.dateAdded.toDate();
+      const timeSinceAdded = now.getTime() - dateAdded.getTime();
+
+      // If 14 days have passed
+      if (timeSinceAdded >= FOURTEEN_DAYS_MS) {
+        // Generate a random dynamic code
+        const promoCode = 'CODOT-VIP-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        
+        console.log(`📧 Firing retention email to ${data.email} with code ${promoCode}`);
+
+        try {
+          await resend.emails.send({
+            from: 'CODOT Agency <hello@yourdomain.com>', 
+            to: data.email,
+            subject: 'Your Exclusive CODOT Architecture Code',
+            html: `
+              <div style="font-family: Arial, sans-serif; background-color: #030303; color: #ffffff; padding: 40px; border-top: 4px solid #00e5ff;">
+                <h2 style="color: #ffffff; margin-bottom: 20px;">CODOT.</h2>
+                <p style="color: #cccccc;">Incoming transmission for ${data.name},</p>
+                <p style="color: #cccccc; line-height: 1.6;">It has been exactly two weeks since you accessed the CODOT terminal. Our engineering team has authorized a single-use architecture deployment code specifically for your project.</p>
+                <p style="color: #cccccc; line-height: 1.6;">Use the secure code below within the next 48 hours to bypass standard setup fees on your custom WebGL infrastructure.</p>
+                
+                <div style="background-color: #111111; padding: 15px; margin: 30px 0; border: 1px solid #333333; text-align: center;">
+                  <span style="font-family: monospace; color: #00e5ff; font-size: 24px; font-weight: bold; letter-spacing: 2px;">${promoCode}</span>
+                </div>
+                
+                <p style="color: #cccccc;">Initialize your build in the <a href="https://yourwebsite.com/buyout.html" style="color: #00e5ff; text-decoration: none;">CODOT Buyout Portal</a>.</p>
+                <p style="color: #777777; font-size: 12px; margin-top: 40px;">// SYSTEM OFFLINE <br> Aditya, Lead Engineer @ CODOT</p>
+              </div>
+            `
+          });
+
+          // Mark as sent so we don't spam them again
+          await db.collection('subscribers').doc(doc.id).update({ followUpSent: true });
+          console.log(`✅ Successfully sent and updated ${data.email}`);
+          
+        } catch (emailError) {
+          console.error(`❌ Failed to send email to ${data.email}:`, emailError);
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Cron Job Error:", error);
   }
 });
 
